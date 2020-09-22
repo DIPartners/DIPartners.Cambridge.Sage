@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Invoice Metadata Details</title>
+    
+    <!-- To avoid display Date/Telephone number as hyperlink in edge browser. -->
+    <meta name="format-detection" content="telephone=no,date=no" />
+    <!-- Styles --> 
+    <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css" />
+    <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery.ui.1.10.0.ie.css" />    
+    <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/demo.css" />
+    
+    <!-- CSS for layout and style -->
+    <link rel="Stylesheet" type="text/css" href="UIControlLibrary/uicontrollibrary-new.css" />
+    <!-- CSS to allow overriding layout and style. -->
+    <link rel="Stylesheet" type="text/css" href="UIControlLibrary/uicontrollibrary-new_branding.css" />
+    <!-- CSS for Tabs -->
+    <link rel="Stylesheet" type="text/css" href="style.css" />
+
+	<!-- JavaScript -->
+	<script type="text/javascript" src="UIControlLibrary/jquery-ui-1.10.0.custom/js/jquery-1.9.0.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/jquery-ui-1.10.0.custom/js/jquery-ui-1.10.0.custom.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/jquery.timeentry-1.5.0-1/jquery.timeentry.m-files.js"></script>
+	
+    <script src="console-dashboard.js"></script>
+	<!-- Patch the jQuery UI Button widget against script injection. -->
+  	<script type="text/javascript" src="UIControlLibrary/jQuery.ui.button.safe.1.10.0.js"></script>
+    <!-- UI Control Library -->
+<!--
+	<script type="text/javascript" src="UIControlLibrary/basecontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/booleancontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/datecontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/dynamiccontrolcontainer.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/labelcontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/lookupcontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/metadatacard.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/multiselectlookupcontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/numbercontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/textcontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/timecontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/timestampcontrol.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/vaultoperations.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/utilities.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/main.js"></script>
+-->
+	<script type="text/javascript" src="UIControlLibrary/configurationhelper.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/propertygrouping.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/configurationmanager.js"></script>
+
+	<script type="text/javascript" src="UIControlLibrary/metadatacard.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/utilities.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/editmanager.js"></script>
+	<script type="text/javascript" src="UIControlLibrary/localization.js"></script>
+    <script src="UIControlLibrary/jquery-resizable-dom/jquery-resizable.min.js"></script>
+    <script src="APInvoice.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Tab initialization
+            $('#tabs').tabs({
+                activate: function (event, ui) {
+                    var tabID = ui.newPanel[0].id;
+                }
+            });
+            $(".panel-left").resizableSafe({
+                handleSelector: ".splitter",
+                resizeHeight: false
+            });
+            //$("#potab").hide();
+            //$("#pstab").hide();
+        });
+        // Apply left-to-right layout.
+        $( "html" ).attr( "dir", "ltr" );
+        $( "html" ).addClass( "mf-ltr" );
+    </script>
+</head>
+<body style="zoom: 1;">
+    <div class="page-container">
+        <label>Invoice Details:  <span id="message_placeholder"></span></label>
+        <div class="panel-container">
+            <div class="panel-left">
+                <div id="tabs">
+                    <p>test----app</p>
+                    <ul>
+<!--
+                        <li><a href="#IN">Invoice</a></li>
+-->
+                    </ul>
+<!--
+                    <div id="IN">
+                        <div id="metadatacard-0" class="mf-metadatacard mf-mode-properties"></div>
+                    </div>
+-->
+                </div>
+            </div>
+            <div class="splitter"></div>
+            <div class="panel-right">
+            </div>
+        </div>
+    </div>
+    <!-- Footer begins -->
+    <div class="eclip" id="mf-footer"><!-- 3rd area footer -->
+ <!--
+		
+	    <div id="mf-newobject-controls">
+			
+		    <div id="mf-useasdefaults">
+			    <input type="checkbox" id="mf-useasdefaults-checkbox" /><label for="mf-useasdefaults-checkbox" id="mf-useasdefaults-label"></label>
+			</div>
+
+			<div id="mf-openforedit">				
+			    <input type="checkbox" id="mf-openforedit-checkbox" /><label for="mf-openforedit-checkbox" id="mf-openforedit-label"></label>
+			</div>
+
+			<div id="mf-checkinimmediately">
+			    <input type="checkbox" id="mf-checkinimmediately-checkbox" /><label for="mf-checkinimmediately-checkbox" id="mf-checkinimmediately-label"></label>
+			</div>
+
+		</div>
+-->
+	    <div id="mf-buttons">
+				
+		    <!-- For testing -->
+            <!-- 
+            <span id="mf-searchhits" class="mf-hits"></span>
+            -->
+
+<!-- 
+		    <button class="mf-skip-button ui-button-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" type="button"><span class="ui-button-text"></span></button>
+-->
+		    <button class="mf-save-button ui-button-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" type="button"><span class="ui-button-text"></span></button>
+<!-- 
+		    <button class="mf-saveall-button ui-button-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" type="button"><span class="ui-button-text"></span></button>
+-->
+		    <button class="mf-discard-button ui-button-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" type="button"><span class="ui-button-text"></span></button>
+
+		    <!-- For testing -->
+		    <!-- 
+		    <button aria-disabled="false" id="mf-refresh-button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" type="button"><span class="ui-button-text">Refresh</span></button>
+		    <button aria-disabled="false" id="mf-export-button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ui-state-hover ui-state-focus" role="button" type="button"><span class="ui-button-text">Export data</span></button>
+            -->
+                
+        </div>		        
+			
+	</div>
+</body>
+</html>

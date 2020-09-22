@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="http://www.m-files.com/schemas/appdef-client-v3.xsd">
+	<guid>A21E4863-3576-46B0-8D85-9531686C6245</guid>
+	<name>DIPartners.Cambridge.Sage</name>
+	<version>0.1</version>
+	<description></description>
+	<publisher></publisher>	
+	<copyright></copyright>
+	<required-mfiles-version>20.8.9339.5</required-mfiles-version>
+	<optional>true</optional>
+	<enabled-by-default>true</enabled-by-default>
+  <platforms>
+    <platform>Desktop</platform>
+  </platforms>
+	<modules>
+		<module environment="shellui">
+			<file>console-shellui.js</file>
+			<file>shellui.js</file>
+		</module>
+	</modules>
+	<dashboards>
+		<dashboard id="APInvoice">
+			<content>APInvoice/APInvoice.html</content>
+			<allow-selection>true</allow-selection>
+		</dashboard>
+	</dashboards>
+</application>
