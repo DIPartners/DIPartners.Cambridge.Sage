@@ -1,0 +1,4 @@
+table.mf-dynamic-table tr.mf-editable.ui-state-hover {
+    cursor: auto !important;
+    background-color: #e5f3ff;
+}

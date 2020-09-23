@@ -19,8 +19,10 @@ function SetDetails(dashboard)
 {
     var Vault=dashboard.Vault;
     var controller=dashboard.CustomData;
-    controller.Vault=Vault;
+    controller.Vault = Vault;
+   
 //console.log(controller.ObjectVersion);
+ 
     // Apply vertical layout.
     $( "body" ).addClass( "mf-layout-vertical" );
     // Show some information of the document.
@@ -317,7 +319,7 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias)
 	if (propertyType==3)
 		propertyValue='$'+propertyValue;
     // Create container element
-	var propertyLine=$('<tr>');
+    var propertyLine = $('<tr>');
 	propertyLine.addClass('mf-dynamic-row mf-property-'+propertyNumber);
     propertyLine.attr('id',propertyNumber)
     // Check if field is editable. If it is, add class 'mf-editable'
@@ -329,7 +331,6 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias)
 	// Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
 	propertyLine.hover(
 		function() {
-
 			// Set the hover theme. The special theme is set for workflow and workstates properties.
 			$( this ).addClass( "ui-state-hover" );
 			if( propertyNumber == 38 || propertyNumber == 99 )
@@ -351,8 +352,7 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias)
         '                <span class="mf-required-indicator">*</span>' +
         '            </div>' +
         '        </td>' +
-        '        <td class="mf-modify">&nbsp;</td>' +
-        '        <td class="mf-dynamic-controlfield">' +
+        '        <td colspan="2" class="mf-dynamic-controlfield">' +
         '            <div class="mf-control mf-dynamic-control mf-text">' +
         '                <div class="mf-internal-container">' +
         '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' +
