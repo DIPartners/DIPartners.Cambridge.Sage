@@ -76,9 +76,10 @@
 			this.switchingToViewMode = false;
 			
 			// Bind click event to this element with 'metadatacard' namespace.
-			this.element.bind( "click.metadatacard", function( event ) {
+// KHJ
+			/*this.element.bind("click.metadatacard", function (event) {
 				self.editManager.requestEditMode( null );
-			} );
+			} );*/
 
 			// When control has completed change to edit-mode, isBusy flag is set to false.
 			this.element.bind( "completed.metadatacard", function( event ) {

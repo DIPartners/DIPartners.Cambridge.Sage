@@ -582,7 +582,7 @@ html.mf-rtl .mf-permissions { margin: .2em 50px .2em  1em; }
 .mf-workflow-icon { position:absolute; z-index:2; background:transparent url('images/workflow.png') no-repeat center center; display:inline-block; width:40px; height:100%; }
 html.mf-ltr .mf-workflow-icon { right: 0em; }
 html.mf-rtl .mf-workflow-icon { left:  0em; }
-.mf-property-footer table.mf-dynamic-table { }
+.mf-property-footer table.mf-dynamic-table { padding-left: 0em; padding-right: 0em;}
 .mf-property-footer table.mf-dynamic-table tr { background:#fafafa; }
 .mf-property-footer table.mf-dynamic-table tr.ui-state-hover.ui-footer-hover { background: #e5f3ff; }
 .mf-property-footer table.mf-dynamic-table td { display:none;}
