@@ -124,22 +124,24 @@ function SetInvoiceDetails(controller) {
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
-            TableBody.append(
+            var htmlStr =
                 '<tr>' +
-                '<td>' +
-                '<INPUT type="checkbox" style="float:left;width:20%;padding:0px;" onclick=deleteRow("invoice_details_table") name="chk"/></td>' +
-                '<td><span id = "ItemNumber"> <input type="text" placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
-                '<td><span id="Quantity"><input type="text" name="Quantity[]" placeholder="' + Qty + '" value="' + Qty + '"></span></td>' +
-                '<td><span id="UnitPrice"><input type="text" name="UnitPrice[]" placeholder="' + Price + '" value="' + Price + '"></span></td>' +
-                '<td><span id="Extension"><input type="text" name="Extension[]" placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
-                "</tr>"
-            );
+                '   <td style="width:5%;padding:0px;">' +
+                '       <INPUT type="checkbox" onclick=deleteRow("invoice_details_table") name="chk"/></td>' +
+                '   <td><span id = "ItemNumber"> <input type="text" placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
+                '   <td><span id=\'Quantity\'><input type="text" name=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
+                '       onkeyup="store3(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\', \'invoice_details_table\')"></span ></td > ' +
+                '   <td><span id=\'UnitPrice\'><input type="text" name=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
+                '       onkeyup="store3(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\', \'invoice_details_table\')" ></span ></td > ' +
+                '   <td><span id=\'Extension\'><input type="text" name=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
+                "</tr>";
+            TableBody.append(htmlStr);
         }
         TableBody.append(
             '<tr>' +
             '<td colspan="4" style="border-bottom: none;border-left: none;">' +
-            '<a id="addRow" href="#" style="text-decoration:none" onclick=addRow("invoice_details_table");>+</a></td > ' +
-            '<td><input type="text" name="ITotal[]" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
+            '<a id="addRow" href="#" style="text-decoration:none" onclick=addRowToTable("invoice_details_table");>+</a></td > ' +
+            '<td><input type="text" name="ITotal" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
             '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
             '</tr>'
         );
