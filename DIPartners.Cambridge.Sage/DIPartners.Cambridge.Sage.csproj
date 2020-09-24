@@ -92,6 +92,7 @@
     <Content Include="app\APInvoice\UIControlLibrary\uicontrollibrary-new.css" />
     <Content Include="app\APInvoice\UIControlLibrary\uicontrollibrary-new_branding.css" />
     <Content Include="app\APInvoice\UIControlLibrary\utilities.js" />
+    <Content Include="app\APInvoice\Util.js" />
     <Content Include="app\appdef.xml">
       <SubType>Designer</SubType>
     </Content>
