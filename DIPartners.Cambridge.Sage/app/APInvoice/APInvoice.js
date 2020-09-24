@@ -126,7 +126,10 @@ function SetInvoiceDetails(controller) {
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
             TableBody.append(
                 '<tr>' +
-                '<td><span id="ItemNumber"><input type="text" placeholder="' + Item + '" value="' + Item + '"></span></td>' +
+                '<td>' +
+                '<div style="float:left;width:5%;">' +
+                '<a id="addRow" href="#" style="text-decoration:none" onclick=deleteRow("invoice_details_table");>-</a></div > ' +
+                '<div style="float:right;width:95%;><span id="ItemNumber"><input type="text" placeholder="' + Item + '" value="' + Item + '"></div></span></td > ' +
                 '<td><span id="Qu antity"><input type="text" name="Quantity[]" placeholder="' + Qty + '" value="' + Qty + '"></span></td>' +
                 '<td><span id="UnitPrice"><input type="text" name="UnitPrice[]" placeholder="' + Price + '" value="' + Price + '"></span></td>' +
                 '<td><span id="Extension"><input type="text" name="Extension[]" placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
@@ -137,7 +140,6 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '<td colspan="3" style="border-bottom: none;border-left: none;">' +
             '<a id="addRow" href="#" style="text-decoration:none" onclick=addRow("invoice_details_table");>+</a></td > ' +
-            /* '<td style="text-align:right">$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +*/
             '<td><input type="text" name="ITotal[]" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
             '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
             '</tr>'
