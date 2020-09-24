@@ -111,7 +111,7 @@ function SetInvoiceDetails(controller)
     {
         editor.table.append(
             '<tr><td colspan="4" align="center">' +
-            '    <table id="invoice_details_table" class="details">' +
+            '    <table width="90%" id="invoice_details_table" class="details">' +
             '        <tr><th width="25%">Item</th><th width="25%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
             '    </table>' +
             '</td></tr>' +
@@ -352,14 +352,13 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias)
         '                <span class="mf-required-indicator">*</span>' +
         '            </div>' +
         '        </td>' +
-        '        <td colspan="2" class="mf-dynamic-controlfield">' +
+        '        <td colspan="3" class="mf-dynamic-controlfield">' +
         '            <div class="mf-control mf-dynamic-control mf-text">' +
         '                <div class="mf-internal-container">' +
         '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' +
         '                </div>' +
         '            </div>' +
-        '        </td>' +
-        '        <td class="mf-dynamic-lastfield"></td>'
+        '        </td>' 
     );
     if (!propertyRequired)
         requiredspan=propertyLine.find('.mf-required-indicator').hide();
@@ -482,7 +481,7 @@ function CreateMetadataCard(controller,editor,tabid,tabtitle)
 
 	// Bind click event to this element with 'metadatacard' namespace.
 	MetaCard.bind( "click.metadatacard", function( event ) {
-alert("Card Clicked!!!");
+//alert("Card Clicked!!!");
 //		self.editManager.requestEditMode( null );
 	} );
 
