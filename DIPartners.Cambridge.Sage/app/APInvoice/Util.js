@@ -32,7 +32,22 @@ function addRow(tableID) {
 		newcell.innerHTML = table.rows[1].cells[i].innerHTML;
 
 		//alert(newcell.childNodes);
-		if (newcell.childNodes[0].childNodes[0].type == "text") {
+		switch (newcell.childNodes[0].type) {
+			case "text":
+				newcell.childNodes[0].value = "";
+				break;
+			case "checkbox":
+				newcell.childNodes[0].checked = false;
+				break;
+			case undefined:
+				if (newcell.childNodes[0].childNodes[0].type == undefined && newcell.childNodes[0].id == "ItemNumber") {
+					newcell.childNodes[0].childNodes[1].defaultValue = "";
+					newcell.childNodes[0].childNodes[1].placeholder = "";
+				}
+				break
+		}
+
+		if (newcell.childNodes[0].type != "checkbox" && newcell.childNodes[0].childNodes[0].type == "text") {
 			newcell.childNodes[0].childNodes[0].value = "";
 			newcell.childNodes[0].childNodes[0].placeholder = "";
 		}

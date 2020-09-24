@@ -103,10 +103,10 @@ function SetInvoiceDetails(controller) {
     */
     if (ObjectSearchResults.Count > 0) {
         editor.table.append(
-            '<tr><td colspan="4" align="center">' +
+            '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="invoice_details_table" class="details">' +
             '       <form id=Invoice>' +
-            '           <tr><th width="25%">Item</th><th width="25%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
+            '           <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
             '       </form>' +
             '    </table>' +
             '</td></tr>' +
@@ -127,10 +127,9 @@ function SetInvoiceDetails(controller) {
             TableBody.append(
                 '<tr>' +
                 '<td>' +
-                '<div style="float:left;width:5%;">' +
-                '<a id="addRow" href="#" style="text-decoration:none" onclick=deleteRow("invoice_details_table");>-</a></div > ' +
-                '<div style="float:right;width:95%;><span id="ItemNumber"><input type="text" placeholder="' + Item + '" value="' + Item + '"></div></span></td > ' +
-                '<td><span id="Qu antity"><input type="text" name="Quantity[]" placeholder="' + Qty + '" value="' + Qty + '"></span></td>' +
+                '<INPUT type="checkbox" style="float:left;width:20%;padding:0px;" onclick=deleteRow("invoice_details_table") name="chk"/></td>' +
+                '<td><span id = "ItemNumber"> <input type="text" placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
+                '<td><span id="Quantity"><input type="text" name="Quantity[]" placeholder="' + Qty + '" value="' + Qty + '"></span></td>' +
                 '<td><span id="UnitPrice"><input type="text" name="UnitPrice[]" placeholder="' + Price + '" value="' + Price + '"></span></td>' +
                 '<td><span id="Extension"><input type="text" name="Extension[]" placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
                 "</tr>"
@@ -138,7 +137,7 @@ function SetInvoiceDetails(controller) {
         }
         TableBody.append(
             '<tr>' +
-            '<td colspan="3" style="border-bottom: none;border-left: none;">' +
+            '<td colspan="4" style="border-bottom: none;border-left: none;">' +
             '<a id="addRow" href="#" style="text-decoration:none" onclick=addRow("invoice_details_table");>+</a></td > ' +
             '<td><input type="text" name="ITotal[]" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
             '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
@@ -345,7 +344,7 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         '                <span class="mf-required-indicator">*</span>' +
         '            </div>' +
         '        </td>' +
-        '        <td colspan="3" class="mf-dynamic-controlfield">' +
+        '        <td colspan="4" class="mf-dynamic-controlfield">' +
         '            <div class="mf-control mf-dynamic-control mf-text">' +
         '                <div class="mf-internal-container">' +
         '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' +
