@@ -1,53 +1,51 @@
-﻿
-window.onkeyup = function () {
+﻿function addRowToTable(tableID) {
 
-	/*var items = document.querySelectorAll("#invoice_details_table");
-	var itemsArray = Array.prototype.slice.call(items, 0);
-	var unit, rate, total, net = 0;
-	itemsArray.forEach(function (el) {
-		unit = el.querySelector('input[name="Quantity"]').value;
-		rate = el.querySelector('input[name="UnitPrice"]').value;
-		rate = rate.substr(1);
-		total = unit * rate;
-		net += total;
-		total = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
-		el.querySelector('input[name="Extension"]').value = total;
-		el.querySelector('input[name="ITotal"]').value = net.toLocaleString('en-US', { minimumFractionDigits: 2 });
-	});*/
+	var tbl = document.getElementById(tableID);
+	var row = tbl.insertRow(lastRow - 1);
+	var lastRow = tbl.rows.length;
+	var iteration = lastRow - 2;
+
+	var cellLeft = row.insertCell(0);
+	var el = document.createElement('input');
+	el.setAttribute('type', 'checkbox');
+	el.setAttribute('id', 'chk' + iteration);
+	cellLeft.appendChild(el);
+
+	var cellRight1 = row.insertCell(1);
+	var el = document.createElement('input');
+	el.setAttribute('type', 'text');
+	el.setAttribute('id', 'ItemNumber' + iteration);
+	cellRight1.appendChild(el);
+
+	var cellRight2 = row.insertCell(2);
+	var el = document.createElement('input');
+	el.setAttribute('type', 'text');
+	el.setAttribute('id', 'Quantity' + iteration);
+	el.onkeyup = function () { Calculate('Quantity' + iteration, 'UnitPrice' + iteration, 'Extension' + iteration, tableID) }
+	cellRight2.appendChild(el);
+
+	var cellRight3 = row.insertCell(3);
+	var el = document.createElement('input');
+	el.setAttribute('type', 'text');
+	el.setAttribute('type', 'text');
+	el.setAttribute('id', 'UnitPrice' + iteration);
+	el.onkeyup = function () { Calculate('Quantity' + iteration, 'UnitPrice' + iteration, 'Extension' + iteration, tableID) }
+	cellRight3.appendChild(el);
+
+	var cellRight4 = row.insertCell(4);
+	var el = document.createElement('input');
+	el.setAttribute('type', 'text');
+	el.setAttribute('id', 'Extension' + iteration);
+	el.setAttribute("readonly", 'true');
+	cellRight4.appendChild(el);
 }
 
-function addRow(tableID) {
-
-	var table = document.getElementById(tableID);
-	var rowCount = table.rows.length;
-	var row = table.insertRow(rowCount - 1);
-	var colCount = table.rows[0].cells.length;
-
-	for (var i = 0; i < colCount; i++) {
-
-		var newcell = row.insertCell(i);
-		newcell.innerHTML = table.rows[1].cells[i].innerHTML;
-
-		switch (newcell.childNodes[0].type) {
-			case "text":
-				newcell.childNodes[0].value = "";
-				break;
-			case "checkbox":
-				newcell.childNodes[0].checked = false;
-				break;
-			case undefined:
-				if (newcell.childNodes[0].childNodes[0].type == undefined && newcell.childNodes[0].id == "ItemNumber") {
-					newcell.childNodes[0].childNodes[1].defaultValue = "";
-					newcell.childNodes[0].childNodes[1].placeholder = "";
-				}
-				break
-		}
-
-		if (newcell.childNodes[0].type != "checkbox" && newcell.childNodes[0].childNodes[0].type == "text") {
-			newcell.childNodes[0].childNodes[0].value = "";
-			newcell.childNodes[0].childNodes[0].placeholder = "";
-		}
-	}
+function Calculate(_qty, _unit, _ext) {
+	var Ext = document.getElementById(_ext);
+	var Qty = document.getElementById(_qty).value;
+	var Unit = document.getElementById(_unit).value;
+	var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
+	Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }
 
 function deleteRow(tableID) {
@@ -71,54 +69,4 @@ function deleteRow(tableID) {
 	} catch (e) {
 		alert(e);
 	}
-}
-
-function addRowToTable(tableID) {
-
-	var tbl = document.getElementById(tableID);
-	var lastRow = tbl.rows.length;
-
-	// if there's no header row in the table, then iteration = lastRow + 1
-	var iteration = lastRow;
-	var row = tbl.insertRow(lastRow - 1);
-
-	// left cell
-	var cellLeft = row.insertCell(0);
-	var textNode = document.createTextNode(iteration);
-	cellLeft.appendChild(textNode);
-
-	var cellRight = row.insertCell(1);
-	var el = document.createElement('input');
-
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'Quantity' + iteration);
-	el.setAttribute('size', '22');
-	el.onkeyup = function () { store3('Extension' + iteration, 'UnitPrice' + iteration, 'Quantity' + iteration, tableID) }
-	cellRight.appendChild(el);
-
-	var cellRight = row.insertCell(1);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'UnitPrice' + iteration);
-	el.setAttribute('size', '20');
-	el.onkeyup = function () { store3('Extension' + iteration, 'UnitPrice' + iteration, 'Quantity' + iteration, tableID) }
-	cellRight.appendChild(el);
-
-	var cellRight = row.insertCell(1);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'Extension' + iteration);
-	el.setAttribute('size', '20');
-	el.onkeyup = function () { store3('Extension' + iteration, 'UnitPrice' + iteration, 'Quantity' + iteration, tableID) }
-	cellRight.appendChild(el);
-}
-
-function store3(t1, t2, t3, tableID) {
-	var tbl = document.getElementById(tableID);
-	var rowIterator = tbl.rows.length;
-	var Ext = document.querySelector('input[name=' + t3 + ']');
-	var Qty = document.querySelector('input[name=' + t1 + ']').value;
-	var Unit = document.querySelector('input[name=' + t2 + ']').value;
-	var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
-	Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }

@@ -128,12 +128,12 @@ function SetInvoiceDetails(controller) {
                 '<tr>' +
                 '   <td style="width:5%;padding:0px;">' +
                 '       <INPUT type="checkbox" onclick=deleteRow("invoice_details_table") name="chk"/></td>' +
-                '   <td><span id = "ItemNumber"> <input type="text" placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
-                '   <td><span id=\'Quantity\'><input type="text" name=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
-                '       onkeyup="store3(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\', \'invoice_details_table\')"></span ></td > ' +
-                '   <td><span id=\'UnitPrice\'><input type="text" name=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
-                '       onkeyup="store3(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\', \'invoice_details_table\')" ></span ></td > ' +
-                '   <td><span id=\'Extension\'><input type="text" name=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
+                '   <td><span id = "ItemNumber"> <input type="text" id=\'ItemNumber\', placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
+                '   <td><span id=\'Quantity\'><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
+                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></span ></td > ' +
+                '   <td><span id=\'UnitPrice\'><input type="text" id=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
+                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ></span ></td > ' +
+                '   <td><span id=\'Extension\'><input type="text" id=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
                 "</tr>";
             TableBody.append(htmlStr);
         }
