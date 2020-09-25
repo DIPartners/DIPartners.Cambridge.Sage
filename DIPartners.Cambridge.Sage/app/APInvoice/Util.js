@@ -40,6 +40,20 @@ function Calculate(_qty, _unit, _ext) {
 	var Unit = document.getElementById(_unit).value;
 	var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
 	Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+	CalculateTotal();
+}
+
+function CalculateTotal() {
+	var tbl = document.getElementById('invoice_details_table');
+	var lastRow = tbl.rows.length - 2 // header and footer;
+	var Ext = 0;
+	for (var i = 0; i < lastRow; i++) {
+		var currency = document.getElementById('Extension' + i).value;
+		Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
+	}
+
+	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }
 
 function deleteRow(tableID) {
