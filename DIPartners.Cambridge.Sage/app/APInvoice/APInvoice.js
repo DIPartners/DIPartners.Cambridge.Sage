@@ -127,7 +127,7 @@ function SetInvoiceDetails(controller) {
             var htmlStr =
                 '<tr>' +
                 '   <td style="width:5%;padding:0px;">' +
-                '       <INPUT type="checkbox" onclick=deleteRow("invoice_details_table") name="chk"/></td>' +
+                '       <INPUT type="checkbox" onclick=removeRow(this) name="chk"/></td>' +
                 '   <td><span id = "ItemNumber"> <input type="text" id=\'ItemNumber\', placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
                 '   <td><span id=\'Quantity\'><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></span ></td > ' +

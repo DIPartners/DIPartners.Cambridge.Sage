@@ -8,6 +8,10 @@
 	var el = document.createElement('input');
 	el.setAttribute('type', 'checkbox');
 	el.setAttribute('id', 'chk' + iteration);
+	el.setAttribute('onclick', 'removeRow(this)');
+	//el.setAttribute('value', '-');
+	//el.setAttribute('onclick', 'removeRow(this)');
+	//el.innerHTML = '-';
 	cellLeft.appendChild(el);
 
 	var startCell = iteration / iteration;
@@ -44,37 +48,38 @@ function Calculate(_qty, _unit, _ext) {
 	CalculateTotal();
 }
 
-function CalculateTotal() {
+function CalculateTotal(from) {
 	var tbl = document.getElementById('invoice_details_table');
-	var lastRow = tbl.rows.length - 2 // header and footer;
+	//var lastRow = (from == 'removed') ? tbl.rows.length - 1 : tbl.rows.length - 2;	// header and footer;
+	var lastRow = tbl.rows.length - 2;	// header and footer;
 	var Ext = 0;
 	for (var i = 0; i < lastRow; i++) {
-		var currency = document.getElementById('Extension' + i).value;
-		Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
+		if (document.getElementById('Extension' + i) != undefined) {
+			var currency = document.getElementById('Extension' + i).value;
+			Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
+		}
 	}
 
 	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 	document.getElementById('subtotal').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }
 
-function deleteRow(tableID) {
-	try {
-		var table = document.getElementById(tableID);
-		var rowCount = table.rows.length;
+function removeRow(sender) {
+	$(sender).parent().parent().remove();
+	CalculateTotal();
+}
 
-		for (var i = 0; i < rowCount; i++) {
-			var row = table.rows[i];
-			var chkbox = row.cells[0].childNodes[0];
-			if (null != chkbox && true == chkbox.checked) {
-				if (rowCount <= 1) {
-					alert("Cannot delete all the rows.");
-					break;
-				}
-				table.deleteRow(i);
-				rowCount--;
-				i--;
+function removeRow_or(tableID) {
+	try {
+		var aObj = document.getElementById(tableID).getElementsByTagName('tr');
+		var i = aObj.length;
+		for (var i = 1; i < aObj.length; i++) {
+			if (aObj[i].getElementsByTagName('input')[0].checked) {
+				aObj[i].parentNode.removeChild(aObj[i]);
+				break;
 			}
 		}
+		CalculateTotal('removed');
 	} catch (e) {
 		alert(e);
 	}
