@@ -339,6 +339,20 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         }
     );
 
+
+    var sub = (propertyName == "Subtotal") ?
+        '            <div class="mf-control mf-dynamic-control mf-text">' +
+        '                <div class="mf-internal-container">' +
+        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' +
+        '<input type = "text" id = "subtotal" value = "' + propertyValue + '" disabled ></div > ' +
+        '                </div>' +
+        '            </div>' :
+        '            <div class="mf-control mf-dynamic-control mf-text">' +
+        '                <div class="mf-internal-container">' +
+        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' +
+        '                </div>' +
+        '            </div>'
+
     propertyLine.append(
         '        <td class="mf-dynamic-namefield">' +
         '            <div>' +
@@ -348,11 +362,11 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         '        </td>' +
         '        <td colspan="4" class="mf-dynamic-controlfield">' +
         '            <div class="mf-control mf-dynamic-control mf-text">' +
-        '                <div class="mf-internal-container">' +
-        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' +
+        '                <div class="mf-internal-container">' + sub +
         '                </div>' +
         '            </div>' +
         '        </td>'
+
     );
     if (!propertyRequired)
         requiredspan = propertyLine.find('.mf-required-indicator').hide();

@@ -54,6 +54,7 @@ function CalculateTotal() {
 	}
 
 	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+	document.getElementById('subtotal').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }
 
 function deleteRow(tableID) {
