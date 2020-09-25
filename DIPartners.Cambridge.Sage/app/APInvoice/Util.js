@@ -1,8 +1,7 @@
 ﻿function addRowToTable(tableID) {
-
 	var tbl = document.getElementById(tableID);
-	var row = tbl.insertRow(lastRow - 1);
 	var lastRow = tbl.rows.length;
+	var row = tbl.insertRow(lastRow - 1);
 	var iteration = lastRow - 2;
 
 	var cellLeft = row.insertCell(0);
@@ -11,33 +10,28 @@
 	el.setAttribute('id', 'chk' + iteration);
 	cellLeft.appendChild(el);
 
-	var cellRight1 = row.insertCell(1);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'ItemNumber' + iteration);
-	cellRight1.appendChild(el);
+	var startCell = iteration / iteration;
 
-	var cellRight2 = row.insertCell(2);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'Quantity' + iteration);
-	el.onkeyup = function () { Calculate('Quantity' + iteration, 'UnitPrice' + iteration, 'Extension' + iteration, tableID) }
-	cellRight2.appendChild(el);
+	for (var i = iteration; i < iteration + 4; i++) {
+		var id = "";
+		var cellRight = row.insertCell(startCell);
+		var el = document.createElement('input');
 
-	var cellRight3 = row.insertCell(3);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'text');
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'UnitPrice' + iteration);
-	el.onkeyup = function () { Calculate('Quantity' + iteration, 'UnitPrice' + iteration, 'Extension' + iteration, tableID) }
-	cellRight3.appendChild(el);
+		if (startCell == 1) id = "ItemNumber";
+		else if (startCell == 2) id = "Quantity";
+		else if (startCell == 3) id = "UnitPrice";
+		else if (startCell == 4) id = "Extension";
 
-	var cellRight4 = row.insertCell(4);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'text');
-	el.setAttribute('id', 'Extension' + iteration);
-	el.setAttribute("readonly", 'true');
-	cellRight4.appendChild(el);
+		el.setAttribute('type', 'text');
+		el.setAttribute('id', id + iteration);
+		if (startCell == 2 || startCell == 3)
+			el.onkeyup = function () { Calculate('Quantity' + iteration, 'UnitPrice' + iteration, 'Extension' + iteration, tableID) }
+		if (startCell == 4)
+			el.setAttribute("readonly", 'true');
+
+		cellRight.appendChild(el);
+		startCell++;
+	}
 }
 
 function Calculate(_qty, _unit, _ext) {
