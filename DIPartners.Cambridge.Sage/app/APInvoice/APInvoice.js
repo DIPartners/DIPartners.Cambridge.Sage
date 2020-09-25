@@ -141,7 +141,7 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '<td colspan="4" style="border-bottom: none;border-left: none;">' +
             '<a id="addRow" href="#" style="text-decoration:none" onclick=addRowToTable("invoice_details_table");>+</a></td > ' +
-            '<td><input type="text" name="ITotal" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
+            '<td><input type="text" id="Total" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
             '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
             '</tr>'
         );
