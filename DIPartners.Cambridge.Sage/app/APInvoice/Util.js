@@ -50,14 +50,13 @@ function Calculate(_qty, _unit, _ext) {
 
 function CalculateTotal(from) {
 	var tbl = document.getElementById('invoice_details_table');
-	//var lastRow = (from == 'removed') ? tbl.rows.length - 1 : tbl.rows.length - 2;	// header and footer;
-	var lastRow = tbl.rows.length - 2;	// header and footer;
+	var lastRow = tbl.rows.length - 1;	// header;
 	var Ext = 0;
-	for (var i = 0; i < lastRow; i++) {
-		if (document.getElementById('Extension' + i) != undefined) {
-			var currency = document.getElementById('Extension' + i).value;
-			Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
-		}
+	for (var i = 1; i < lastRow; i++) {
+		var tempExt = tbl.rows[i].cells[4].innerHTML;
+		tempExt = tempExt.split("\"");
+		tempExt = tempExt[tempExt.length - 2].substr(1);
+		Ext += Number(tempExt.replace(/[^0-9.-]+/g, ""));
 	}
 
 	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
@@ -67,20 +66,4 @@ function CalculateTotal(from) {
 function removeRow(sender) {
 	$(sender).parent().parent().remove();
 	CalculateTotal();
-}
-
-function removeRow_or(tableID) {
-	try {
-		var aObj = document.getElementById(tableID).getElementsByTagName('tr');
-		var i = aObj.length;
-		for (var i = 1; i < aObj.length; i++) {
-			if (aObj[i].getElementsByTagName('input')[0].checked) {
-				aObj[i].parentNode.removeChild(aObj[i]);
-				break;
-			}
-		}
-		CalculateTotal('removed');
-	} catch (e) {
-		alert(e);
-	}
 }
