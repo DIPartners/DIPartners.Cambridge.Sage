@@ -126,14 +126,14 @@ function SetInvoiceDetails(controller) {
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
             var htmlStr =
                 '<tr>' +
-                '   <td style="width:5%;padding:0px;">' +
+                '   <td>' +
                 '       <INPUT type="checkbox" onclick=removeRow(this) name="chk"/></td>' +
-                '   <td><span id = "ItemNumber"> <input type="text" id=\'ItemNumber\', placeholder="' + Item + '" value="' + Item + '"></div></span ></td > ' +
-                '   <td><span id=\'Quantity\'><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
-                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></span ></td > ' +
-                '   <td><span id=\'UnitPrice\'><input type="text" id=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
-                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ></span ></td > ' +
-                '   <td><span id=\'Extension\'><input type="text" id=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></span></td>' +
+                '   <td><input type="text" id=\'ItemNumber\', placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
+                '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
+                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></td > ' +
+                '   <td><input type="text" id=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
+                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ></td > ' +
+                '   <td><input type="text" id=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></td>' +
                 "</tr>";
             TableBody.append(htmlStr);
         }
