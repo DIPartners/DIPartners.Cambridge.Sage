@@ -1,3 +1,5 @@
+//const { error } = require("jquery");
+
 var gVault;
 var gDashboard;
 // Entry point of the dashboard.
@@ -79,8 +81,6 @@ function SetDetails(dashboard) {
     $("#tabs").tabs("option", "active", 0);
     SetPODetails(controller);
     SetPSDetails(controller);
-
-
 }
 
 function setInvoiceProperty(vault, props, pptName, no) {
@@ -94,7 +94,6 @@ function setInvoiceProperty(vault, props, pptName, no) {
 }
 
 function SaveInvoice() {
-
     var controller = gDashboard.CustomData;
     var editor = controller.Invoice;
     var Vault = controller.Vault;
@@ -119,14 +118,14 @@ function SaveInvoice() {
         propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
     }
 
-    var TOTAL = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Total", true);
-
-    var propertyValue = new MFiles.PropertyValue();
-    propertyValue.PropertyDef = TOTAL.PropertyDef;
-    propertyValue.TypedValue.SetValue(
-        TOTAL.TypedValue.DataType,
-        document.getElementById("subtotal").value);
-    propertyValues.Add(-1, propertyValue);
+    /* var TOTAL = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Total", true);
+ 
+     var propertyValue = new MFiles.PropertyValue();
+     propertyValue.PropertyDef = TOTAL.PropertyDef;
+     propertyValue.TypedValue.SetValue(
+         TOTAL.TypedValue.DataType,
+         document.getElementById("subtotal").value);
+     propertyValues.Add(-1, propertyValue);*/
 
     try {
         Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
@@ -140,6 +139,7 @@ function SaveInvoice() {
 
     alert("Update saved!!");
 }
+
 
 
 function SetInvoiceDetails(controller) {
@@ -324,6 +324,36 @@ function FindObjects(Vault, OTAlias, PDAlias, PDType, Value) {
     return oSCs;
 }
 
+function FindClassObjects(Vault, CTAlias, PDAlias, PDType, Value) {
+    // We need a few IDs based on aliases defined in the M-Files Admin tool for object types, properties, etc.
+    // Note that all these methods could be run asynchronously as well, if it seems they take a long time and block the UI.
+    var CT = Vault.ClassOperations.GetObjectTypeIDByAlias(CTAlias);
+    var PD = Vault.PropertyDefOperations.GetPropertyDefIDByAlias(PDAlias);
+
+    var oSC = new MFiles.SearchCondition();
+    var oSCs = new MFiles.SearchConditions();
+
+    // Search condition that defines the object is not marked as deleted.
+    oSC.ConditionType = MFConditionTypeEqual;
+    oSC.Expression.SetStatusValueExpression(MFStatusTypeDeleted, new MFiles.DataFunctionCall());
+    oSC.TypedValue.SetValue(MFDatatypeBoolean, false);
+    oSCs.Add(-1, oSC);
+
+    // Search condition that defines the object type 
+    oSC.ConditionType = MFConditionTypeEqual;
+    oSC.Expression.SetStatusValueExpression(MFStatusTypeObjectID, new MFiles.DataFunctionCall());
+    oSC.TypedValue.SetValue(MFDatatypeLookup, CT);
+    oSCs.Add(-1, oSC);
+
+    // Search condition that defines that the object must refer to the given object.
+    oSC.ConditionType = MFConditionTypeEqual;
+    oSC.Expression.DataPropertyValuePropertyDef = PD;
+    oSC.TypedValue.SetValue(PDType, Value);
+    oSCs.Add(-1, oSC);
+
+    return oSCs;
+}
+
 function DisplayImage(Vault, ObjectVersionProperties) {
 
     var ctrlContainer = $('div.panel-right');
@@ -406,8 +436,7 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         }
     );
 
-
-    var sub = (propertyName == "Subtotal") ?
+    var sub = (propertyName == "Subtotal--") ?
         '            <div class="mf-control mf-dynamic-control mf-text">' +
         '                <div class="mf-internal-container">' +
         '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' +

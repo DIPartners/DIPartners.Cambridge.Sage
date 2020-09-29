@@ -54,11 +54,12 @@
 function Calculate(_qty, _unit, _ext) {
 	var Ext = document.getElementById(_ext);
 	var Qty = document.getElementById(_qty).value;
+
 	var Unit = document.getElementById(_unit).value;
+	if (Unit.substring(0, 1) != "$") document.getElementById(_unit).value = '$' + Unit;
+
 	var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
 	Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
-
-	CalculateTotal();
 }
 
 function CalculateTotal() {
@@ -73,22 +74,7 @@ function CalculateTotal() {
 	}
 
 	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
-	document.getElementById('subtotal').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
-}
-
-function CalculateTotal1() {
-	var tbl = document.getElementById('invoice_details_table');
-	var lastRow = tbl.rows.length - 1;	// header;
-	var Ext = 0;
-	for (var i = 1; i < lastRow; i++) {
-		var tempExt = tbl.rows[i].cells[4].innerHTML;
-		tempExt = tempExt.split("\"");
-		tempExt = tempExt[tempExt.length - 2].substr(1);
-		Ext += Number(tempExt.replace(/[^0-9.-]+/g, ""));
-	}
-
-	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
-	document.getElementById('subtotal').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+	//document.getElementById('subtotal').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 }
 
 function removeRow(sender) {
