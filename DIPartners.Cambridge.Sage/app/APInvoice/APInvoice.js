@@ -99,16 +99,14 @@ function SaveInvoice() {
     var editor = controller.Invoice;
     var Vault = controller.Vault;
 
-
     /*140551.06
      * CAMB-SR103*/
-
-
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
     var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
     var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+    var ObjVer = editor.ObjectVersion.ObjVer;
 
     var propertyValues = new MFiles.PropertyValues();
 
@@ -119,17 +117,27 @@ function SaveInvoice() {
         propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", i));
         propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", i));
         propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
-
-        try {
-            Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults[i].ObjVer, propertyValues);
-        }
-        catch (ex) {
-            var errorText = "Exception: " + ex.message;
-            alert(errorText);
-            return;
-        }
-
     }
+
+    var TOTAL = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Total", true);
+
+    var propertyValue = new MFiles.PropertyValue();
+    propertyValue.PropertyDef = TOTAL.PropertyDef;
+    propertyValue.TypedValue.SetValue(
+        TOTAL.TypedValue.DataType,
+        document.getElementById("subtotal").value);
+    propertyValues.Add(-1, propertyValue);
+
+    try {
+        Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+        Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
+    }
+    catch (ex) {
+        var errorText = "Exception: " + ex.message;
+        alert(errorText);
+        return;
+    }
+
     alert("Update saved!!");
 }
 
