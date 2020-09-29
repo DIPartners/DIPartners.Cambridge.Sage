@@ -83,7 +83,18 @@ function SetDetails(dashboard) {
 
 }
 
+function setInvoiceProperty(vault, props, pptName, no) {
+    var propertyValue = new MFiles.PropertyValue();
+    propertyValue = props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true);
+    propertyValue.TypedValue.SetValue(
+        props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true).TypedValue.DataType,
+        document.getElementById((pptName == 'InvoiceLineExtension') ? "Extension" : pptName + no).value);
+
+    return propertyValue;
+}
+
 function SaveInvoice() {
+
     var controller = gDashboard.CustomData;
     var editor = controller.Invoice;
     var Vault = controller.Vault;
@@ -103,46 +114,11 @@ function SaveInvoice() {
 
     for (var i = 0; i < ObjectSearchResults.Count; i++) {
         var props = ObjectSearchResultsProperties[i];
-        /*
-                var oObjectVersionCheckedOut = new MFiles.ObjectVersion();
-                oObjectVersionCheckedOut = Vault.ObjectOperations.CheckOut(oObjID);
-                
-                var InvoiceDetailName = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceDetailName", true).Value.DisplayValue;
-                var Invoice = props.SearchForPropertyByAlias(Vault, "vProperty.Invoice", true).Value.DisplayValue;
-                var InvoiceLineNumber = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
-                var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
-                var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
-                var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-                var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-        */
-        var propertyValue = new MFiles.PropertyValue();
-        propertyValue = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true);
-        propertyValue.TypedValue.SetValue(
-            MFDatatypeText,
-            document.getElementById('ItemNumber' + i).value);
-        propertyValues.Add(-1, propertyValue);
 
-        var propertyValue = new MFiles.PropertyValue();
-        propertyValue = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true);
-        propertyValue.TypedValue.SetValue(
-            MFDatatypeInteger,
-            document.getElementById('Quantity' + i).value);
-        propertyValues.Add(-1, propertyValue);
-
-        var propertyValue = new MFiles.PropertyValue();
-        propertyValue = props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true);
-        propertyValue.TypedValue.SetValue(
-            MFDatatypeFloating,
-            document.getElementById('UnitPrice' + i).value);
-        propertyValues.Add(-1, propertyValue);
-
-        var propertyValue = new MFiles.PropertyValue();
-        propertyValue = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true);
-        /*propertyValue.PropertyDef = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).PropertyDef;*/
-        propertyValue.TypedValue.SetValue(
-            MFDatatypeFloating,
-            document.getElementById('Extension' + i).value);
-        propertyValues.Add(-1, propertyValue);
+        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "ItemNumber", i));
+        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", i));
+        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", i));
+        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
 
         try {
             Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults[i].ObjVer, propertyValues);
@@ -156,7 +132,6 @@ function SaveInvoice() {
     }
     alert("Update saved!!");
 }
-
 
 
 function SetInvoiceDetails(controller) {
