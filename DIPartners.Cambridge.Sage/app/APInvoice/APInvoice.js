@@ -1,3 +1,5 @@
+var gVault;
+var gDashboard;
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
 
@@ -7,6 +9,7 @@ function OnNewDashboard(dashboard) {
     // Initialize console.
     console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
 
+    gDashboard = dashboard;
     // Some things are ready only after the dashboard has started.
     dashboard.Events.Register(MFiles.Event.Started, OnStarted);
     function OnStarted() {
@@ -19,6 +22,7 @@ function SetDetails(dashboard) {
     var Vault = dashboard.Vault;
     var controller = dashboard.CustomData;
     controller.Vault = Vault;
+
     //console.log(controller.ObjectVersion);
     // Apply vertical layout.
     $("body").addClass("mf-layout-vertical");
@@ -63,25 +67,145 @@ function SetDetails(dashboard) {
 
         }
     }
-    controller.PackingSlip = {
-        ObjectVersion: null,
-        ObjectVersionProperties: null,
-        PropertyControls: null,
-        Events: dashboard.Events
+    /*controller.PackingSlip={
+        ObjectVersion:null,
+        ObjectVersionProperties:null,
+        PropertyControls:null,
+        Events:dashboard.Events
     };
-
+*/
 
     SetInvoiceDetails(controller);
     $("#tabs").tabs("option", "active", 0);
     SetPODetails(controller);
     SetPSDetails(controller);
+
+
 }
+
+function SaveInvoice() {
+
+    var controller = gDashboard.CustomData;
+    var editor = controller.Invoice;
+    var Vault = controller.Vault;
+
+
+
+    /*140551.06
+     * CAMB-SR103
+     * var propertyValue = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vClass.InvoiceDetail", true).Value;
+    var propertyNumber = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).PropertyDef;
+    var PropertyDef = Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
+
+    var classID = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
+    var assocPropDefs = Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
+
+    var props = editor.ObjectVersionProperties;
+    var Item = props.SearchForPropertyByAlias(Vault, "vClass.InvoiceDetail", true).Value.DisplayValue;*/
+
+
+    var fo = FindObjects(Vault, 'vClass.InvoiceDetail', 'vProperty.Quantity', MFDatatypeText, editor.ObjectVersion.Title);
+
+    var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+
+    var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+    var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+    /*   var Total = 0;
+       var objVer = new MFiles.ObjVer();
+       var oCurrObjVals = vault.ObjectPropertyOperations.GetProperties(objVer, false);
+   
+   
+       var propertyValues = new MFiles.PropertyValues();
+       // Add the class property.
+       {
+           var propertyValue = new MFiles.PropertyValue();
+           propertyValue.PropertyDef = MFBuiltInPropertyDefClass;
+           propertyValue.TypedValue.SetValue(MFDatatypeLookup, Vault.ClassOperations.GetObjectClassIDByAlias("vClass.InvoiceDetail"));
+           propertyValues.Add(-1, propertyValue);
+       }
+   
+       var ppt = ppvs.SearchForProperty(SetDef);
+       ppValue.Value.SetValue(ppt.TypedValue.DataType, SearchPropertyValue(ppvs, SetDef, ppt));
+   
+   
+       // Add the name or title property.
+       {
+           var propertyValue = new MFiles.PropertyValue();
+           propertyValue.PropertyDef = MFBuiltInPropertyDefNameOrTitle;
+           propertyValue.TypedValue.SetValue(
+               MFDatatypeText,
+               "hello world");
+           propertyValues.Add(-1, propertyValue);
+       }
+   
+       // Create the new object.
+       Vault.ObjectOperations.CreateNewObjectEx(
+           MFBuiltInObjectTypeDocument,
+           propertyValues,
+           new MFiles.SourceObjectFiles(),
+           false, // Zero files, so it isn't a single-file-document.
+           true, // Check it in.
+           new MFiles.AccessControlList());
+   */
+    var objVer = new MFiles.ObjVer();
+    //var oCurrObjVals = vault.ObjectPropertyOperations.GetProperties(objVer, false);
+
+    var propertyValues = new MFiles.PropertyValues();
+
+    for (var i = 0; i < ObjectSearchResults.Count; i++) {
+        var result = ObjectSearchResults[i];
+        var props = ObjectSearchResultsProperties[i];
+        var propertyValue = new MFiles.PropertyValue();
+
+        var InvoiceDetailName = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceDetailName", true).Value.DisplayValue;
+        var Invoice = props.SearchForPropertyByAlias(Vault, "vProperty.Invoice", true).Value.DisplayValue;
+        var InvoiceLineNumber = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
+        var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
+        var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
+        var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+        /* props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).TypedValue.SetValue(
+             MFDatatypeText,
+             Qty);
+         propertyValues.Remove(-1, props);*/
+        propertyValue = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true);
+        //props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).PropertyDef = MFBuiltInPropertyDefNameOrTitle;
+        propertyValue.PropertyDef = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).PropertyDef;
+        propertyValue.TypedValue.SetValue(
+            MFDatatypeText,
+            document.getElementById('ItemNumber0').value);
+        propertyValues.Add(-1, propertyValue);
+
+        Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults[i].ObjVer, propertyValues);
+        /* Vault.ObjectOperations.CreateNewObjectEx(
+             MFBuiltInObjectTypeDocument,
+             propertyValues,
+             new MFiles.SourceObjectFiles(),
+             false, // Zero files, so it isn't a single-file-document.
+             true, // Check it in.
+             new MFiles.AccessControlList());*/
+    }
+
+
+    /*
+        classPropertyValue.PropertyDef = MFBuiltInPropertyDef.MFBuiltInPropertyDefClass;
+        classPropertyValue.Value.SetValue(MFDataType.MFDatatypeLookup, Vault.ClassOperations.GetObjectClassIDByAlias("vClass.InvoiceDetail"));
+        propertyValues.Add(-1, classPropertyValue);
+    */
+
+}
+
+
 
 function SetInvoiceDetails(controller) {
     var editor = controller.Invoice;
     var Vault = controller.Vault;
     var tabname = 'Invoice';
     var tabdisplayname = tabname;
+
+    var self = this;
 
     CreateMetadataCard(controller, editor, tabname, tabdisplayname);
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.InvoiceNumber')
@@ -128,7 +252,7 @@ function SetInvoiceDetails(controller) {
                 '<tr>' +
                 '   <td>' +
                 '       <INPUT type="checkbox" onclick=removeRow(this) name="chk"/></td>' +
-                '   <td><input type="text" id=\'ItemNumber\', placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
+                '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
                 '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></td > ' +
                 '   <td><input type="text" id=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
@@ -214,14 +338,14 @@ function SetPODetails(controller) {
 }
 
 function SetPSDetails(controller) {
-    var editor = controller.PackingSlip;
-    var Vault = controller.Vault;
-    var tabname = 'PackingSlip';
-    var tabdisplayname = 'Packing Slip';
-
-    CreateMetadataCard(controller, editor, tabname, tabdisplayname);
-
-    editor.table.append('<span>Packing Slip Details!</span>')
+    /* var editor=controller.PackingSlip;
+     var Vault=controller.Vault;
+     var tabname='PackingSlip';
+     var tabdisplayname='Packing Slip';
+ 
+     CreateMetadataCard(controller,editor,tabname,tabdisplayname);
+ 
+     editor.table.append('<span>Packing Slip Details!</span>')*/
 
 }
 
@@ -412,7 +536,30 @@ function setProperty(Vault, editor, propertyAlias) {
     return propertyObject
 }
 
+function setControlState(anyControlInEditMode, updateHighlights, updateTheme) {
+
+    this.anyControlInEditMode = anyControlInEditMode;
+
+    // If any control is in edit mode or model has modified values or this is uncreated object,
+    // set the metadata card to edit mode.
+    //RSS			if( anyControlInEditMode || this.controller.isModified() || this.controller.dataModel.UncreatedObject )
+    if (anyControlInEditMode)
+        this.editModeStarted(updateTheme);
+    else
+        this.viewModeStarted(updateTheme);
+
+    if (updateHighlights) {
+
+        var self = this;
+        // something may have returned to view mode... update highlighting
+        setTimeout(function () {
+            self.updateHighlights(self.controller.editor);
+        }, 0);
+    }
+}
+
 function CreateMetadataCard(controller, editor, tabid, tabtitle) {
+    var self = this;
     var Vault = controller.Vault;
     controller.editor = editor;
     if (typeof controller.cards === 'undefined')
@@ -441,10 +588,9 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
     metadatacard.metadatacard({});
     // Enable configurability, disable logging.
     initParameters = { enableConfigurability: true, enableLogging: false }
-    metadatacard.metadatacard("initialize", controller, initParameters);
 
     // Set initial metadata card mode to view mode. Don't try to update theme yet, because configuration data is not yet ready.
-    //metadatacard.metadatacard( "setControlState", false, true, false );
+    metadatacard.metadatacard("initialize", controller, initParameters);
 
     var MetaCard = $('div #' + editor.cardname);
     MetaCard.addClass("mf-card-docked");
@@ -488,7 +634,8 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
     // Bind click event to this element with 'metadatacard' namespace.
     MetaCard.bind("click.metadatacard", function (event) {
         //alert("Card Clicked!!!");
-        //		self.editManager.requestEditMode( null );
+        // metadatacard.requestEditMode(null);
+        //self.editManager.requestEditMode(null);
     });
 
     editor.metadatacard = MetaCard;

@@ -273,6 +273,7 @@
 			
 				// If we are in comments view, try to move all controls to view mode. This ensures that the text
 				// from the "New comment" field is stored to the model before actual discarding.
+				// from the "New comment" field is stored to the model before actual discarding.
 				if( $( "#mf-comments-view" ).css( "display" ) !== "none" )
 					self.editManager.requestEditMode( null );
 				
