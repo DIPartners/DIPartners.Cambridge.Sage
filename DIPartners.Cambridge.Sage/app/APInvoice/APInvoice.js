@@ -1,6 +1,4 @@
 //const { error } = require("jquery");
-
-var gVault;
 var gDashboard;
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
@@ -66,7 +64,6 @@ function SetDetails(dashboard) {
 
             var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
                 FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
-
         }
     }
     /*controller.PackingSlip={
@@ -94,7 +91,7 @@ function setInvoiceProperty(vault, props, pptName, no) {
 }
 
 function SaveInvoice() {
-    var controller = gDashboard.CustomData;
+    var controller = gDashboard.customData;
     var editor = controller.Invoice;
     var Vault = controller.Vault;
 
@@ -118,15 +115,6 @@ function SaveInvoice() {
         propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
     }
 
-    /* var TOTAL = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Total", true);
- 
-     var propertyValue = new MFiles.PropertyValue();
-     propertyValue.PropertyDef = TOTAL.PropertyDef;
-     propertyValue.TypedValue.SetValue(
-         TOTAL.TypedValue.DataType,
-         document.getElementById("subtotal").value);
-     propertyValues.Add(-1, propertyValue);*/
-
     try {
         Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
         Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
@@ -138,9 +126,13 @@ function SaveInvoice() {
     }
 
     alert("Update saved!!");
+    //refreshTab(ObjectSearchResults.ObjectVersions[0].ObjVer);
 }
 
-
+function refreshTab(ver) {
+    gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(ver.ObjID, true, true);
+    OnNewDashboard(gDashboard);
+}
 
 function SetInvoiceDetails(controller) {
     var editor = controller.Invoice;
@@ -194,7 +186,7 @@ function SetInvoiceDetails(controller) {
             var htmlStr =
                 '<tr>' +
                 '   <td>' +
-                '       <INPUT type="checkbox" onclick=removeRow(this) name="chk"/></td>' +
+                '       <INPUT type="checkbox" onclick="removeRow(this)" name="chk"/></td>' +
                 '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
                 '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></td > ' +
@@ -204,10 +196,15 @@ function SetInvoiceDetails(controller) {
                 "</tr>";
             TableBody.append(htmlStr);
         }
+
+        var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
+        var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
         TableBody.append(
             '<tr>' +
-            '<td colspan="4" style="border-bottom: none;border-left: none;">' +
-            '<a id="addRow" href="#" style="text-decoration:none" onclick=addRowToTable("invoice_details_table");>+</a></td > ' +
+            '<td style="border-bottom: none;border-left: none;">' +
+            '<a id="addRow" href="#" style="text-decoration:none" onclick=addRowToTable("invoice_details_table");>+</a></td> ' +
+            //    '<td colspan="3" style="text-align:right;"><input type="text" id="Balanced" class=' + balance + ' value=' + balance + ' disabled> ' +
+            '<td colspan="3" style="text-align:right;"><label id="Balanced" class="' + balance.split(" ").join("") + '">' + balance + '</label> ' +
             '<td><input type="text" id="Total" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
             '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
             '</tr>'
@@ -435,19 +432,8 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
                 $(this).removeClass("ui-footer-hover");
         }
     );
-
-    var sub = (propertyName == "Subtotal--") ?
-        '            <div class="mf-control mf-dynamic-control mf-text">' +
-        '                <div class="mf-internal-container">' +
-        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' +
-        '<input type = "text" id = "subtotal" value = "' + propertyValue + '" disabled ></div > ' +
-        '                </div>' +
-        '            </div>' :
-        '            <div class="mf-control mf-dynamic-control mf-text">' +
-        '                <div class="mf-internal-container">' +
-        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' +
-        '                </div>' +
-        '            </div>'
+    var sub = (propertyName == "Subtotal") ?
+        '                <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + propertyValue + '" disabled ></div > ' : "";
 
     propertyLine.append(
         '        <td class="mf-dynamic-namefield">' +
@@ -458,12 +444,14 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         '        </td>' +
         '        <td colspan="4" class="mf-dynamic-controlfield">' +
         '            <div class="mf-control mf-dynamic-control mf-text">' +
-        '                <div class="mf-internal-container">' + sub +
+        '                <div class="mf-internal-container">' +
+        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' + sub +
         '                </div>' +
         '            </div>' +
         '        </td>'
-
     );
+
+
     if (!propertyRequired)
         requiredspan = propertyLine.find('.mf-required-indicator').hide();
 }

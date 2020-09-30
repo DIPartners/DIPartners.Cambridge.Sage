@@ -4,13 +4,9 @@
 	var row = tbl.insertRow(lastRow - 1);
 	var iteration = lastRow - 2;
 
-
-
 	var tempExt = tbl.rows[lastRow - 2].cells[4].innerHTML;
 	tempExt = tbl.rows[iteration].cells[4].innerHTML.split("\"")[1]; // extract a last id
 	iteration = parseInt(tempExt.match(/\d+/)[0]) + 1;
-
-
 
 	var cellLeft = row.insertCell(0);
 	var el = document.createElement('input');
@@ -18,9 +14,6 @@
 	el.setAttribute('id', 'chk' + iteration);
 	el.setAttribute('onclick', 'removeRow(this)');
 	el.setAttribute('clsss', 'le-checkbox');
-	//el.setAttribute('value', '-');
-	//el.setAttribute('onclick', 'removeRow(this)');
-	//el.innerHTML = '-';
 	cellLeft.appendChild(el);
 
 	var startCell = iteration / iteration;
@@ -39,7 +32,6 @@
 		el.setAttribute('id', id + iteration);
 		if (startCell == 2 || startCell == 3)
 			el.setAttribute('onkeyup', 'Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'Extension' + iteration + '\')');
-		//el.onkeyup = function () { Calculate('Quantity' + iteration, 'UnitPrice' + iteration, 'Extension' + iteration, tableID) }
 		if (startCell == 4)
 			el.setAttribute("readonly", 'true');
 
@@ -60,6 +52,8 @@ function Calculate(_qty, _unit, _ext) {
 
 	var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
 	Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+	CalculateTotal();
 }
 
 function CalculateTotal() {
@@ -74,7 +68,32 @@ function CalculateTotal() {
 	}
 
 	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
-	//document.getElementById('subtotal').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+	setBalanceStyle();
+}
+
+function setBalanceStyle() {
+	var subTotal = document.getElementById('hSubtotal').value.replace(/[^0-9.-]+/g, "");
+	var total = document.getElementById('Total').value.replace(/[^0-9.-]+/g, "");
+
+	var TextLabel = document.getElementById('Balanced');
+
+	if (subTotal != total) {
+		TextLabel.innerHTML = "Not Balanced";
+		TextLabel.style.color = "red";
+		TextLabel.style.background = "rgb(250, 215, 215)";
+		TextLabel.style.width = "85px";
+	}
+	else {
+		TextLabel.innerHTML = "Balanced";
+		TextLabel.style.color = "green";
+		TextLabel.style.background = "rgb(223, 248, 223)";
+		TextLabel.style.width = "60px";
+	}
+
+	TextLabel.style.height = "22px";
+	TextLabel.style.textAlign = "center";
+	TextLabel.style.verticalAlign = "sub";
+	TextLabel.style.display = "inline-block";
 }
 
 function removeRow(sender) {
