@@ -43,9 +43,9 @@ input[type="text"]:disabled {
     background: #fafafa;
 }
 
-input[type=checkbox] {
+.delRow {
     transform: scale(0.5);
-    padding: 0 0px 0 0;
+    padding: 0 0 0 0;
     margin: 0 0 0 0;
     margin-top: 1px \9;
     line-height: 4;
@@ -53,68 +53,22 @@ input[type=checkbox] {
     border-color: #d9534f !important;
 }
 
-.Balanced {
+.Balance {
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
     border-radius: 25px;
+    text-align: center;
+    float: right;
+}
+
+.Balanced {
     color: green;
     background: rgb(223, 248, 223);
-    width: 85px;
-    text-align: center;
+    width: 60px;
 }
 
 .NotBalanced {
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 25px;
     color: red;
     background: rgb(250, 215, 215);
     width: 85px;
-    text-align: center;
 }
-
-
-/*
-input.NotBalanced{
-	-webkit-border-radius: 20px;
-	-moz-border-radius: 20px;
-		border-radius: 25px;
-		border: 1px solid rgb(250, 215, 215);
-		color: #9e0c0c;
-		width: 85px;
-		height: 30px;
-		background: darkgreen;
-		text-align: center;
-		padding-right: 5px;
-		margin-right: 5px;
-	}
-
-.rounded {
-	border-radius: 30px;
-	padding: 2px; 
-	height: 17px;  
-    text-align: center;
-	color: white;
-}
-.rounded_green input{
-	background: darkgreen;
-	border: 2px solid darkgreen;
-	width: 60px;
-}
-
-input.rounded_red{
-	background: rgb(223, 9, 9);
-	border: 2px solid red;
-	width: 80px;
-}
-
-#rounded_green {
-	border-radius: 30px;
-	background: darkgreen;
-	border: 2px solid darkgreen;
-	padding: 2px; 
-	width: 60px;
-	height: 17px;  
-    text-align: center;
-	color: white;
-}*/

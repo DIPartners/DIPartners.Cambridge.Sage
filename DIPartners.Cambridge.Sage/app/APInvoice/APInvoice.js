@@ -78,6 +78,8 @@ function SetDetails(dashboard) {
     $("#tabs").tabs("option", "active", 0);
     SetPODetails(controller);
     SetPSDetails(controller);
+
+    // document.getElementById("Balanced").innerHTML = setBalanceStyle();
 }
 
 function setInvoiceProperty(vault, props, pptName, no) {
@@ -186,7 +188,7 @@ function SetInvoiceDetails(controller) {
             var htmlStr =
                 '<tr>' +
                 '   <td>' +
-                '       <INPUT type="checkbox" onclick="removeRow(this)" name="chk"/></td>' +
+                '       <INPUT type="checkbox" class="delRow" onclick="removeRow(this)" name="chk"/></td>' +
                 '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
                 '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></td > ' +
@@ -203,8 +205,7 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '<td style="border-bottom: none;border-left: none;">' +
             '<a id="addRow" href="#" style="text-decoration:none" onclick=addRowToTable("invoice_details_table");>+</a></td> ' +
-            //    '<td colspan="3" style="text-align:right;"><input type="text" id="Balanced" class=' + balance + ' value=' + balance + ' disabled> ' +
-            '<td colspan="3" style="text-align:right;"><label id="Balanced" class="' + balance.split(" ").join("") + '">' + balance + '</label> ' +
+            '<td colspan="3" style="text-align:right;"><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
             '<td><input type="text" id="Total" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
             '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
             '</tr>'
@@ -212,6 +213,7 @@ function SetInvoiceDetails(controller) {
     }
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified')
+
 }
 
 function SetPODetails(controller) {
