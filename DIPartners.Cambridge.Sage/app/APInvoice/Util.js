@@ -60,7 +60,7 @@ function CalculateTotal() {
 	var tbl = document.getElementById('invoice_details_table');
 	var lastRow = tbl.rows.length - 1;	// header
 	var Ext = 0;
-	for (var i = 0; i < lastRow; i++) {
+	for (var i = 0; i <= lastRow; i++) {
 		if (document.getElementById('Extension' + i) != undefined) {
 			var currency = document.getElementById('Extension' + i).value;
 			Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
