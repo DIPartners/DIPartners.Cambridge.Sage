@@ -4,9 +4,7 @@
 	var row = tbl.insertRow(lastRow - 1);
 	var iteration = lastRow - 2;
 
-	var tempExt = tbl.rows[lastRow - 2].cells[4].innerHTML;
-	tempExt = tbl.rows[iteration].cells[4].innerHTML.split("\"")[1]; // extract a last id
-	iteration = parseInt(tempExt.match(/\d+/)[0]) + 1;
+	iteration = Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, "")) + 1;
 
 	var cellLeft = row.insertCell(0);
 	var el = document.createElement('input');
