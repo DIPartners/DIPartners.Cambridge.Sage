@@ -102,41 +102,38 @@ function setInvoiceProperty(vault, propertyValue, props, pptName, no) {
     return propertyValue;
 }
 
-function SaveInvoice() {
+function DestroyOldDetails() {
     var controller = gDashboard.customData;
     var editor = controller.Invoice;
     var Vault = controller.Vault;
-
-    /*140551.06
-     * CAMB-SR103*/
-
-    /*
-        for (var i = 0; i < ObjectSearchResults.count; i++) {
-            var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
-            var chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
-            var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-            var searchProperty = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
-            var props = ObjectSearchResultsProperties[i];
-            //Vault.ObjectPropertyOperations.RemoveProperty(ObjectSearchResults[0].ObjVer, searchProperty);
-            Vault.ObjectPropertyOperations.RemoveProperty(chkOut.ObjVer, searchProperty);
-            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
-        }
-    */
     var chkOut;
+
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+
+
+    for (var i = 0; i < ObjectSearchResults.count; i++) {
+        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+        var chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
+        var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+        var searchProperty = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
+        var props = ObjectSearchResultsProperties[i];
+        //Vault.ObjectPropertyOperations.RemoveProperty(ObjectSearchResults[0].ObjVer, searchProperty);
+        Vault.ObjectPropertyOperations.RemoveProperty(chkOut.ObjVer, searchProperty);
+        Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+    }
+
+
 
     if (ObjectSearchResults != null) {
 
         var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         var ObjVer = editor.ObjectVersion.ObjVer;
-        //chkOut = Vault.ObjectOperations.CheckOut(ObjVer.ObjID);
-
-        // var te = vault.ObjectOperations.IsCheckedOut(ObjVer.ObjID, True);
 
         var count = document.getElementById('invoice_details_table').rows.length - 2;
-        for (var i = 0; i < ObjectSearchResults.Count; i++) {
+        count = (count > ObjectSearchResults.Count) ? ObjectSearchResults.Count : count;
+        for (var i = 0; i < count /*ObjectSearchResults.Count*/; i++) {
             var propertyValues = new MFiles.PropertyValues();
 
             if (Vault.ObjectOperations.IsCheckedOut(ObjectSearchResults[i].ObjVer.ObjID, true))
@@ -146,12 +143,6 @@ function SaveInvoice() {
             var props = ObjectSearchResultsProperties[i];
 
             var propertyValue = new MFiles.PropertyValue();
-            /*var InvoiceDetailName = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceDetailName", true);
-            propertyValue.PropertyDef = InvoiceDetailName.PropertyDef;
-            propertyValue.TypedValue.SetValue(
-                InvoiceDetailName.TypedValue.DataType,
-                InvoiceDetailName.TypedValue.DisplayValue);
-            propertyValues.Add(-1, propertyValue);*/
 
             propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "ItemNumber", i));
             propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "Quantity", i));
@@ -163,24 +154,70 @@ function SaveInvoice() {
         }
 
         Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
-        //var editedProps = Vault.ObjectPropertyOperations.GetProperties(chkOut.ObjVer);
-        try {
+    }
+    alert("Update saved!!");
+}
 
-            /*Vault.ObjectOperations.CreateNewObjectEx(
-                Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
-                propertyValues,
-                new MFiles.SourceObjectFiles(),
-                false, // Zero files, so it isn't a single-file-document.
-                true, // Check it in.
-                new MFiles.AccessControlList());*/
-            // Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
-            //Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
+function SaveInvoice() {
+    var controller = gDashboard.customData;
+    var editor = controller.Invoice;
+    var Vault = controller.Vault;
 
+    var chkOut;
+    var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+
+    if (ObjectSearchResults != null) {
+
+        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+        var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+        var ObjVer = editor.ObjectVersion.ObjVer;
+
+        var count = document.getElementById('invoice_details_table').rows.length - 2;
+        count = (count > ObjectSearchResults.Count) ? ObjectSearchResults.Count : count;
+        for (var i = 0; i < count /*ObjectSearchResults.Count*/; i++) {
+            var propertyValues = new MFiles.PropertyValues();
+
+            if (Vault.ObjectOperations.IsCheckedOut(ObjectSearchResults[i].ObjVer.ObjID, true))
+                Vault.ObjectOperations.UndoCheckout(ObjectSearchResults[i].ObjVer);
+
+            chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
+            var props = ObjectSearchResultsProperties[i];
+
+            var propertyValue = new MFiles.PropertyValue();
+
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "ItemNumber", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "Quantity", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "UnitPrice", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "InvoiceLineExtension", i));
+
+            Vault.ObjectPropertyOperations.SetProperties(chkOut.ObjVer, propertyValues);
+            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
         }
-        catch (ex) {
-            var errorText = "Exception: " + ex.message;
-            alert(errorText);
-            return;
+
+        Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+
+        for (var k = 0; k < ObjectSearchResults.Count - count; k++) {
+            /*if (!Vault.ObjectOperations.IsCheckedOut(ObjectSearchResults[count + k].ObjVer.ObjID, true))
+                //Vault.ObjectOperations.UndoCheckout(ObjectSearchResults[count + k].ObjVer);
+                chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[count + k].ObjVer.ObjID);
+            else {
+                chkOut = Vault.ObjectOperations.CheckedOutVersion;
+            }*/
+            var delProps = ObjectSearchResultsProperties[count + k];
+            var objID = new MFiles.ObjID();
+            objID.SetIDs(
+                ObjectSearchResults[count + k].ObjVer.Type,
+                ObjectSearchResults[count + k].ObjVer.ID);
+
+            Vault.ObjectOperations.DestroyObject(
+                objID,
+                true,
+                -1);
+
+            //Vault.ObjectPropertyOperations.RemoveProperty(chkOut.ObjVer, delProps);
+            //Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+            //DestroyOldDetails();
         }
     }
     alert("Update saved!!");
