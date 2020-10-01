@@ -82,17 +82,7 @@ function SetDetails(dashboard) {
     // document.getElementById("Balanced").innerHTML = setBalanceStyle();
 }
 
-function GetCellValues() {
-    var table = document.getElementById('invoice_details_table');
-    for (var r = 0, n = table.rows.length; r < n; r++) {
-        for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-            if (table.rows[r].cells[c].querySelector('input') != null)
-                var aaa = table.rows[r].cells[c].querySelector('input').value;
-        }
-    }
-}
-
-function setInvoiceProperty(vault, props, pptName, no) {
+function setInvoiceProperty(vault, propertyValue, props, pptName, no) {
 
     var value;
     var tbl = document.getElementById('invoice_details_table');
@@ -104,7 +94,6 @@ function setInvoiceProperty(vault, props, pptName, no) {
     else if (pptName == "InvoiceLineExtension") i = 4;
 
     value = tbl.rows[no + 1].cells[i].querySelector('input').value;
-
     propertyValue = props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true);
     propertyValue.TypedValue.SetValue(
         propertyValue.TypedValue.DataType,
@@ -145,21 +134,36 @@ function SaveInvoice() {
         //chkOut = Vault.ObjectOperations.CheckOut(ObjVer.ObjID);
 
         // var te = vault.ObjectOperations.IsCheckedOut(ObjVer.ObjID, True);
-        //  te = Vault.ObjectOperations.UndoCheckout(ObjVer);
 
-        var propertyValues = new MFiles.PropertyValues();
         var count = document.getElementById('invoice_details_table').rows.length - 2;
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
+            var propertyValues = new MFiles.PropertyValues();
+
+            if (Vault.ObjectOperations.IsCheckedOut(ObjectSearchResults[i].ObjVer.ObjID, true))
+                Vault.ObjectOperations.UndoCheckout(ObjectSearchResults[i].ObjVer);
+
             chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
             var props = ObjectSearchResultsProperties[i];
 
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "ItemNumber", i));
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", i));
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", i));
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
+            var propertyValue = new MFiles.PropertyValue();
+            /*var InvoiceDetailName = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceDetailName", true);
+            propertyValue.PropertyDef = InvoiceDetailName.PropertyDef;
+            propertyValue.TypedValue.SetValue(
+                InvoiceDetailName.TypedValue.DataType,
+                InvoiceDetailName.TypedValue.DisplayValue);
+            propertyValues.Add(-1, propertyValue);*/
+
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "ItemNumber", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "Quantity", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "UnitPrice", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, propertyValue, props, "InvoiceLineExtension", i));
+
+            Vault.ObjectPropertyOperations.SetProperties(chkOut.ObjVer, propertyValues);
+            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
         }
 
-        var editedProps = Vault.ObjectPropertyOperations.GetProperties(chkOut.ObjVer);
+        Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+        //var editedProps = Vault.ObjectPropertyOperations.GetProperties(chkOut.ObjVer);
         try {
 
             /*Vault.ObjectOperations.CreateNewObjectEx(
@@ -171,9 +175,7 @@ function SaveInvoice() {
                 new MFiles.AccessControlList());*/
             // Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
             //Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
-            Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
-            Vault.ObjectPropertyOperations.SetProperties(chkOut.ObjVer, propertyValues);
-            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+
         }
         catch (ex) {
             var errorText = "Exception: " + ex.message;
