@@ -82,12 +82,33 @@ function SetDetails(dashboard) {
     // document.getElementById("Balanced").innerHTML = setBalanceStyle();
 }
 
+function GetCellValues() {
+    var table = document.getElementById('invoice_details_table');
+    for (var r = 0, n = table.rows.length; r < n; r++) {
+        for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
+            if (table.rows[r].cells[c].querySelector('input') != null)
+                var aaa = table.rows[r].cells[c].querySelector('input').value;
+        }
+    }
+}
+
 function setInvoiceProperty(vault, props, pptName, no) {
-    var propertyValue = new MFiles.PropertyValue();
+
+    var value;
+    var tbl = document.getElementById('invoice_details_table');
+    var i;
+
+    if (pptName == "ItemNumber") i = 1;
+    else if (pptName == "Quantity") i = 2;
+    else if (pptName == "UnitPrice") i = 3;
+    else if (pptName == "InvoiceLineExtension") i = 4;
+
+    value = tbl.rows[no + 1].cells[i].querySelector('input').value;
+
     propertyValue = props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true);
     propertyValue.TypedValue.SetValue(
-        props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true).TypedValue.DataType,
-        document.getElementById((pptName == 'InvoiceLineExtension') ? "Extension" : pptName + no).value);
+        propertyValue.TypedValue.DataType,
+        value);
 
     return propertyValue;
 }
@@ -99,34 +120,67 @@ function SaveInvoice() {
 
     /*140551.06
      * CAMB-SR103*/
+
+    /*
+        for (var i = 0; i < ObjectSearchResults.count; i++) {
+            var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+            var chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
+            var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+            var searchProperty = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
+            var props = ObjectSearchResultsProperties[i];
+            //Vault.ObjectPropertyOperations.RemoveProperty(ObjectSearchResults[0].ObjVer, searchProperty);
+            Vault.ObjectPropertyOperations.RemoveProperty(chkOut.ObjVer, searchProperty);
+            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+        }
+    */
+    var chkOut;
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
-    var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
-    var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-    var ObjVer = editor.ObjectVersion.ObjVer;
+    if (ObjectSearchResults != null) {
 
-    var propertyValues = new MFiles.PropertyValues();
+        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+        var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+        var ObjVer = editor.ObjectVersion.ObjVer;
+        //chkOut = Vault.ObjectOperations.CheckOut(ObjVer.ObjID);
 
-    for (var i = 0; i < ObjectSearchResults.Count; i++) {
-        var props = ObjectSearchResultsProperties[i];
+        // var te = vault.ObjectOperations.IsCheckedOut(ObjVer.ObjID, True);
+        //  te = Vault.ObjectOperations.UndoCheckout(ObjVer);
 
-        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "ItemNumber", i));
-        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", i));
-        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", i));
-        propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
+        var propertyValues = new MFiles.PropertyValues();
+        var count = document.getElementById('invoice_details_table').rows.length - 2;
+        for (var i = 0; i < ObjectSearchResults.Count; i++) {
+            chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
+            var props = ObjectSearchResultsProperties[i];
+
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "ItemNumber", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
+        }
+
+        var editedProps = Vault.ObjectPropertyOperations.GetProperties(chkOut.ObjVer);
+        try {
+
+            /*Vault.ObjectOperations.CreateNewObjectEx(
+                Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
+                propertyValues,
+                new MFiles.SourceObjectFiles(),
+                false, // Zero files, so it isn't a single-file-document.
+                true, // Check it in.
+                new MFiles.AccessControlList());*/
+            // Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+            //Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
+            Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+            Vault.ObjectPropertyOperations.SetProperties(chkOut.ObjVer, propertyValues);
+            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+        }
+        catch (ex) {
+            var errorText = "Exception: " + ex.message;
+            alert(errorText);
+            return;
+        }
     }
-
-    try {
-        Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
-        Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
-    }
-    catch (ex) {
-        var errorText = "Exception: " + ex.message;
-        alert(errorText);
-        return;
-    }
-
     alert("Update saved!!");
     //refreshTab(ObjectSearchResults.ObjectVersions[0].ObjVer);
 }
