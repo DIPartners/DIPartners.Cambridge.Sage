@@ -7,11 +7,10 @@
 	iteration = Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, "")) + 1;
 
 	var cellLeft = row.insertCell(0);
-	var el = document.createElement('input');
-	el.setAttribute('type', 'checkbox');
+	var el = document.createElement('IMG');
+	el.src = 'UIControlLibrary/images/remove-button-red.png';
 	el.setAttribute('id', 'chk' + iteration);
 	el.setAttribute('onclick', 'removeRow(this)');
-	el.setAttribute('clsss', 'le-checkbox');
 	cellLeft.appendChild(el);
 
 	var startCell = iteration / iteration;
