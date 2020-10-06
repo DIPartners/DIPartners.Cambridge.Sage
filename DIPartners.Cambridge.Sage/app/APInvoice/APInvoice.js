@@ -64,13 +64,13 @@ function SetDetails(dashboard) {
                 FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
         }
     }
-    /*controller.PackingSlip={
-        ObjectVersion:null,
-        ObjectVersionProperties:null,
-        PropertyControls:null,
-        Events:dashboard.Events
+    controller.PackingSlip = {
+        ObjectVersion: null,
+        ObjectVersionProperties: null,
+        PropertyControls: null,
+        Events: dashboard.Events
     };
-*/
+
 
     SetInvoiceDetails(controller);
     $("#tabs").tabs("option", "active", 0);
@@ -231,10 +231,12 @@ function SaveInvoice() {
     DestroyOldDetails(Vault, ObjectSearchResults);
     CreateNewDetails(editor, Vault);
     alert("Saved!!");
+
+    refreshTab();
 }
 
-function refreshTab(ver) {
-    gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(ver.ObjID, true, true);
+function refreshTab() {
+    gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(gDashboard.customData.ObjectVersion.ObjVer.ObjID, true, true);
     OnNewDashboard(gDashboard);
 }
 
@@ -362,9 +364,9 @@ function SetPODetails(controller) {
         FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
     if (ObjectSearchResults.Count > 0) {
         editor.table.append(
-            '<tr><td colspan="4" align="center">' +
-            '    <table id="po_details_table" class="details">' +
-            '        <tr><th>Line</th><th>Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th>Ext $</th><th>Account</th></tr>' +
+            '<tr><td colspan="5" align="center">' +
+            '    <table width="90%" id="po_details_table" class="details">' +
+            '        <tr><th width="7%">Line</th><th width="20%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th>Ext $</th><th>Account</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -385,22 +387,23 @@ function SetPODetails(controller) {
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+            var AccountNO = Account.split(" ");
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value
             TableBody.append(
                 '<tr>' +
                 '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
-                '<td style="text-align:center" style="word-wrap:break-word;"><span id="ItemNumber">' + Item + '</span></td>' +
+                '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
                 '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
                 '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
                 '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
                 '<td style="text-align:right"><span id="Extension">' + Amount + '</span></td>' +
-                '<td style="text-align:right"><span id="Account">' + Account + '</span></td>' +
+                '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
                 "</tr>"
             );
         }
         TableBody.append(
             '<tr>' +
-            '<td colspan="5" style="border-bottom: none;border-left: none;">&nbsp;</td>' +
+            '<td colspan="6" style="border-bottom: none;border-left: none;">&nbsp;</td>' +
             '<td style="text-align:right">$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +
             '</tr>'
         );
