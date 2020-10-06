@@ -1,9 +1,4 @@
 
-table.mf-dynamic-table tr.mf-editable.ui-state-hover {
-    cursor: auto !important;
-    background-color: #e5f3ff;
-}
-
 table.mf-dynamic-table tr {
     cursor: auto !important;
     background-color: #fafafa;
@@ -27,16 +22,11 @@ table.details td {
     color: black !important;
 }
 
-    table.details td input {
-        text-align: right !important;
-        outline: none !important;
-        border-color: transparent !important;
-        background-color: transparent;
-    }
-
-.mf-dynamic-controlfield input {
+table#invoice_details_table td input {
+    text-align: right !important;
     outline: none !important;
     border-color: transparent !important;
+    background-color: transparent;
 }
 
 input[type="text"]:disabled {
@@ -66,4 +56,8 @@ input[type="text"]:disabled {
 #chk {
     cursor: pointer;
     text-align: center;
+}
+
+#po_details_table tr td:nth-child(2), td:nth-child(7) {
+    cursor: pointer;
 }
