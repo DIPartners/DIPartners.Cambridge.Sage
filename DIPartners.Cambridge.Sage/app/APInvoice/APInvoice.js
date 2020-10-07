@@ -82,6 +82,14 @@ function SetDetails(dashboard) {
 
 }
 
+function getColIndex(pptName) {
+
+    if (pptName == "ItemNumber") return 1;
+    else if (pptName == "Quantity") return 2;
+    else if (pptName == "UnitPrice") return 3;
+    else if (pptName == "InvoiceLineExtension") return 4;
+}
+
 function setInvoiceProperty(vault, props, pptName, no) {
 
     var value, i, dataType;
@@ -89,14 +97,9 @@ function setInvoiceProperty(vault, props, pptName, no) {
     var propertyValue = new MFiles.PropertyValue();
     propertyValue = props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true);
 
-    if (pptName == "ItemNumber") i = 1;
-    else if (pptName == "Quantity") i = 2;
-    else if (pptName == "UnitPrice") i = 3;
-    else if (pptName == "InvoiceLineExtension") i = 4;
-
     if (pptName == "Invoice") value = propertyValue.TypedValue.DisplayValue;
     else if (pptName == "InvoiceLineNumber") value = no + 1;
-    else value = tbl.rows[no + 1].cells[i].querySelector('input').value;
+    else value = tbl.rows[no + 1].cells[getColIndex(pptName)].querySelector('input').value;
 
     try {
         propertyValue.TypedValue.SetValue(propertyValue.TypedValue.DataType, value);
@@ -114,12 +117,7 @@ function setFirstInvoiceProperty(vault, pptName) {
     var propertyValue = new MFiles.PropertyValue();
     var VaultOp = vault.PropertyDefOperations;
 
-    if (pptName == "ItemNumber") i = 1;
-    else if (pptName == "Quantity") i = 2;
-    else if (pptName == "UnitPrice") i = 3;
-    else if (pptName == "InvoiceLineExtension") i = 4;
-
-    value = tbl.rows[1].cells[i].querySelector('input').value;
+    value = tbl.rows[1].cells[getColIndex(pptName)].querySelector('input').value;
 
     propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + pptName);
     propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
