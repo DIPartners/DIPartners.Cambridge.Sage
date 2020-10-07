@@ -104,7 +104,11 @@ function GetPropertyValue(vault, pptName, no) {
     return propertyValue;
 }
 
-function DestroyOldDetails(Vault, ObjectSearchResults) {
+function DestroyOldDetails(editor, Vault) {
+
+    var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+
     for (var k = 0; k < ObjectSearchResults.count; k++) {
         var objID = new MFiles.ObjID();
         objID.SetIDs(ObjectSearchResults[k].ObjVer.Type, ObjectSearchResults[k].ObjVer.ID);
@@ -189,10 +193,7 @@ function SaveInvoice() {
     var editor = controller.Invoice;
     var Vault = controller.Vault;
 
-    var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
-
-    DestroyOldDetails(Vault, ObjectSearchResults);
+    DestroyOldDetails(editor, Vault);
     CreateNewDetails(editor, Vault);
     alert("Saved!!");
 
