@@ -9,7 +9,7 @@
 	var cellLeft = row.insertCell(0);
 	var el = document.createElement('IMG');
 	el.src = 'UIControlLibrary/images/remove-button-red.png';
-	el.setAttribute('id', 'chk' + iteration);
+	el.setAttribute('id', 'chk');
 	el.setAttribute('onclick', 'removeRow(this)');
 	cellLeft.appendChild(el);
 
@@ -27,22 +27,27 @@
 
 		el.setAttribute('type', 'text');
 		el.setAttribute('id', id + iteration);
-		if (startCell == 2 || startCell == 3)
+		if (startCell == 2 || startCell == 3) {
 			el.setAttribute('onkeyup', 'Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'Extension' + iteration + '\')');
+			el.setAttribute('onkeypress', 'return isNumberKey(event,this.id)');
+		}
 		if (startCell == 4)
 			el.setAttribute("readonly", 'true');
 
-		el.setAttribute("placeholder", '');
-		el.setAttribute("value", '');
+		/*el.setAttribute("placeholder", '');
+		el.setAttribute("value", '');*/
 
 		cellRight.appendChild(el);
 		startCell++;
 	}
+	ChangeValue(false);
 }
 
 function Calculate(_qty, _unit, _ext) {
+
 	var Ext = document.getElementById(_ext);
 	var Qty = document.getElementById(_qty).value;
+
 
 	var Unit = document.getElementById(_unit).value;
 	if (Unit.substring(0, 1) != "$") document.getElementById(_unit).value = '$' + Unit;
@@ -50,7 +55,28 @@ function Calculate(_qty, _unit, _ext) {
 	var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
 	Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
 
+	ChangeValue(false);
 	CalculateTotal();
+}
+
+function isNumberKey(evt, id) {
+	try {
+		var charCode = (evt.which) ? evt.which : event.keyCode;
+
+		if (charCode == 46) {	// del key
+			var txt = document.getElementById(id).value;
+			if (!(txt.indexOf(".") > -1)) {
+
+				return true;
+			}
+		}
+		if (charCode > 31 && (charCode < 48 || charCode > 57))
+			return false;
+
+		return true;
+	} catch (w) {
+		alert(w);
+	}
 }
 
 function CalculateTotal() {
@@ -60,10 +86,10 @@ function CalculateTotal() {
 	for (var i = 0; i <= lastRow; i++) {
 		if (document.getElementById('Extension' + i) != undefined) {
 			var currency = document.getElementById('Extension' + i).value;
+
 			Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
 		}
 	}
-
 	document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 	setBalanceStyle();
 }
@@ -96,4 +122,10 @@ function setBalanceStyle() {
 function removeRow(sender) {
 	$(sender).parent().parent().remove();
 	CalculateTotal();
+	ChangeValue(false);
+}
+
+function ChangeValue(val) {
+	document.getElementById("save-data").disabled = val;
+	document.getElementById("discard-data").disabled = val;
 }

@@ -1,7 +1,9 @@
 //const { error } = require("jquery");
 var gDashboard;
+
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
+
     // Parent is a shell pane container (tab), when dashboard is shown in right pane.
     var tab = dashboard.Parent;
 
@@ -14,6 +16,7 @@ function OnNewDashboard(dashboard) {
     function OnStarted() {
         SetDetails(dashboard);
     }
+
 }
 
 function SetDetails(dashboard) {
@@ -77,7 +80,6 @@ function SetDetails(dashboard) {
     SetPODetails(controller);
     SetPSDetails(controller);
 
-    // document.getElementById("Balanced").innerHTML = setBalanceStyle();
 }
 
 function setInvoiceProperty(vault, props, pptName, no) {
@@ -220,7 +222,26 @@ function CreateNewDetails(editor, Vault) {
     }
 }
 
+function checkNull() {
+    var tbl = document.getElementById('invoice_details_table');
+    document.getElementById('invoice_details_table').rows.length
+    for (var i = 1; i < tbl.rows.length - 1; i++) {
+        for (var j = 1; j < 4; j++) {
+            var val = tbl.rows[i].cells[j].querySelector('input').value;
+            if (val === "" || val === 0 || val === "$") return false;
+        }
+    }
+
+    return true;
+}
+
 function SaveInvoice() {
+
+    if (!checkNull()) {
+        alert("Please check values!!");
+        return;
+    }
+
     var controller = gDashboard.customData;
     var editor = controller.Invoice;
     var Vault = controller.Vault;
@@ -233,11 +254,17 @@ function SaveInvoice() {
     alert("Saved!!");
 
     refreshTab();
+    ChangeValue(true);
 }
 
 function refreshTab() {
     gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(gDashboard.customData.ObjectVersion.ObjVer.ObjID, true, true);
     OnNewDashboard(gDashboard);
+}
+
+function DiscardInvoice() {
+    //window.location.reload(true);
+    refreshTab();
 }
 
 function SetInvoiceDetails(controller) {
@@ -271,9 +298,7 @@ function SetInvoiceDetails(controller) {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="invoice_details_table" class="details">' +
-            '       <form id=Invoice>' +
-            '           <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
-            '       </form>' +
+            '       <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -292,13 +317,15 @@ function SetInvoiceDetails(controller) {
 
             var htmlStr =
                 '<tr>' +
-                '   <td>' +
-                '       <img src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" onclick="removeRow(this)" id="chk"></td>' +
+                '   <td><img src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" ' +
+                '               onclick="removeRow(this)" id = "chk" ></td > ' +
                 '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
                 '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
-                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')"></td > ' +
+                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
+                '       onkeypress="return isNumberKey(event,this.id)" ></td> ' +
                 '   <td><input type="text" id=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
-                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ></td > ' +
+                '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
+                '       onkeypress="return isNumberKey(event,this.id)" ></td> ' +
                 '   <td><input type="text" id=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></td>' +
                 "</tr>";
             TableBody.append(htmlStr);
@@ -308,9 +335,7 @@ function SetInvoiceDetails(controller) {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="invoice_details_table" class="details">' +
-            '       <form id=Invoice>' +
-            '           <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
-            '       </form>' +
+            '       <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -366,7 +391,7 @@ function SetPODetails(controller) {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="po_details_table" class="details">' +
-            '        <tr><th width="7%">Line</th><th width="20%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th>Ext $</th><th>Account</th></tr>' +
+            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th width="18%">Ext $</th><th>Account</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -396,15 +421,15 @@ function SetPODetails(controller) {
                 '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
                 '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
                 '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
-                '<td style="text-align:right"><span id="Extension">' + Amount + '</span></td>' +
+                '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
                 '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
                 "</tr>"
             );
         }
         TableBody.append(
             '<tr>' +
-            '<td colspan="6" style="border-bottom: none;border-left: none;">&nbsp;</td>' +
-            '<td style="text-align:right">$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +
+            '<td colspan="7" style="border-bottom: none;border-left: none; text-align:right">' +
+            '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +
             '</tr>'
         );
     }
