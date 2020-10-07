@@ -90,7 +90,7 @@ function GetColIndex(pptName) {
     else if (pptName == "InvoiceLineExtension") return 4;
 }
 
-function SetInvoiceProperty(vault, pptName, no) {
+function GetPropertyValue(vault, pptName, no) {
 
     var tbl = document.getElementById('invoice_details_table');
     var propertyValue = new MFiles.PropertyValue();
@@ -150,10 +150,10 @@ function CreateNewDetails(editor, Vault) {
         propertyValue.Value.SetValue(MFDatatypeInteger, i + 1);
         propertyValues.Add(-1, propertyValue);
 
-        propertyValues.Add(-1, SetInvoiceProperty(Vault, "ItemNumber", i));            //1150
-        propertyValues.Add(-1, SetInvoiceProperty(Vault, "Quantity", i));             //1151
-        propertyValues.Add(-1, SetInvoiceProperty(Vault, "UnitPrice", i));            //1154
-        propertyValues.Add(-1, SetInvoiceProperty(Vault, "InvoiceLineExtension", i)); //1157
+        propertyValues.Add(-1, GetPropertyValue(Vault, "ItemNumber", i));            //1150
+        propertyValues.Add(-1, GetPropertyValue(Vault, "Quantity", i));             //1151
+        propertyValues.Add(-1, GetPropertyValue(Vault, "UnitPrice", i));            //1154
+        propertyValues.Add(-1, GetPropertyValue(Vault, "InvoiceLineExtension", i)); //1157
 
         var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
             Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
