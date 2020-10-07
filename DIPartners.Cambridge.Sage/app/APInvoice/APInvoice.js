@@ -84,7 +84,7 @@ function SetDetails(dashboard) {
 
 function setInvoiceProperty(vault, props, pptName, no) {
 
-    var value, i;
+    var value, i, dataType;
     var tbl = document.getElementById('invoice_details_table');
     var propertyValue = new MFiles.PropertyValue();
     propertyValue = props.SearchForPropertyByAlias(vault, "vProperty." + pptName, true);
@@ -107,6 +107,26 @@ function setInvoiceProperty(vault, props, pptName, no) {
     return propertyValue;
 }
 
+function setFirstInvoiceProperty(vault, pptName) {
+
+    var value, i;
+    var tbl = document.getElementById('invoice_details_table');
+    var propertyValue = new MFiles.PropertyValue();
+    var VaultOp = vault.PropertyDefOperations;
+
+    if (pptName == "ItemNumber") i = 1;
+    else if (pptName == "Quantity") i = 2;
+    else if (pptName == "UnitPrice") i = 3;
+    else if (pptName == "InvoiceLineExtension") i = 4;
+
+    value = tbl.rows[1].cells[i].querySelector('input').value;
+
+    propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + pptName);
+    propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
+
+    return propertyValue;
+}
+
 function DestroyOldDetails(Vault, ObjectSearchResults) {
     for (var k = 0; k < ObjectSearchResults.count; k++) {
         var objID = new MFiles.ObjID();
@@ -119,9 +139,9 @@ function CreateNewDetails(editor, Vault) {
     var ObjectSearchResults, SearchResultsObjVers;
 
     var actCount = document.getElementById('invoice_details_table').rows.length - 2;
-    var props = editor.ObjectVersionProperties;
     for (var i = 0; i < actCount; i++) {
         if (i == 0) {
+            var props = editor.ObjectVersionProperties;
             var propertyValues = new MFiles.PropertyValues();
 
             //set class
@@ -148,9 +168,6 @@ function CreateNewDetails(editor, Vault) {
             var propertyValue = new MFiles.PropertyValue();
             propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Invoice");
             propertyValue.Value.SetValue(MFDatatypeLookup, newInvoice);
-
-            //propertyValue.Value.SetValueToMultiSelectLookup(newLookup);
-
             propertyValues.Add(-1, propertyValue);
 
             // set InvoiceLineNumber
@@ -159,12 +176,33 @@ function CreateNewDetails(editor, Vault) {
             propertyValue.Value.SetValue(MFDatatypeInteger, 1);
             propertyValues.Add(-1, propertyValue);
 
+            /*var propertyValue = new MFiles.PropertyValue();
+            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
+            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, "test22");
+            propertyValues.Add(-1, propertyValue);
+
+
+            var propertyValue = new MFiles.PropertyValue();
+            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Quantity");
+            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, 2);
+            propertyValues.Add(-1, propertyValue);
+
+            var propertyValue = new MFiles.PropertyValue();
+            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.UnitPrice");
+            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, 2);
+            propertyValues.Add(-1, propertyValue);
+
+            var propertyValue = new MFiles.PropertyValue();
+            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceLineExtension");
+            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, 2);
+            propertyValues.Add(-1, propertyValue);
+*/
             // set other properties valus read from table
             // propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineNumber", j));     //1155
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "ItemNumber", 0));              //1150
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", 0));                //1151
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", 0));               //1154
-            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", 0));    //1157
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "ItemNumber"));              //1150
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "Quantity"));              //1151
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "UnitPrice"));              //1154
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "InvoiceLineExtension"));              //1157
 
             var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
                 Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
@@ -234,7 +272,90 @@ function checkNull() {
 
     return true;
 }
+function SaveInvoice00() {
+    var controller = gDashboard.customData;
+    var editor = controller.Invoice;
+    var Vault = controller.Vault;
 
+    /*140551.06
+     * CAMB-SR103*/
+
+    /*
+        for (var i = 0; i < ObjectSearchResults.count; i++) {
+            var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+            var chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
+            var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+            var searchProperty = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
+            var props = ObjectSearchResultsProperties[i];
+            //Vault.ObjectPropertyOperations.RemoveProperty(ObjectSearchResults[0].ObjVer, searchProperty);
+            Vault.ObjectPropertyOperations.RemoveProperty(chkOut.ObjVer, searchProperty);
+            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+        }
+    */
+    var chkOut;
+    var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+
+    if (ObjectSearchResults != null) {
+
+        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+        var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+        var ObjVer = editor.ObjectVersion.ObjVer;
+        //chkOut = Vault.ObjectOperations.CheckOut(ObjVer.ObjID);
+
+        // var te = vault.ObjectOperations.IsCheckedOut(ObjVer.ObjID, True);
+
+        var count = document.getElementById('invoice_details_table').rows.length - 2;
+        for (var i = 0; i < ObjectSearchResults.Count; i++) {
+            var propertyValues = new MFiles.PropertyValues();
+
+            if (Vault.ObjectOperations.IsCheckedOut(ObjectSearchResults[i].ObjVer.ObjID, true))
+                Vault.ObjectOperations.UndoCheckout(ObjectSearchResults[i].ObjVer);
+
+            chkOut = Vault.ObjectOperations.CheckOut(ObjectSearchResults[i].ObjVer.ObjID);
+            var props = ObjectSearchResultsProperties[i];
+
+            var propertyValue = new MFiles.PropertyValue();
+            /*var InvoiceDetailName = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceDetailName", true);
+            propertyValue.PropertyDef = InvoiceDetailName.PropertyDef;
+            propertyValue.TypedValue.SetValue(
+                InvoiceDetailName.TypedValue.DataType,
+                InvoiceDetailName.TypedValue.DisplayValue);
+            propertyValues.Add(-1, propertyValue);*/
+
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "ItemNumber", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "Quantity", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "UnitPrice", i));
+            propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineExtension", i));
+
+            Vault.ObjectPropertyOperations.SetProperties(chkOut.ObjVer, propertyValues);
+            Vault.ObjectOperations.CheckIn(chkOut.ObjVer);
+        }
+
+        Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+        //var editedProps = Vault.ObjectPropertyOperations.GetProperties(chkOut.ObjVer);
+        try {
+
+            /*Vault.ObjectOperations.CreateNewObjectEx(
+                Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
+                propertyValues,
+                new MFiles.SourceObjectFiles(),
+                false, // Zero files, so it isn't a single-file-document.
+                true, // Check it in.
+                new MFiles.AccessControlList());*/
+            // Vault.ObjectPropertyOperations.SetProperties(ObjVer, propertyValues);
+            //Vault.ObjectPropertyOperations.SetProperties(ObjectSearchResults.ObjectVersions[0].ObjVer, propertyValues);
+
+        }
+        catch (ex) {
+            var errorText = "Exception: " + ex.message;
+            alert(errorText);
+            return;
+        }
+    }
+    alert("Update saved!!");
+    //refreshTab(ObjectSearchResults.ObjectVersions[0].ObjVer);
+}
 function SaveInvoice() {
 
     if (!checkNull()) {
@@ -259,7 +380,6 @@ function SaveInvoice() {
 
 function refreshTab() {
     gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(gDashboard.customData.ObjectVersion.ObjVer.ObjID, true, true);
-    OnNewDashboard(gDashboard);
 }
 
 function DiscardInvoice() {
@@ -293,19 +413,18 @@ function SetInvoiceDetails(controller) {
         var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
                 FindObjects(Vault,'vObject.InvoiceDetail','vProperty.Invoice',MFDatatypeLookup, InvNO), MFSearchFlagNone, true);
     */
+    editor.table.append(
+        '<tr><td colspan="5" align="center">' +
+        '    <table width="90%" id="invoice_details_table" class="details">' +
+        '       <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
+        '    </table>' +
+        '</td></tr>' +
+        '');
+    var TableBody = editor.table.find('#invoice_details_table');
+    var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
+    var Total = 0
 
     if (ObjectSearchResults.Count > 0) {
-        editor.table.append(
-            '<tr><td colspan="5" align="center">' +
-            '    <table width="90%" id="invoice_details_table" class="details">' +
-            '       <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
-            '    </table>' +
-            '</td></tr>' +
-            '');
-        var TableBody = editor.table.find('#invoice_details_table');
-        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
-        var Total = 0
-
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
@@ -332,22 +451,14 @@ function SetInvoiceDetails(controller) {
         }
     }
     else {
-        editor.table.append(
-            '<tr><td colspan="5" align="center">' +
-            '    <table width="90%" id="invoice_details_table" class="details">' +
-            '       <tr><th width="5%">-</th><th width="25%">Item</th><th width="20%">Qty</th><th width="25%">Unit $</th><th width="25%">Ext $</th></tr>' +
-            '    </table>' +
-            '</td></tr>' +
-            '');
-        var TableBody = editor.table.find('#invoice_details_table');
-        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
-        var Total = 0
         var htmlStr =
             '<tr>' +
             '   <td><img src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" onclick="removeRow(this)" id="chk"></td>' +
             '   <td><input type="text" id="ItemNumber0" placeholder="" value=""></td >' +
-            '   <td><input type="text" id="Quantity0"  placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')"></td > ' +
-            '   <td><input type="text" id="UnitPrice0" placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')"></td > ' +
+            '   <td><input type="text" id="Quantity0"  placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '       onkeypress="return isNumberKey(event,this.id)" ></td>' +
+            '   <td><input type="text" id="UnitPrice0" placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '       onkeypress="return isNumberKey(event,this.id)" ></td> ' +
             '   <td><input type="text" id="Extension0" placeholder="" value="" readonly="true"></td>' +
             "</tr>";
 
@@ -401,7 +512,6 @@ function SetPODetails(controller) {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         var Total = 0
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
-            var result = ObjectSearchResults[i];
             var props = ObjectSearchResultsProperties[i];
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
@@ -736,7 +846,7 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
 
     var mfscrollableDiv = $('<div>');
     mfscrollableDiv.addClass('ui-scrollable');
-    mfscrollableDiv.css('height', '500px');
+    mfscrollableDiv.css('height', '600px');
     mfsectionDiv.append(mfscrollableDiv);
 
     var mfsectioncontentDiv = $('<div>');
