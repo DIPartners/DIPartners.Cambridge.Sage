@@ -136,28 +136,27 @@ function DestroyOldDetails(Vault, ObjectSearchResults) {
 }
 
 function CreateNewDetails(editor, Vault) {
-    var ObjectSearchResults, SearchResultsObjVers;
-
+    var ObjectSearchResults, ObjectSearchResultsProperties, SearchResultsObjVers, props;
     var actCount = document.getElementById('invoice_details_table').rows.length - 2;
+
     for (var i = 0; i < actCount; i++) {
+        var propertyValues = new MFiles.PropertyValues();
+
+        //set class
+        var classID = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
+        var propertyValue = new MFiles.PropertyValue();
+        propertyValue.PropertyDef = MFBuiltInPropertyDefClass;
+        propertyValue.Value.SetValue(MFDatatypeLookup, classID);
+        propertyValues.Add(-1, propertyValue);
+
+        // set Name or Title
+        var propTitle = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefNameOrTitle);
+        var propertyValue = new MFiles.PropertyValue();
+        propertyValue.PropertyDef = MFBuiltInPropertyDefNameOrTitle;
+        propertyValue.Value.SetValue(propTitle.TypedValue.DataType, propTitle.TypedValue.DisplayValue);
+        propertyValues.Add(-1, propertyValue);
+
         if (i == 0) {
-            var props = editor.ObjectVersionProperties;
-            var propertyValues = new MFiles.PropertyValues();
-
-            //set class
-            var classID = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = MFBuiltInPropertyDefClass;
-            propertyValue.Value.SetValue(MFDatatypeLookup, classID);
-            propertyValues.Add(-1, propertyValue);
-
-            // set Name or Title
-            var propTitle = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefNameOrTitle);
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = MFBuiltInPropertyDefNameOrTitle;
-            propertyValue.Value.SetValue(propTitle.TypedValue.DataType, propTitle.TypedValue.DisplayValue);
-            propertyValues.Add(-1, propertyValue);
-
             // set Invoice - lookup
             var newInvoice = new MFiles.Lookup();
             newInvoice.ObjectType = MFBuiltInObjectTypeDocument;
@@ -176,33 +175,10 @@ function CreateNewDetails(editor, Vault) {
             propertyValue.Value.SetValue(MFDatatypeInteger, 1);
             propertyValues.Add(-1, propertyValue);
 
-            /*var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
-            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, "test22");
-            propertyValues.Add(-1, propertyValue);
-
-
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Quantity");
-            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, 2);
-            propertyValues.Add(-1, propertyValue);
-
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.UnitPrice");
-            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, 2);
-            propertyValues.Add(-1, propertyValue);
-
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceLineExtension");
-            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, 2);
-            propertyValues.Add(-1, propertyValue);
-*/
-            // set other properties valus read from table
-            // propertyValues.Add(-1, setInvoiceProperty(Vault, props, "InvoiceLineNumber", j));     //1155
-            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "ItemNumber"));              //1150
-            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "Quantity"));              //1151
-            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "UnitPrice"));              //1154
-            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "InvoiceLineExtension"));              //1157
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "ItemNumber"));            //1150
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "Quantity"));             //1151
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "UnitPrice"));            //1154
+            propertyValues.Add(-1, setFirstInvoiceProperty(Vault, "InvoiceLineExtension")); //1157
 
             var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
                 Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
@@ -216,26 +192,10 @@ function CreateNewDetails(editor, Vault) {
                 FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
             SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+            ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+            props = ObjectSearchResultsProperties[0];
         }
         else {
-            var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-            var props = ObjectSearchResultsProperties[0];
-            var propertyValues = new MFiles.PropertyValues();
-
-            //set class
-            var classID = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = MFBuiltInPropertyDefClass;
-            propertyValue.Value.SetValue(MFDatatypeLookup, classID);
-            propertyValues.Add(-1, propertyValue);
-
-            // set Name or Title
-            var propTitle = editor.ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefNameOrTitle);
-            var propertyValue = new MFiles.PropertyValue();
-            propertyValue.PropertyDef = MFBuiltInPropertyDefNameOrTitle;
-            propertyValue.Value.SetValue(propTitle.TypedValue.DataType, propTitle.TypedValue.DisplayValue);
-            propertyValues.Add(-1, propertyValue);
-
             // set Invoice
             var propertyValue = new MFiles.PropertyValue();
             propertyValue = props.SearchForPropertyByAlias(Vault, "vProperty.Invoice", true);
