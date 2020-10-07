@@ -82,7 +82,7 @@ function SetDetails(dashboard) {
 
 }
 
-function getColIndex(pptName) {
+function GetColIndex(pptName) {
 
     if (pptName == "ItemNumber") return 1;
     else if (pptName == "Quantity") return 2;
@@ -90,13 +90,13 @@ function getColIndex(pptName) {
     else if (pptName == "InvoiceLineExtension") return 4;
 }
 
-function setInvoiceProperty(vault, pptName, no) {
+function SetInvoiceProperty(vault, pptName, no) {
 
     var tbl = document.getElementById('invoice_details_table');
     var propertyValue = new MFiles.PropertyValue();
     var VaultOp = vault.PropertyDefOperations;
 
-    var value = tbl.rows[no + 1].cells[getColIndex(pptName)].querySelector('input').value;
+    var value = tbl.rows[no + 1].cells[GetColIndex(pptName)].querySelector('input').value;
 
     propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + pptName);
     propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
@@ -150,10 +150,10 @@ function CreateNewDetails(editor, Vault) {
         propertyValue.Value.SetValue(MFDatatypeInteger, i + 1);
         propertyValues.Add(-1, propertyValue);
 
-        propertyValues.Add(-1, setInvoiceProperty(Vault, "ItemNumber", i));            //1150
-        propertyValues.Add(-1, setInvoiceProperty(Vault, "Quantity", i));             //1151
-        propertyValues.Add(-1, setInvoiceProperty(Vault, "UnitPrice", i));            //1154
-        propertyValues.Add(-1, setInvoiceProperty(Vault, "InvoiceLineExtension", i)); //1157
+        propertyValues.Add(-1, SetInvoiceProperty(Vault, "ItemNumber", i));            //1150
+        propertyValues.Add(-1, SetInvoiceProperty(Vault, "Quantity", i));             //1151
+        propertyValues.Add(-1, SetInvoiceProperty(Vault, "UnitPrice", i));            //1154
+        propertyValues.Add(-1, SetInvoiceProperty(Vault, "InvoiceLineExtension", i)); //1157
 
         var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
             Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
@@ -165,7 +165,7 @@ function CreateNewDetails(editor, Vault) {
     }
 }
 
-function checkNull() {
+function CheckNull() {
     var tbl = document.getElementById('invoice_details_table');
     document.getElementById('invoice_details_table').rows.length
     for (var i = 1; i < tbl.rows.length - 1; i++) {
@@ -180,7 +180,7 @@ function checkNull() {
 
 function SaveInvoice() {
 
-    if (!checkNull()) {
+    if (!CheckNull()) {
         alert("Please check values!!");
         return;
     }
@@ -196,11 +196,11 @@ function SaveInvoice() {
     CreateNewDetails(editor, Vault);
     alert("Saved!!");
 
-    refreshTab();
+    RefreshTab();
     ChangeValue(true);
 }
 
-function refreshTab() {
+function RefreshTab() {
     gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(gDashboard.customData.ObjectVersion.ObjVer.ObjID, true, true);
 }
 
