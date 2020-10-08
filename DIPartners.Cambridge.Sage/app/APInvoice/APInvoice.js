@@ -195,19 +195,35 @@ function SaveInvoice() {
 
     DestroyOldDetails(editor, Vault);
     CreateNewDetails(editor, Vault);
-    alert("Saved!!");
 
     RefreshTab();
-    ChangeValue(true);
 }
 
 function RefreshTab() {
-    gDashboard.CustomData.latestObjVer = gDashboard.Vault.ObjectOperations.GetLatestObjVer(gDashboard.customData.ObjectVersion.ObjVer.ObjID, true, true);
+    $(".panel-left").empty();
+    $(".panel-left").append('<div id="tabs"><ul></ul></div>');
+    $('#tabs').tabs({
+        activate: function (event, ui) {
+            var tabID = ui.newPanel[0].id;
+        }
+    });
+
+    SetDetails(gDashboard);
+    ChangeValue(true);
 }
 
 function DiscardInvoice() {
-    //window.location.reload(true);
-    refreshTab();
+    var result = gDashboard.Parent.shellFrame.ShowMessage({
+        caption: "Unsaved Changes",
+        message: "You have unsaved changes to \"" + gDashboard.customData.ObjectVersion.Title + "\".",
+        button1_title: "Save",
+        button2_title: "Do Not Save",
+        button3_title: "Cancel",
+        defaultButton: 1
+    });
+
+    if (result == 1) SaveInvoice();     // save
+    else if (result == 2) RefreshTab(); // don't save
 }
 
 function SetInvoiceDetails(controller) {
