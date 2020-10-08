@@ -364,7 +364,7 @@ function SetPODetails(controller) {
         var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         var Total = 0;
-        var ArrayVal = [];//new Array(ObjectSearchResults.Count);
+        var ArrayVal = [];
         var strTable = "";
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
@@ -388,8 +388,7 @@ function SetPODetails(controller) {
                 '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
                 '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
                 "</tr>";
-            // HKo
-            // for list sort by LineNo; 1, 10, 11, 2, 3 => 1, 2, 3, 10
+            // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
             ArrayVal[i] = LineNo + ", " + strTable;
         }
         var SortedList = SortLineNo(ArrayVal).join();
