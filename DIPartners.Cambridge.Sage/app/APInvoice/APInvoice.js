@@ -1,34 +1,43 @@
 //const { error } = require("jquery");
 var gDashboard;
-
+var isPopup;
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
+
+    gDashboard = dashboard;
+    isPopup = dashboard.IsPopupDashboard;
 
     // Parent is a shell pane container (tab), when dashboard is shown in right pane.
     var tab = dashboard.Parent;
 
     // Initialize console.
-    console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
+    if (!isPopup) {
+        console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
+    }
+    else {
+        $("#iv-buttons").empty();
+    }
 
-    gDashboard = dashboard;
     // Some things are ready only after the dashboard has started.
     dashboard.Events.Register(MFiles.Event.Started, OnStarted);
     function OnStarted() {
         SetDetails(dashboard);
     }
-
 }
 
 function SetDetails(dashboard) {
     var Vault = dashboard.Vault;
     var controller = dashboard.CustomData;
     controller.Vault = Vault;
+    var editor = controller.Invoice;
+
 
     //console.log(controller.ObjectVersion);
     // Apply vertical layout.
     $("body").addClass("mf-layout-vertical");
     // Show some information of the document.
     $('#message_placeholder').text(controller.ObjectVersion.Title + ' (' + controller.ObjectVersion.ObjVer.ID + ')');
+
 
     var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 
@@ -79,7 +88,12 @@ function SetDetails(dashboard) {
     $("#tabs").tabs("option", "active", 0);
     SetPODetails(controller);
     SetPSDetails(controller);
-
+    if (!isPopup) CreatePopupIcon(controller, editor);
+    else {
+        $("input").prop("disabled", true);
+        $('img').hide();
+        $("#addRow").empty();
+    }
 }
 
 function GetColIndex(pptName) {
@@ -275,8 +289,8 @@ function SetInvoiceDetails(controller) {
 
             var htmlStr =
                 '<tr>' +
-                '   <td><img src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" ' +
-                '               onclick="removeRow(this)" id = "chk" ></td > ' +
+                '   <td><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" ' +
+                '               onclick="removeRow(this)"></td > ' +
                 '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
                 '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
@@ -292,7 +306,7 @@ function SetInvoiceDetails(controller) {
     else {
         var htmlStr =
             '<tr>' +
-            '   <td><img src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" onclick="removeRow(this)" id="chk"></td>' +
+            '   <td><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" onclick="removeRow(this)"></td>' +
             '   <td><input type="text" id="ItemNumber0" placeholder="" value=""></td >' +
             '   <td><input type="text" id="Quantity0"  placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
             '       onkeypress="return isNumberKey(event,this.id)" ></td>' +
@@ -709,3 +723,12 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
 }
 
+function CreatePopupIcon(controller, editor) {
+    $('<li style="float:right"><a href="#" target="popup" onclick="PopupDashboard(); return false;");">' +
+        '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#tabs ul");
+    $('<div id="0"><div id="popupIcon"></div></div>').appendTo("#tabs");
+}
+
+function PopupDashboard() {
+    gDashboard.Parent.shellFrame.ShowPopupDashboard("APInvoice", true, gDashboard.CustomData);
+}
