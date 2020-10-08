@@ -364,37 +364,68 @@ function SetPODetails(controller) {
         var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         var Total = 0;
-        var ArrayVal = [];//new Array(ObjectSearchResults.Count);
-        var strTable = "";
+        var prevNo = 0;//ObjectSearchResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+        var skipNo = 0;
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
-            var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
-            var ItemNO = Item.split("=>");
-            var ItemVal = ItemNO[0];
-            var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
-            var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
-            var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
-            var AccountNO = Account.split(" ");
-            Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value;
-            strTable = '<tr>' +
-                '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
-                '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
-                '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
-                '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
-                '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
-                '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
-                '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
-                "</tr>";
-            // HKo
-            // for list sort by LineNo; 1, 10, 11, 2, 3 => 1, 2, 3, 10
-            ArrayVal[i] = LineNo + ", " + strTable;
+            if (prevNo + 1 == Number(LineNo)) {
+                prevNo = Number(LineNo);
+                var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
+                var ItemNO = Item.split("=>");
+                var ItemVal = ItemNO[0];
+                var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
+                var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
+                var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+                var AccountNO = Account.split(" ");
+                Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value
+                TableBody.append(
+                    '<tr>' +
+                    '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
+                    // '<td style="text-align:center"><span id="LineNumber">' + Number(i + 1) + '</span></td>' +
+                    '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
+                    '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
+                    '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
+                    '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
+                    "</tr>"
+                );
+            }
+            else skipNo++;
         }
-        var SortedList = SortLineNo(ArrayVal).join();
 
-        TableBody.append(SortedList);
+        for (var i = 1; i <= skipNo; i++) {
+            var props = ObjectSearchResultsProperties[i];
+            var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+            if (prevNo + 1 == Number(LineNo)) {
+                prevNo = Number(LineNo);
+                var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
+                var ItemNO = Item.split("=>");
+                var ItemVal = ItemNO[0];
+                var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
+                var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
+                var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+                var AccountNO = Account.split(" ");
+                Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value
+                TableBody.append(
+                    '<tr>' +
+                    '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
+                    '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
+                    '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
+                    '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
+                    '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
+                    "</tr>"
+                );
+            }
+            else skipNo++;
+        }
         TableBody.append(
             '<tr>' +
             '<td colspan="7" style="border-bottom: none;border-left: none; text-align:right">' +
@@ -402,13 +433,6 @@ function SetPODetails(controller) {
             '</tr>'
         );
     }
-}
-
-function SortLineNo(ArrayVal) {
-    ArrayVal.sort(function (a, b) {
-        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-    });
-    return ArrayVal;
 }
 
 function SetPSDetails(controller) {
