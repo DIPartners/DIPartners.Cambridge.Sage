@@ -88,7 +88,7 @@ function SetDetails(dashboard) {
     $("#tabs").tabs("option", "active", 0);
     SetPODetails(controller);
     SetPSDetails(controller);
-    if (!isPopup) CreatePopupIcon(controller, editor);
+    if (!isPopup) CreatePopupIcon();
     else {
         $("input").prop("disabled", true);
         $('img').hide();
@@ -363,31 +363,68 @@ function SetPODetails(controller) {
         var TableBody = editor.table.find('#po_details_table');
         var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-        var Total = 0
+        var Total = 0;
+        var prevNo = 0;//ObjectSearchResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+        var skipNo = 0;
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
-            var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
-            var ItemNO = Item.split("=>");
-            var ItemVal = ItemNO[0];
-            var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
-            var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
-            var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
-            var AccountNO = Account.split(" ");
-            Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value
-            TableBody.append(
-                '<tr>' +
-                '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
-                '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
-                '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
-                '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
-                '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
-                '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
-                '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
-                "</tr>"
-            );
+            if (prevNo + 1 == Number(LineNo)) {
+                prevNo = Number(LineNo);
+                var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
+                var ItemNO = Item.split("=>");
+                var ItemVal = ItemNO[0];
+                var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
+                var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
+                var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+                var AccountNO = Account.split(" ");
+                Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value
+                TableBody.append(
+                    '<tr>' +
+                    '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
+                    // '<td style="text-align:center"><span id="LineNumber">' + Number(i + 1) + '</span></td>' +
+                    '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
+                    '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
+                    '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
+                    '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
+                    "</tr>"
+                );
+            }
+            else skipNo++;
+        }
+
+        for (var i = 1; i <= skipNo; i++) {
+            var props = ObjectSearchResultsProperties[i];
+            var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+            if (prevNo + 1 == Number(LineNo)) {
+                prevNo = Number(LineNo);
+                var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
+                var ItemNO = Item.split("=>");
+                var ItemVal = ItemNO[0];
+                var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
+                var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
+                var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+                var AccountNO = Account.split(" ");
+                Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value
+                TableBody.append(
+                    '<tr>' +
+                    '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
+                    '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
+                    '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
+                    '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
+                    '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
+                    '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
+                    "</tr>"
+                );
+            }
+            else skipNo++;
         }
         TableBody.append(
             '<tr>' +
@@ -723,7 +760,7 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
 }
 
-function CreatePopupIcon(controller, editor) {
+function CreatePopupIcon() {
     $('<li style="float:right"><a href="#" target="popup" onclick="PopupDashboard(); return false;");">' +
         '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#tabs ul");
     $('<div id="0"><div id="popupIcon"></div></div>').appendTo("#tabs");
