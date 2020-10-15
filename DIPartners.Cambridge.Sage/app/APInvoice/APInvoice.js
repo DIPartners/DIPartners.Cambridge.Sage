@@ -188,7 +188,7 @@ function CheckNull() {
 function SaveInvoice() {
 
     if (!CheckNull()) {
-        alert("Please check values!!");
+        alert("The value(s) can not be empty");
         return;
     }
 
@@ -727,7 +727,6 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
 function CreatePopupIcon() {
     $('<li style="float:right"><a href="#" target="popup" onclick="PopupDashboard(); return false;");">' +
         '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#tabs ul");
-    $('<div id="0"><div id="popupIcon"></div></div>').appendTo("#tabs");
 }
 
 function PopupDashboard() {
