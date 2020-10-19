@@ -31,8 +31,6 @@ function SetDetails(dashboard) {
     controller.Vault = Vault;
     var editor = controller.Invoice;
 
-
-    //console.log(controller.ObjectVersion);
     // Apply vertical layout.
     $("body").addClass("mf-layout-vertical");
     ResetTabs();
@@ -223,6 +221,9 @@ function ResetTabs() {
     $('#rtabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
+            if (tabID == 'InvPre') {
+                LoadPreview();
+            }
         }
     });
 
@@ -261,10 +262,10 @@ function SetInvoiceDetails(controller) {
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
 
-    DisplayImage(Vault, editor.ObjectVersionProperties);
+    //DisplayImage(Vault, editor.ObjectVersionProperties);
 
     // HKo
-    //   DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
+    DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
 
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
@@ -404,7 +405,14 @@ function SetPODetails(controller) {
             '</tr>'
         );
     }
-    //CreateRPOMetadataCard(controller, editor, tabname, tabdisplayname, "rtabs");
+
+
+    /* // Add the tab to the tab list
+    // $('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#rtabs ul");
+     $('<li><a href="#' + tabname + '" onclick="javascript:CreateRPOMetadataCard(' + tabname + ')">' + tabdisplayname + '</a></li>').appendTo("#rtabs ul");
+     $('<div id="' + tabname + '"><div id="' + tabname + '"></div></div>').appendTo("#rtabs");*/
+    //$("#rtabs").tabs("refresh");
+    CreateRPOMetadataCard(controller, editor, tabname, tabdisplayname, "rtabs");
 }
 
 function SortLineNo(ArrayVal) {
@@ -493,9 +501,10 @@ function DisplayImage(Vault, ObjectVersionProperties) {
     var tabname = 'InvPre';
     var tabdisplayname = 'Invoice Preview';
 
+
     // Add the tab to the tab list
     $('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    //    $('<div id="' + tabname + '"></div>').appendTo("#" + tablist);
+    // $('<div id="' + tabname + '"></div>').appendTo("#" + tablist);
     $('<div id="' + tabname + '"><div id="' + tabname + '0"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
@@ -523,57 +532,28 @@ function DisplayImage(Vault, ObjectVersionProperties) {
     // be an option. For details, see:
     // https://www.m-files.com/UI_Extensibility_Framework/#Embedding%20Shell%20Listings%20in%20Dashboards.html
     ctrlContainer.html('<object id="preview-ctrl" classid="clsid:' + MFiles.CLSID.PreviewerCtrl + '"> </object>');
-
     // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
     // case it is within a tab on shellFrame.RightPane).
-    //    var previewCtrl = document.getElementById('preview-ctrl');
-    var previewCtrl = $('#' + tabname + '0 object').get(0)
+    // var previewCtrl = document.getElementById('preview-ctrl');
+    var previewCtrl = $('#' + tabname + '0 object').get(0);
+
     previewCtrl.ShowFilePreview(filepath);
     //	ctrlContainer.html('<span>' + filepath + '</span>');
 }
 
 function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
 
-
-    //    var ctrlContainer = $('div.tab-contents');
-    var filepath = "";
-
-    var Vault = controller.Vault;
-    controller.editor = editor;
-    editor.tabname = tabid;
-    editor.tabdisplayname = tabtitle;
+    var tablist = 'rtabs';
+    var tabname = 'InvPre';
+    var tabdisplayname = 'Invoice Preview';
 
     // Add the tab to the tab list
-    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div id="' + editor.tabname + '"></div>').appendTo("#" + tablist);
+    //$('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<li><a href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div id="' + tabname + '"><div id="' + tabname + '0"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
-    var ctrlContainer = $('div #' + editor.tabname);
-
-    var DisplaySearchCondition = new MFiles.SearchCondition();
-    var DisplaySearchConditions = new MFiles.SearchConditions();
-
-    DisplaySearchCondition.ConditionType = MFConditionTypeEqual;
-    DisplaySearchCondition.Expression.DataPropertyValuePropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceName")
-    DisplaySearchCondition.TypedValue.SetValue(MFDatatypeText, editor.ObjectVersionProperties[0].Value.DisplayValue);
-    DisplaySearchConditions.Add(-1, DisplaySearchCondition);
-
-
-    var DisplayResult = Vault.ObjectSearchOperations.SearchForObjectsByConditions(DisplaySearchConditions, MFSearchFlagNone, false);
-    var doc = Vault.ObjectOperations.GetLatestObjectVersionAndProperties(DisplayResult[0].ObjVer.ObjID, false);
-    var file = doc.VersionData.Files(1);
-    filepath = Vault.ObjectFileOperations.GetPathInDefaultView(doc.VersionData.ObjVer.ObjID, doc.VersionData.ObjVer.Version, file.FileVer.ID, file.FileVer.Version);
-
-    // EXTRA: Also show a preview of the document related to this Invoice object.
-    // Add the ActiveX control to the DOM. Were are not using jQuery here to access the DOM, but would obviously
-    // be an option. For details, see:
-    // https://www.m-files.com/UI_Extensibility_Framework/#Embedding%20Shell%20Listings%20in%20Dashboards.html
-    ctrlContainer.html('<object id="preview-ctrl" classid="clsid:' + MFiles.CLSID.PreviewerCtrl + '"> </object>');
-
-    // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
-    // case it is within a tab on shellFrame.RightPane).
-    var previewCtrl = document.getElementById('preview-ctrl');
-    previewCtrl.ShowFilePreview(filepath);
+    LoadPreview();
 }
 
 
@@ -798,7 +778,13 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 }
 
 function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
+    var controller = gDashboard.CustomData;
+    var editor = controller.Invoice;
 
+    if (typeof controller.cards === 'undefined')
+        cardid = 0;
+    else
+        cardid = controller.cards + 1;
     editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = "r" + tabid;
     editor.tabdisplayname = tabtitle;
@@ -808,8 +794,47 @@ function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
     $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
-    PO = document.getElementById(tabid);
+    var PO = document.getElementById(tabid);
     $(PO.innerHTML).appendTo("#" + editor.tabname);
+}
+
+function LoadPreview() {
+    var controller = gDashboard.CustomData;
+    var editor = controller.Invoice;
+    var Vault = controller.Vault;
+
+    var tablist = 'rtabs';
+    var tabname = 'InvPre';
+    var tabdisplayname = 'Invoice Preview';
+    var ctrlContainer = $('#' + tabname);
+    var filepath = "";
+
+
+    var DisplaySearchCondition = new MFiles.SearchCondition();
+    var DisplaySearchConditions = new MFiles.SearchConditions();
+
+    DisplaySearchCondition.ConditionType = MFConditionTypeEqual;
+    DisplaySearchCondition.Expression.DataPropertyValuePropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceName")
+    DisplaySearchCondition.TypedValue.SetValue(MFDatatypeText, editor.ObjectVersionProperties[0].Value.DisplayValue);
+    DisplaySearchConditions.Add(-1, DisplaySearchCondition);
+
+
+    var DisplayResult = Vault.ObjectSearchOperations.SearchForObjectsByConditions(DisplaySearchConditions, MFSearchFlagNone, false);
+    var doc = Vault.ObjectOperations.GetLatestObjectVersionAndProperties(DisplayResult[0].ObjVer.ObjID, false);
+    var file = doc.VersionData.Files(1);
+    filepath = Vault.ObjectFileOperations.GetPathInDefaultView(doc.VersionData.ObjVer.ObjID, doc.VersionData.ObjVer.Version, file.FileVer.ID, file.FileVer.Version);
+
+    // EXTRA: Also show a preview of the document related to this Invoice object.
+    // Add the ActiveX control to the DOM. Were are not using jQuery here to access the DOM, but would obviously
+    // be an option. For details, see:
+    // https://www.m-files.com/UI_Extensibility_Framework/#Embedding%20Shell%20Listings%20in%20Dashboards.html
+    ctrlContainer.html('<object id="preview-ctrl" classid="clsid:' + MFiles.CLSID.PreviewerCtrl + '"> </object>');
+    // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
+    // case it is within a tab on shellFrame.RightPane).
+    var previewCtrl = document.getElementById('preview-ctrl');
+    //var previewCtrl = $('#' + tabname + ' object').get(0);
+
+    previewCtrl.ShowFilePreview(filepath);
 }
 
 function CreatePopupIcon() {
