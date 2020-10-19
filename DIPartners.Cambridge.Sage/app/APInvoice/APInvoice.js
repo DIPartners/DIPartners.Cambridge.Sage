@@ -4,13 +4,19 @@ var isPopup;
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
 
-    gDashboard = dashboard;
     isPopup = dashboard.IsPopupDashboard;
     // Parent is a shell pane container (tab), when dashboard is shown in right pane.
     var tab = dashboard.Parent;
 
+    if (isPopup) {
+        dashboard.Window.Height = 880;
+        dashboard.Window.Resizable = false;
+        dashboard.Window.Maximizable = false;
+    }
     // Initialize console.
-    if (!isPopup) console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
+    else console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
+
+    gDashboard = dashboard;
 
     // Some things are ready only after the dashboard has started.
     dashboard.Events.Register(MFiles.Event.Started, OnStarted);
@@ -208,7 +214,7 @@ function ResetTabs() {
     $(".panel-left").empty();
     $(".panel-left").append('<div id="ltabs" style="height:100%"><ul></ul></div>');
     $(".panel-right").empty();
-    $(".panel-right").append('<div id="rtabs" style="height:100%"><ul></ul><div class="tab-contents"></div></div>');
+    $(".panel-right").append('<div id="rtabs" style="height:100%"><ul></ul></div>');
     $('#ltabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
@@ -255,10 +261,10 @@ function SetInvoiceDetails(controller) {
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
 
-    //DisplayImage(Vault, editor.ObjectVersionProperties);
+    DisplayImage(Vault, editor.ObjectVersionProperties);
 
     // HKo
-    DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
+    //   DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
 
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
@@ -398,7 +404,7 @@ function SetPODetails(controller) {
             '</tr>'
         );
     }
-    CreateRPOMetadataCard(controller, editor, tabname, tabdisplayname, "rtabs");
+    //CreateRPOMetadataCard(controller, editor, tabname, tabdisplayname, "rtabs");
 }
 
 function SortLineNo(ArrayVal) {
@@ -483,7 +489,19 @@ function FindClassObjects(Vault, CTAlias, PDAlias, PDType, Value) {
 }
 
 function DisplayImage(Vault, ObjectVersionProperties) {
-    var ctrlContainer = $('div.panel-right');
+    var tablist = 'rtabs';
+    var tabname = 'InvPre';
+    var tabdisplayname = 'Invoice Preview';
+
+    // Add the tab to the tab list
+    $('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    //    $('<div id="' + tabname + '"></div>').appendTo("#" + tablist);
+    $('<div id="' + tabname + '"><div id="' + tabname + '0"></div></div>').appendTo("#" + tablist);
+    $("#" + tablist).tabs("refresh");
+
+    var ctrlContainer = $('#' + tabname + '0');
+
+    //var ctrlContainer = $('div.panel-right');
     var filepath = "";
 
     var DisplaySearchCondition = new MFiles.SearchCondition();
@@ -508,32 +526,29 @@ function DisplayImage(Vault, ObjectVersionProperties) {
 
     // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
     // case it is within a tab on shellFrame.RightPane).
-    var previewCtrl = document.getElementById('preview-ctrl');
+    //    var previewCtrl = document.getElementById('preview-ctrl');
+    var previewCtrl = $('#' + tabname + '0 object').get(0)
     previewCtrl.ShowFilePreview(filepath);
     //	ctrlContainer.html('<span>' + filepath + '</span>');
 }
 
 function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
-    var ctrlContainer = $('div.tab-contents');
-    var filepath = "";
 
+
+    //    var ctrlContainer = $('div.tab-contents');
+    var filepath = "";
 
     var Vault = controller.Vault;
     controller.editor = editor;
-    if (typeof controller.cards === 'undefined')
-        cardid = 0;
-    else
-        cardid = controller.cards + 1;
-    controller.cards = cardid;
-
-    editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = tabid;
     editor.tabdisplayname = tabtitle;
 
     // Add the tab to the tab list
     $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
+    $('<div id="' + editor.tabname + '"></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
+
+    var ctrlContainer = $('div #' + editor.tabname);
 
     var DisplaySearchCondition = new MFiles.SearchCondition();
     var DisplaySearchConditions = new MFiles.SearchConditions();
@@ -736,7 +751,7 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
     var mfcontentDiv = $('<div>');
     mfcontentDiv.addClass('mf-content');
-    mfcontentDiv.css('height', '600px');
+    mfcontentDiv.css('height', '100%');
     MetaCard.append(mfcontentDiv);
 
     var mfpropertiesviewDiv = $('<div>');
@@ -757,7 +772,7 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
     var mfscrollableDiv = $('<div>');
     mfscrollableDiv.addClass('ui-scrollable');
-    mfscrollableDiv.css('height', '600px');
+    mfscrollableDiv.css('height', '100%');
     mfsectionDiv.append(mfscrollableDiv);
 
     var mfsectioncontentDiv = $('<div>');
@@ -783,10 +798,6 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 }
 
 function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
-
-    var self = this;
-    var Vault = controller.Vault;
-    controller.editor = editor;
 
     editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = "r" + tabid;
