@@ -1,7 +1,6 @@
 //const { error } = require("jquery");
 var gDashboard;
 var isPopup;
-var PO;
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
 
@@ -209,7 +208,7 @@ function ResetTabs() {
     $(".panel-left").empty();
     $(".panel-left").append('<div id="ltabs" style="height:100%"><ul></ul></div>');
     $(".panel-right").empty();
-    $(".panel-right").append('<div id="rtabs" style="height:100%"><ul></ul></div>');
+    $(".panel-right").append('<div id="rtabs" style="height:100%"><ul></ul><div class="tab-contents"></div></div>');
     $('#ltabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
@@ -258,18 +257,12 @@ function SetInvoiceDetails(controller) {
 
     //DisplayImage(Vault, editor.ObjectVersionProperties);
 
+    // HKo
     DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
 
-    /*
-        var InvNO = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.InvoiceNumber", true).Value.DisplayValue;
-    */
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
-    /*
-        var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-                FindObjects(Vault,'vObject.InvoiceDetail','vProperty.Invoice',MFDatatypeLookup, InvNO), MFSearchFlagNone, true);
-    */
     editor.table.append(
         '<tr><td colspan="5" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details">' +
@@ -521,7 +514,7 @@ function DisplayImage(Vault, ObjectVersionProperties) {
 }
 
 function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
-    var ctrlContainer = $('div.panel-right');
+    var ctrlContainer = $('div.tab-contents');
     var filepath = "";
 
 
@@ -542,7 +535,7 @@ function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
     $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
-    /*var DisplaySearchCondition = new MFiles.SearchCondition();
+    var DisplaySearchCondition = new MFiles.SearchCondition();
     var DisplaySearchConditions = new MFiles.SearchConditions();
 
     DisplaySearchCondition.ConditionType = MFConditionTypeEqual;
@@ -565,7 +558,7 @@ function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
     // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
     // case it is within a tab on shellFrame.RightPane).
     var previewCtrl = document.getElementById('preview-ctrl');
-    previewCtrl.ShowFilePreview(filepath);*/
+    previewCtrl.ShowFilePreview(filepath);
 }
 
 
@@ -794,11 +787,6 @@ function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
     var self = this;
     var Vault = controller.Vault;
     controller.editor = editor;
-    if (typeof controller.cards === 'undefined')
-        cardid = 0;
-    else
-        cardid = controller.cards + 1;
-    controller.cards = cardid;
 
     editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = "r" + tabid;
@@ -809,17 +797,14 @@ function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
     $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
-
     PO = document.getElementById(tabid);
-    //    $("#" + tablist).append(PO.);
     $(PO.innerHTML).appendTo("#" + editor.tabname);
-
 }
 
 function CreatePopupIcon() {
 
     $('<li style="float:right"><a href="#" target="popup" onclick="PopupDashboard(); return false;");">' +
-        '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#tabs ul");
+        '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#ltabs ul");
 }
 
 function PopupDashboard() {
