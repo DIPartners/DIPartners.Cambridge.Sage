@@ -62,12 +62,6 @@
     <script>
 
         $(document).ready(function () {
-            // Tab initialization
-            $('#tabs').tabs({
-                activate: function (event, ui) {
-                    var tabID = ui.newPanel[0].id;
-                }
-            });
             $(".panel-left").resizableSafe({
                 handleSelector: ".splitter",
                 resizeHeight: false
@@ -76,6 +70,7 @@
         // Apply left-to-right layout.
         $("html").attr("dir", "ltr");
         $("html").addClass("mf-ltr");
+
     </script>
 
 </head>
@@ -83,23 +78,9 @@
     <div class="page-container">
         <label id="testLabel">Invoice Details:  <span id="message_placeholder"></span></label>
         <div class="panel-container">
-            <div class="panel-left">
-                <div id="tabs">
-                    <ul>
-                        <!--
-                                                <li><a href="#IN">Invoice</a></li>
-                        -->
-                    </ul>
-                    <!--
-                                        <div id="IN">
-                                            <div id="metadatacard-0" class="mf-metadatacard mf-mode-properties"></div>
-                                        </div>
-                    -->
-                </div>
-            </div>
+            <div class="panel-left"></div>
             <div class="splitter"></div>
-            <div class="panel-right">
-            </div>
+            <div class="panel-right"></div>
         </div>
     </div>
     <!-- Footer begins -->

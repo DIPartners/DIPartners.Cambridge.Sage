@@ -49,7 +49,7 @@ label {
     width: 100%;
     min-height: 200px;
 /*    min-width: 200px !important; /* NOTE: This won't be respected! Explicit size of left forces the size to be fixed */
-    background: #eee;
+    /*background: #eee;*/
 }
 
 table.details {

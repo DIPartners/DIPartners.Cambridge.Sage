@@ -1,12 +1,12 @@
 //const { error } = require("jquery");
 var gDashboard;
 var isPopup;
+var PO;
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
 
     gDashboard = dashboard;
     isPopup = dashboard.IsPopupDashboard;
-
     // Parent is a shell pane container (tab), when dashboard is shown in right pane.
     var tab = dashboard.Parent;
 
@@ -30,6 +30,8 @@ function SetDetails(dashboard) {
     //console.log(controller.ObjectVersion);
     // Apply vertical layout.
     $("body").addClass("mf-layout-vertical");
+    ResetTabs();
+
     // Show some information of the document.
     $('#message_placeholder').text(controller.ObjectVersion.Title + ' (' + controller.ObjectVersion.ObjVer.ID + ')');
 
@@ -79,9 +81,10 @@ function SetDetails(dashboard) {
     };
 
     SetInvoiceDetails(controller);
-    $("#tabs").tabs("option", "active", 0);
     SetPODetails(controller);
     SetPSDetails(controller);
+    $("#ltabs").tabs("option", "active", 0);
+    $("#rtabs").tabs("option", "active", 0);
     if (!isPopup) CreatePopupIcon();
 }
 
@@ -202,15 +205,25 @@ function SaveInvoice() {
     RefreshTab();
 }
 
-function RefreshTab() {
+function ResetTabs() {
     $(".panel-left").empty();
-    $(".panel-left").append('<div id="tabs"><ul></ul></div>');
-    $('#tabs').tabs({
+    $(".panel-left").append('<div id="ltabs" style="height:100%"><ul></ul></div>');
+    $(".panel-right").empty();
+    $(".panel-right").append('<div id="rtabs" style="height:100%"><ul></ul></div>');
+    $('#ltabs').tabs({
+        activate: function (event, ui) {
+            var tabID = ui.newPanel[0].id;
+        }
+    });
+    $('#rtabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
         }
     });
 
+}
+
+function RefreshTab() {
     SetDetails(gDashboard);
     ChangeValue(true);
 }
@@ -237,13 +250,15 @@ function SetInvoiceDetails(controller) {
 
     var self = this;
 
-    CreateMetadataCard(controller, editor, tabname, tabdisplayname);
+    CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.InvoiceNumber')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Date')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
 
-    DisplayImage(Vault, editor.ObjectVersionProperties);
+    //DisplayImage(Vault, editor.ObjectVersionProperties);
+
+    DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
 
     /*
         var InvNO = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.InvoiceNumber", true).Value.DisplayValue;
@@ -330,7 +345,7 @@ function SetPODetails(controller) {
     var tabname = 'PO' + editor.ObjectVersion.Title;
     var tabdisplayname = 'PO ' + editor.ObjectVersion.Title;
 
-    CreateMetadataCard(controller, editor, tabname, tabdisplayname);
+    CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
 
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PONumber')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
@@ -390,6 +405,7 @@ function SetPODetails(controller) {
             '</tr>'
         );
     }
+    CreateRPOMetadataCard(controller, editor, tabname, tabdisplayname, "rtabs");
 }
 
 function SortLineNo(ArrayVal) {
@@ -405,7 +421,7 @@ function SetPSDetails(controller) {
      var tabname='PackingSlip';
      var tabdisplayname='Packing Slip';
  
-     CreateMetadataCard(controller,editor,tabname,tabdisplayname);
+     CreateMetadataCard(controller,editor,"rtabs",tabname,tabdisplayname);
  
      editor.table.append('<span>Packing Slip Details!</span>')*/
 
@@ -474,7 +490,6 @@ function FindClassObjects(Vault, CTAlias, PDAlias, PDType, Value) {
 }
 
 function DisplayImage(Vault, ObjectVersionProperties) {
-
     var ctrlContainer = $('div.panel-right');
     var filepath = "";
 
@@ -504,6 +519,55 @@ function DisplayImage(Vault, ObjectVersionProperties) {
     previewCtrl.ShowFilePreview(filepath);
     //	ctrlContainer.html('<span>' + filepath + '</span>');
 }
+
+function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
+    var ctrlContainer = $('div.panel-right');
+    var filepath = "";
+
+
+    var Vault = controller.Vault;
+    controller.editor = editor;
+    if (typeof controller.cards === 'undefined')
+        cardid = 0;
+    else
+        cardid = controller.cards + 1;
+    controller.cards = cardid;
+
+    editor.cardname = 'metadatacard-' + cardid;
+    editor.tabname = tabid;
+    editor.tabdisplayname = tabtitle;
+
+    // Add the tab to the tab list
+    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
+    $("#" + tablist).tabs("refresh");
+
+    /*var DisplaySearchCondition = new MFiles.SearchCondition();
+    var DisplaySearchConditions = new MFiles.SearchConditions();
+
+    DisplaySearchCondition.ConditionType = MFConditionTypeEqual;
+    DisplaySearchCondition.Expression.DataPropertyValuePropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceName")
+    DisplaySearchCondition.TypedValue.SetValue(MFDatatypeText, editor.ObjectVersionProperties[0].Value.DisplayValue);
+    DisplaySearchConditions.Add(-1, DisplaySearchCondition);
+
+
+    var DisplayResult = Vault.ObjectSearchOperations.SearchForObjectsByConditions(DisplaySearchConditions, MFSearchFlagNone, false);
+    var doc = Vault.ObjectOperations.GetLatestObjectVersionAndProperties(DisplayResult[0].ObjVer.ObjID, false);
+    var file = doc.VersionData.Files(1);
+    filepath = Vault.ObjectFileOperations.GetPathInDefaultView(doc.VersionData.ObjVer.ObjID, doc.VersionData.ObjVer.Version, file.FileVer.ID, file.FileVer.Version);
+
+    // EXTRA: Also show a preview of the document related to this Invoice object.
+    // Add the ActiveX control to the DOM. Were are not using jQuery here to access the DOM, but would obviously
+    // be an option. For details, see:
+    // https://www.m-files.com/UI_Extensibility_Framework/#Embedding%20Shell%20Listings%20in%20Dashboards.html
+    ctrlContainer.html('<object id="preview-ctrl" classid="clsid:' + MFiles.CLSID.PreviewerCtrl + '"> </object>');
+
+    // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
+    // case it is within a tab on shellFrame.RightPane).
+    var previewCtrl = document.getElementById('preview-ctrl');
+    previewCtrl.ShowFilePreview(filepath);*/
+}
+
 
 function isRequired(assocPropDefs, propertyNumber) {
     for (var i = 0; i < assocPropDefs.Count; i++) {
@@ -640,7 +704,7 @@ function setControlState(anyControlInEditMode, updateHighlights, updateTheme) {
     }
 }
 
-function CreateMetadataCard(controller, editor, tabid, tabtitle) {
+function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var self = this;
     var Vault = controller.Vault;
     controller.editor = editor;
@@ -655,9 +719,9 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
     editor.tabdisplayname = tabtitle;
 
     // Add the tab to the tab list
-    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#tabs ul");
-    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#tabs");
-    $("#tabs").tabs("refresh");
+    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
+    $("#" + tablist).tabs("refresh");
 
     // Add localization to the controller
     controller.localization = new localization();
@@ -722,9 +786,38 @@ function CreateMetadataCard(controller, editor, tabid, tabtitle) {
 
     editor.metadatacard = MetaCard;
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
+
+}
+
+function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
+
+    var self = this;
+    var Vault = controller.Vault;
+    controller.editor = editor;
+    if (typeof controller.cards === 'undefined')
+        cardid = 0;
+    else
+        cardid = controller.cards + 1;
+    controller.cards = cardid;
+
+    editor.cardname = 'metadatacard-' + cardid;
+    editor.tabname = "r" + tabid;
+    editor.tabdisplayname = tabtitle;
+
+    // Add the tab to the tab list
+    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
+    $("#" + tablist).tabs("refresh");
+
+
+    PO = document.getElementById(tabid);
+    //    $("#" + tablist).append(PO.);
+    $(PO.innerHTML).appendTo("#" + editor.tabname);
+
 }
 
 function CreatePopupIcon() {
+
     $('<li style="float:right"><a href="#" target="popup" onclick="PopupDashboard(); return false;");">' +
         '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#tabs ul");
 }
