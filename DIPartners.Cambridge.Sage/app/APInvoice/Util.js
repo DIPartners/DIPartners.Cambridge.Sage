@@ -4,14 +4,18 @@
 	var row = tbl.insertRow(lastRow - 1);
 	var iteration = lastRow - 2;
 
-	iteration = Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, "")) + 1;
+	iteration = (lastRow == 2) ? 1 : Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, "")) + 1;
 
 	var cellLeft = row.insertCell(0);
 	var el = document.createElement('IMG');
-	el.src = 'UIControlLibrary/images/remove-button-red.png';
+	el.setAttribute('src', 'UIControlLibrary/images/remove-button-red.png');
+	el.setAttribute('style', 'padding-left:0px;text-align:center;');
 	el.setAttribute('id', 'chk');
 	el.setAttribute('onclick', 'removeRow(this)');
+
 	cellLeft.appendChild(el);
+	cellLeft.style.padding = '0 0 0 0px';
+	cellLeft.style.textAlign = 'center';
 
 	var startCell = iteration / iteration;
 

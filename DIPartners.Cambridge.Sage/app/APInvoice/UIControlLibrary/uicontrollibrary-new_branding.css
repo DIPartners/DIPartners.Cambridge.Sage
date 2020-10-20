@@ -29,6 +29,13 @@ table#invoice_details_table td input {
     background-color: transparent;
 }
 
+table#po_details_table td input {
+    text-align: right !important;
+    outline: none !important;
+    border-color: transparent !important;
+    background-color: transparent;
+}
+
 input[type="text"]:disabled {
     background: #fafafa;
 }
@@ -58,6 +65,18 @@ input[type="text"]:disabled {
     text-align: center;
 }
 
-#po_details_table tr td:nth-child(2), td:nth-child(7) {
+#po_details_table tr td:nth-child(5) {
+    background-color: white;
+}
+
+#po_details_table tr td:nth-child(2), td:nth-child(7), td:nth-child(8) {
     cursor: pointer;
+}
+
+#invoice_details_table tr td:nth-child(1) {
+    text-align: center !important;
+}
+
+#invoice_details_table tr td:nth-child(2), td:nth-child(3), td:nth-child(4) {
+    background-color: white;
 }

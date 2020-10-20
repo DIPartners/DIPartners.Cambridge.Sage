@@ -226,7 +226,6 @@ function ResetTabs() {
             }
         }
     });
-
 }
 
 function RefreshTab() {
@@ -262,10 +261,9 @@ function SetInvoiceDetails(controller) {
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
 
-    //DisplayImage(Vault, editor.ObjectVersionProperties);
-
     // HKo
-    DisplayImageHKo(Vault, controller, editor, "rtabs", tabname, tabdisplayname);
+    SetInvoicePreview();
+    LoadPreview();
 
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
@@ -293,8 +291,8 @@ function SetInvoiceDetails(controller) {
 
             var htmlStr =
                 '<tr>' +
-                '   <td><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" ' +
-                '               onclick="removeRow(this)"></td > ' +
+                '   <td style="padding:0px;"><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item"' +
+                '       alt="del" onclick = "removeRow(this)" ></td > ' +
                 '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + '"></div></td > ' +
                 '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
@@ -310,7 +308,8 @@ function SetInvoiceDetails(controller) {
     else {
         var htmlStr =
             '<tr>' +
-            '   <td><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item" alt="del" onclick="removeRow(this)"></td>' +
+            '   <td style="padding:0px";><img id="chk" src="UIControlLibrary/images/remove-button-red.png" ' +
+            '        title="delete item" alt = "del" onclick = "removeRow(this)" ></td > ' +
             '   <td><input type="text" id="ItemNumber0" placeholder="" value=""></td >' +
             '   <td><input type="text" id="Quantity0"  placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
             '       onkeypress="return isNumberKey(event,this.id)" ></td>' +
@@ -326,8 +325,8 @@ function SetInvoiceDetails(controller) {
     var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
     TableBody.append(
         '<tr>' +
-        '<td style="border-bottom: none;border-left: none;">' +
-        '<a id="addRow" href="#" title="Add Item" style="text-decoration:none" onclick=addRowToTable("invoice_details_table");>+</a></td> ' +
+        '<td><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
+        '       onclick=addRowToTable("invoice_details_table");><strong>+</strong></a ></td > ' +
         '<td colspan="3" style="text-align:right;"><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
         '<td><input type="text" id="Total" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
         '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
@@ -345,7 +344,7 @@ function SetPODetails(controller) {
     var tabname = 'PO' + editor.ObjectVersion.Title;
     var tabdisplayname = 'PO ' + editor.ObjectVersion.Title;
 
-    CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
+    CreateMetadataCard(controller, editor, "rtabs", tabname, tabdisplayname);
 
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PONumber')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
@@ -359,7 +358,7 @@ function SetPODetails(controller) {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="po_details_table" class="details">' +
-            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th width="18%">Ext $</th><th>Account</th></tr>' +
+            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>REC</th><th>Unit $</th><th width="18%">Ext $</th><th>Account</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -388,6 +387,7 @@ function SetPODetails(controller) {
                 '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
                 '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
                 '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
+                '<td><input type="text" id=\'RECQuantity' + i + '\'" value="0"></td >' +
                 '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
                 '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
                 '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
@@ -400,19 +400,11 @@ function SetPODetails(controller) {
         TableBody.append(SortedList);
         TableBody.append(
             '<tr>' +
-            '<td colspan="7" style="border-bottom: none;border-left: none; text-align:right">' +
+            '<td colspan="8" style="border-bottom: none;border-left: none; text-align:right">' +
             '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +
             '</tr>'
         );
     }
-
-
-    /* // Add the tab to the tab list
-    // $('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#rtabs ul");
-     $('<li><a href="#' + tabname + '" onclick="javascript:CreateRPOMetadataCard(' + tabname + ')">' + tabdisplayname + '</a></li>').appendTo("#rtabs ul");
-     $('<div id="' + tabname + '"><div id="' + tabname + '"></div></div>').appendTo("#rtabs");*/
-    //$("#rtabs").tabs("refresh");
-    CreateRPOMetadataCard(controller, editor, tabname, tabdisplayname, "rtabs");
 }
 
 function SortLineNo(ArrayVal) {
@@ -496,66 +488,17 @@ function FindClassObjects(Vault, CTAlias, PDAlias, PDType, Value) {
     return oSCs;
 }
 
-function DisplayImage(Vault, ObjectVersionProperties) {
-    var tablist = 'rtabs';
-    var tabname = 'InvPre';
-    var tabdisplayname = 'Invoice Preview';
-
-
-    // Add the tab to the tab list
-    $('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    // $('<div id="' + tabname + '"></div>').appendTo("#" + tablist);
-    $('<div id="' + tabname + '"><div id="' + tabname + '0"></div></div>').appendTo("#" + tablist);
-    $("#" + tablist).tabs("refresh");
-
-    var ctrlContainer = $('#' + tabname + '0');
-
-    //var ctrlContainer = $('div.panel-right');
-    var filepath = "";
-
-    var DisplaySearchCondition = new MFiles.SearchCondition();
-    var DisplaySearchConditions = new MFiles.SearchConditions();
-
-    DisplaySearchCondition.ConditionType = MFConditionTypeEqual;
-    DisplaySearchCondition.Expression.DataPropertyValuePropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceName")
-    DisplaySearchCondition.TypedValue.SetValue(MFDatatypeText, ObjectVersionProperties[0].Value.DisplayValue);
-    DisplaySearchConditions.Add(-1, DisplaySearchCondition);
-
-
-    var DisplayResult = Vault.ObjectSearchOperations.SearchForObjectsByConditions(DisplaySearchConditions, MFSearchFlagNone, false);
-    var doc = Vault.ObjectOperations.GetLatestObjectVersionAndProperties(DisplayResult[0].ObjVer.ObjID, false);
-    var file = doc.VersionData.Files(1);
-    filepath = Vault.ObjectFileOperations.GetPathInDefaultView(doc.VersionData.ObjVer.ObjID, doc.VersionData.ObjVer.Version, file.FileVer.ID, file.FileVer.Version);
-
-    // EXTRA: Also show a preview of the document related to this Invoice object.
-    // Add the ActiveX control to the DOM. Were are not using jQuery here to access the DOM, but would obviously
-    // be an option. For details, see:
-    // https://www.m-files.com/UI_Extensibility_Framework/#Embedding%20Shell%20Listings%20in%20Dashboards.html
-    ctrlContainer.html('<object id="preview-ctrl" classid="clsid:' + MFiles.CLSID.PreviewerCtrl + '"> </object>');
-    // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
-    // case it is within a tab on shellFrame.RightPane).
-    // var previewCtrl = document.getElementById('preview-ctrl');
-    var previewCtrl = $('#' + tabname + '0 object').get(0);
-
-    previewCtrl.ShowFilePreview(filepath);
-    //	ctrlContainer.html('<span>' + filepath + '</span>');
-}
-
-function DisplayImageHKo(Vault, controller, editor, tablist, tabid, tabtitle) {
+function SetInvoicePreview() {
 
     var tablist = 'rtabs';
     var tabname = 'InvPre';
     var tabdisplayname = 'Invoice Preview';
 
     // Add the tab to the tab list
-    //$('<li><a href="#' + tabname + '">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
     $('<li><a href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
     $('<div id="' + tabname + '"><div id="' + tabname + '0"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
-
-    LoadPreview();
 }
-
 
 function isRequired(assocPropDefs, propertyNumber) {
     for (var i = 0; i < assocPropDefs.Count; i++) {
@@ -777,35 +720,12 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
 }
 
-function CreateRPOMetadataCard(controller, editor, tabid, tabtitle, tablist) {
-    var controller = gDashboard.CustomData;
-    var editor = controller.Invoice;
-
-    if (typeof controller.cards === 'undefined')
-        cardid = 0;
-    else
-        cardid = controller.cards + 1;
-    editor.cardname = 'metadatacard-' + cardid;
-    editor.tabname = "r" + tabid;
-    editor.tabdisplayname = tabtitle;
-
-    // Add the tab to the tab list
-    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
-    $("#" + tablist).tabs("refresh");
-
-    var PO = document.getElementById(tabid);
-    $(PO.innerHTML).appendTo("#" + editor.tabname);
-}
-
 function LoadPreview() {
     var controller = gDashboard.CustomData;
     var editor = controller.Invoice;
     var Vault = controller.Vault;
 
-    var tablist = 'rtabs';
     var tabname = 'InvPre';
-    var tabdisplayname = 'Invoice Preview';
     var ctrlContainer = $('#' + tabname);
     var filepath = "";
 
@@ -832,8 +752,6 @@ function LoadPreview() {
     // Use the control to show the given file preview (path comes from whoever is embedding this dashboard, in this
     // case it is within a tab on shellFrame.RightPane).
     var previewCtrl = document.getElementById('preview-ctrl');
-    //var previewCtrl = $('#' + tabname + ' object').get(0);
-
     previewCtrl.ShowFilePreview(filepath);
 }
 
