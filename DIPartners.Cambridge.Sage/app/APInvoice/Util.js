@@ -19,7 +19,7 @@
 
 	var startCell = iteration / iteration;
 
-	for (var i = iteration; i < iteration + 4; i++) {
+	for (var i = iteration; i < iteration + 5; i++) {
 		var id = "";
 		var cellRight = row.insertCell(startCell);
 		var el = document.createElement('input');
@@ -28,6 +28,7 @@
 		else if (startCell == 2) id = "Quantity";
 		else if (startCell == 3) id = "UnitPrice";
 		else if (startCell == 4) id = "Extension";
+		else if (startCell == 5) id = "PONumber";
 
 		el.setAttribute('type', 'text');
 		el.setAttribute('id', id + iteration);
@@ -37,6 +38,10 @@
 		}
 		if (startCell == 4)
 			el.setAttribute("readonly", 'true');
+		/*if (startCell == 5) {
+			el.setAttribute("readonly", 'false');
+			el.setAttribute('onkeypress', 'return isNumberKey(event,this.id)');
+		}*/
 
 		/*el.setAttribute("placeholder", '');
 		el.setAttribute("value", '');*/
@@ -64,6 +69,7 @@ function Calculate(_qty, _unit, _ext) {
 }
 
 function isNumberKey(evt, id) {
+	ChangeValue(false);
 	try {
 		var charCode = (evt.which) ? evt.which : event.keyCode;
 
