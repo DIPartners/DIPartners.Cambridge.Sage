@@ -167,6 +167,30 @@ function CreateNewDetails(editor, Vault) {
         propertyValues.Add(-1, GetPropertyValue(Vault, "Quantity", i));             //1151
         propertyValues.Add(-1, GetPropertyValue(Vault, "UnitPrice", i));            //1154
         propertyValues.Add(-1, GetPropertyValue(Vault, "InvoiceLineExtension", i)); //1157
+/*
+            var oPropertyValue = new MFiles.PropertyValue();
+            oPropertyValue = Vault.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true);
+            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
+    
+            var oLookUpRef = new MFiles.Lookup();
+            oLookUpRef.Lookup = oPropertyValue.TypedValue.Getvalueaslookup();
+    
+    
+            var oValListObjType = new MFiles.ObjType();
+            oValListObjType = oVvault.ValueListOperations.GetValueList(propertyValue.PropertyDef.ValueList);
+    */
+    /*  // set Purchase Order Detail - lookup
+            newInvoice.ObjectType = MFBuiltInObjectTypeDocument;
+            newInvoice.Item = editor.ObjectVersion.ObjVer.ID;
+            newInvoice.DisplayValue = propTitle.TypedValue.DisplayValue;
+    
+            // set Purchase Order Detail - properties
+            var propertyValue = new MFiles.PropertyValue();
+            var propertyNumber = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.POReference", true).Value.DisplayValue;
+            propertyValue.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
+            propertyValue.Value.SetValue(Vault.PropertyDefOperations.GetPropertyDef(propertyValue.PropertyDef).DataType, propertyNumber + " - " + i + 1);
+            propertyValues.Add(-1, propertyValue); //1177
+            */
 
         var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
             Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
