@@ -171,12 +171,8 @@ function CreateNewDetails(editor, Vault) {
         propertyValues.Add(-1, GetPropertyValue(Vault, "InvoiceLineExtension", i)); //1157
 
         var PODetails = GetPODetails(Vault, i);
-        if (PODetails != null) {
-            propertyValues.Add(-1, PODetails);      //PO Details
-        }
-        else if (PODetails == -1) {
-            return false;
-        }
+        if (PODetails == -1) return false;
+        if (PODetails != null) propertyValues.Add(-1, PODetails);      //PO Details
 
         var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
             Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
@@ -236,28 +232,58 @@ function GetPODetails(Vault, no) {
     var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
     var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
 
-    var props = ObjectSearchResultsProperties[value - 1];
-    if (props == undefined) {
-        alert("check PO#");
+    var isFound = false;
+
+    for (var i = 0; i < ObjectSearchResults.Count; i++) {
+        var props = ObjectSearchResultsProperties[i];
+        var PoLine = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+
+        if (PoLine == value) {
+            isFound = true;
+            var SearchResult = ObjectSearchResults[i];
+
+            var newLookup = new MFiles.Lookup();
+            newLookup.ObjectType = SearchResult.ObjVer.Type;
+            newLookup.Item = SearchResult.ObjVer.ID;
+            newLookup.DisplayValue = SearchResult.DisplayID;
+
+            var propertyValue = new MFiles.PropertyValue();
+            var VaultOp = Vault.PropertyDefOperations;
+
+            propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
+            propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, newLookup);
+
+            return propertyValue;
+        }
+    }
+
+    if (!isFound) {
+        alert("PO# is out of range");
         return -1;
     }
-    var SearchResult = ObjectSearchResults[value - 1];
-    var PODetailName = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
-    if (SearchResult.Title == PODetailName) {
-        var newLookup = new MFiles.Lookup();
-        newLookup.ObjectType = SearchResult.ObjVer.Type;
-        newLookup.Item = SearchResult.ObjVer.ID;
-        newLookup.DisplayValue = SearchResult.DisplayID;
 
-
-        var propertyValue = new MFiles.PropertyValue();
-        var VaultOp = Vault.PropertyDefOperations;
-
-        propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
-        propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, newLookup);
-
-        return propertyValue;
-    }
+    /* var props = ObjectSearchResultsProperties[value-1];
+     if (props == undefined) {
+         alert("check PO#");
+         return -1;
+     }
+     var SearchResult = ObjectSearchResults[value-1];
+    // var PODetailName = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
+     if (SearchResult.Title == PODetailName) {
+         var newLookup = new MFiles.Lookup();
+         newLookup.ObjectType = SearchResult.ObjVer.Type;
+         newLookup.Item = SearchResult.ObjVer.ID;
+         newLookup.DisplayValue = SearchResult.DisplayID;
+ 
+ 
+         var propertyValue = new MFiles.PropertyValue();
+         var VaultOp = Vault.PropertyDefOperations;
+ 
+         propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
+         propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, newLookup);
+ 
+         return propertyValue;
+     }*/
 
     /*
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
