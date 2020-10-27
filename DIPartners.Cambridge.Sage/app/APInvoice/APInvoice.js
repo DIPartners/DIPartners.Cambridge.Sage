@@ -170,9 +170,9 @@ function CreateNewDetails(editor, Vault) {
         propertyValues.Add(-1, GetPropertyValue(Vault, "UnitPrice", i));            //1154
         propertyValues.Add(-1, GetPropertyValue(Vault, "InvoiceLineExtension", i)); //1157
 
-        var PODetails = GetPODetails(Vault, i);
-        if (PODetails == -1) return false;
-        if (PODetails != null) propertyValues.Add(-1, PODetails);      //PO Details
+        var POValues = GetPOPropertyValue(Vault, i);
+        if (POValues == -1) return false;
+        if (POValues != null) propertyValues.Add(-1, POValues);      //PO Details
 
         var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
             Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
@@ -205,14 +205,11 @@ function DuplicatedPOValue() {
             return true;
         }
     }
-    /*if (new Set(arrPOVal).size !== arrPOVal.length) {
-        alert("PO# is duplicated");
-        return true;
-    }*/
+
     return false;
 }
 
-function GetPODetails(Vault, no) {
+function GetPOPropertyValue(Vault, no) {
 
     var Vault = gDashboard.Vault;
     var controller = gDashboard.CustomData;
@@ -226,6 +223,7 @@ function GetPODetails(Vault, no) {
     var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
     var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
 
+    if (PONO == "") return null;
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
 
@@ -261,55 +259,6 @@ function GetPODetails(Vault, no) {
         alert("PO# is out of range");
         return -1;
     }
-
-    /* var props = ObjectSearchResultsProperties[value-1];
-     if (props == undefined) {
-         alert("check PO#");
-         return -1;
-     }
-     var SearchResult = ObjectSearchResults[value-1];
-    // var PODetailName = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
-     if (SearchResult.Title == PODetailName) {
-         var newLookup = new MFiles.Lookup();
-         newLookup.ObjectType = SearchResult.ObjVer.Type;
-         newLookup.Item = SearchResult.ObjVer.ID;
-         newLookup.DisplayValue = SearchResult.DisplayID;
- 
- 
-         var propertyValue = new MFiles.PropertyValue();
-         var VaultOp = Vault.PropertyDefOperations;
- 
-         propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
-         propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, newLookup);
- 
-         return propertyValue;
-     }*/
-
-    /*
-        for (var i = 0; i < ObjectSearchResults.Count; i++) {
-            var props = ObjectSearchResultsProperties[i];
-            var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
-    
-    
-    
-            if (LineNo == value.trim() && ObjectSearchResults[i].Title == props.TypedValue.DisplayValue) {
-    
-                var newLookup = new MFiles.Lookup();
-                newLookup.ObjectType = ObjectSearchResults[i].ObjVer.Type;
-                newLookup.Item = ObjectSearchResults[i].ObjVer.ID;
-                newLookup.DisplayValue = ObjectSearchResults[i].DisplayID;
-    
-    
-                var propertyValue = new MFiles.PropertyValue();
-                var VaultOp = Vault.PropertyDefOperations;
-    
-                propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty.PurchaseOrderDetail");
-                propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, newLookup);
-    
-                return propertyValue;
-            }
-        }*/
-
 }
 
 function CheckNull() {
@@ -384,6 +333,7 @@ function SetInvoiceDetails(controller) {
     var Vault = controller.Vault;
     var tabname = 'Invoice';
     var tabdisplayname = tabname;
+    var ArrayVal = [];
 
     var self = this;
 
@@ -403,7 +353,7 @@ function SetInvoiceDetails(controller) {
     editor.table.append(
         '<tr><td colspan="5" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details">' +
-        '       <tr><th width="5%">-</th><th width="25%">Item</th><th width="15%">Qty</th><th width="25%">Unit $</th><th width="20%">Ext $</th><th width="10%">PO#</th></tr>' +
+        '       <tr><th width="5%">-</th><th width="30%">Item</th><th width="15%">Qty</th><th width="20%">Unit $</th><th width="20%">Ext $</th><th width="10%">PO#</th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
@@ -438,8 +388,14 @@ function SetInvoiceDetails(controller) {
                 '   <td><input type="text" id=\'PONumber' + i + '\' placeholder="' + PONumber + '" value="' + PONumber.split("-").pop().trim() + ' "title="' + PONumber + '"' +
                 '       onkeypress="return isNumberKey(event,this.id)"></div></td > ' +
                 "</tr>";
-            TableBody.append(htmlStr);
+            // TableBody.append(htmlStr);
+
+            // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
+            ArrayVal[i] = PONumber + ", " + htmlStr;
         }
+
+        var SortedList = SortLineNo(ArrayVal).join();
+        TableBody.append(SortedList);
     }
     else {
         var htmlStr =
@@ -508,6 +464,7 @@ function SetPODetails(controller) {
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+            var PODetailName = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
             var ItemNO = Item.split("=>");
             var ItemVal = ItemNO[0];
@@ -519,7 +476,7 @@ function SetPODetails(controller) {
             var AccountNO = Account.split(" ");
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value;
             strTable = '<tr>' +
-                '<td style="text-align:center"><span id="LineNumber">' + LineNo + '</span></td>' +
+                '<td style="text-align:center" title="' + PODetailName + '"><span id="LineNumber">' + LineNo + '</span></td>' +
                 '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
                 '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
                 '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
