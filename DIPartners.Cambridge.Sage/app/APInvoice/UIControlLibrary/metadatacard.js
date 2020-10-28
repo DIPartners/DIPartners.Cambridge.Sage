@@ -566,8 +566,7 @@
 			$(window).resize(function () {
 
 				self.refreshReqCount = 0;
-				//HKo
-				if (!isPopup) self.resizeLayout();
+				self.resizeLayout();
 			});
 
 			// control text-selectability
@@ -2731,97 +2730,101 @@
 			var self = this;
 			this.resizeContentArea();
 
-			// update title size in vertical layout
-			var max = 23, min = 13;
-			var header = $(".mf-file-header:first");
-			var title = header.find(".mf-filename");
-			var titleLength = title.text().length;
-			var width = header.width() - 140;
-			var ratio = .28; // the larger the value, the smaller the font size
-
-			// 17 characters seem to fit at 23px font size and minimum window width 250
-			// above 18px font we get 2 lines, at or below 18px we get 3
-			// at 13px we get 4 lines - and everything should fit there
-			var size = Math.round(width / (titleLength * ratio));
-			size = Math.min(max, Math.max(min, size));
-
-			// resize with normal word breaking
-			title.css({
-				"font-size": size + "px",
-				"word-break": "normal",
-				"opacity": 0.0
-			});
-
-			// Allow timeout callback below to be handled before possibly now waiting deferred control creation. Otherwise CSS zero opacity set
-			// above may be active while controls are being created, there hiding title (NOTE: the title still seems to disappear for 
-			// longish time).
-			var reschedule = false;
-			if (this.deferredControlCreation.timeoutId) {
-				clearTimeout(this.deferredControlCreation.timeoutId);
-				this.deferredControlCreation.timeoutId = undefined;
-				reschedule = true;
-			}
-
-			// TERRIBLE HACK!
-			// toggle pre/pre-wrap property to force IE to render the text properly
-			// without this, ie can clip characters of the ends of line despite the fact that it is wrapping
-			// this is also done in multiline control - pre-wrap seems to be the problem
-			title.css("white-space", "pre");
-			setTimeout(function () {
-				title.css({
-					"white-space": "pre-wrap",
-					"opacity": 0.99
-				});
-
-				// force word breaking if needed after pre-wrap has been reset
-				var newWidth = header[0].scrollWidth;
-				var cardWidth = $(".mf-metadatacard").innerWidth();
-				if (newWidth - 80 > cardWidth) {
-					title.css("word-break", "break-all");
-				}
-
-				if (reschedule)
-					self.enqueDeferredControlCreation(10);
-
-			}, 0);
-
+			/*			// update title size in vertical layout
+						var max = 23, min = 13;
+						var header = $( ".mf-file-header:first" );
+						var title = header.find( ".mf-filename" );
+						var titleLength = title.text().length;
+						var width = header.width() - 140;
+						var ratio = .28; // the larger the value, the smaller the font size
+			
+						// 17 characters seem to fit at 23px font size and minimum window width 250
+						// above 18px font we get 2 lines, at or below 18px we get 3
+						// at 13px we get 4 lines - and everything should fit there
+						var size = Math.round( width / ( titleLength * ratio ) );
+						size = Math.min( max, Math.max( min, size ) );
+			
+						// resize with normal word breaking
+						title.css( {
+							"font-size": size + "px",
+							"word-break": "normal",
+							"opacity": 0.0
+						} );
+			
+						// Allow timeout callback below to be handled before possibly now waiting deferred control creation. Otherwise CSS zero opacity set
+						// above may be active while controls are being created, there hiding title (NOTE: the title still seems to disappear for 
+						// longish time).
+						var reschedule = false;
+						if( this.deferredControlCreation.timeoutId ) {
+							clearTimeout( this.deferredControlCreation.timeoutId );
+							this.deferredControlCreation.timeoutId = undefined;
+							reschedule = true;
+						}
+						
+						// TERRIBLE HACK!
+						// toggle pre/pre-wrap property to force IE to render the text properly
+						// without this, ie can clip characters of the ends of line despite the fact that it is wrapping
+						// this is also done in multiline control - pre-wrap seems to be the problem
+						title.css( "white-space", "pre" );
+						setTimeout( function() {
+							title.css( {
+								"white-space": "pre-wrap",
+								"opacity": 0.99
+							} );
+			
+							// force word breaking if needed after pre-wrap has been reset
+							var newWidth = header[0].scrollWidth;
+							var cardWidth = $( ".mf-metadatacard" ).innerWidth();
+							if( newWidth - 80 > cardWidth ) {
+								title.css( "word-break", "break-all" );
+							}
+			
+							if ( reschedule )
+								self.enqueDeferredControlCreation( 10 );
+			
+						}, 0 );
+			*/
 			// Notify active control about resizing by calling function viewResized (if the function exists).
 			if (this.activeControl && this.activeControl.viewResized) {
 				this.activeControl.viewResized();
 			}
+
 
 			// Show additional links: Subobjects and Remote vault.
 			$(".mf-a dditional-links-bottom").hide();
 			$(".mf-additional-links").show();
 
 			// update comment layout
-			if (!isPopup) {
-				$(".mf-comment-area").commentscontrol("size");
-			}
-
+			//			$(".mf-comment-area").commentscontrol("size");
 		},
 
 		resizeContentArea: function () {
 
-			//HKO
 			// Figure out all heights.
-			if (!isPopup) {
-				var headerExpanded = self.controller.editor.GetUIData("HeaderExpanded", true),
-					win = $(window).height(),
-					header = (!headerExpanded) ? 0 : this.element.find(".mf-file-header").outerHeight(),
-					saveas = $("#save-as").outerHeight(),
-					bar = this.element.find(".mf-header-bar").outerHeight(),
-					footer = this.element.find("#mf-footer").outerHeight(),
-					content = win - header - bar - footer;
-			}
+			//			var headerExpanded = self.controller.editor.GetUIData("HeaderExpanded", true),
+			win = $(window).height(),
+				//				header = (!headerExpanded) ? 0 : this.element.find(".mf-file-header").outerHeight(),
+				//				saveas = $("#save-as").outerHeight(),
+				//				bar = this.element.find(".mf-header-bar").outerHeight(),
+				//				footer = this.element.find("#mf-footer").outerHeight(),
+				footer = $("#mf-footer").outerHeight(),
+				content = win - footer;
 			// Figure out property footer's height based on its visibility.
-			var propFooter = 0;
-			if ($(".mf-property-footer").css("display") !== "none")
-				propFooter = this.element.find(".mf-property-footer").outerHeight();
+			// var propFooter = 0;
+			//			if( $( ".mf-property-footer" ).css( "display" ) !== "none" )
+			//				propFooter = this.element.find( ".mf-property-footer" ).outerHeight();
 
 			// Set height of the content area.
-			this.element.find(".mf-content").outerHeight(content);
-			this.element.find(".mf-section-properties>div").outerHeight(content - saveas - propFooter);
+			var pch = $(".panel-container").innerHeight();
+			var tabh = $(".ui-tabs-nav").outerHeight();
+			$(".mf-layout-vertical").height(win - 10);
+			$(".panel-container").height(content - 20);
+			$(".ui-tabs-panel").height(pch - tabh);
+			$(".mf-section-properties>div").outerHeight($(".ui-tabs-panel").height());
+
+			//$(".page-container").height(content - 10);
+			//$(".mf-content").outerHeight(win);
+			//$("#preview-ctrl").height(50);
 		},
 
 		hidePreview: function () {

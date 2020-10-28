@@ -10,8 +10,8 @@ function OnNewDashboard(dashboard) {
 
     if (isPopup) {
         dashboard.Window.Height = 880;
-        dashboard.Window.Resizable = false;
-        dashboard.Window.Maximizable = false;
+        /*dashboard.Window.Resizable = false;
+        dashboard.Window.Maximizable = false;*/
     }
     // Initialize console.
     else console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
@@ -88,6 +88,17 @@ function SetDetails(dashboard) {
     SetPSDetails(controller);
     $("#ltabs").tabs("option", "active", 0);
     $("#rtabs").tabs("option", "active", 0);
+
+    var pch = $(".panel-container").innerHeight();
+    var tabh = $(".ui-tabs-nav").outerHeight();
+    $(".ui-tabs-panel").height(pch - tabh - 10);
+
+    //    $("#Invoice").css("height", "100%");
+    //if(isPopup) $(".mf-layout-vertical").attr({ style: 'width:60% !important; height:50% !important; position: relative !important;' });
+    //var calWidth = $(".mf-layout-vertical").width();
+    //   var calHeight = $(".mf-layout-vertical").height();
+    //    alert(calWidth);
+    //   alert(calHeight);
     if (!isPopup) CreatePopupIcon();
 }
 
@@ -291,9 +302,9 @@ function SaveInvoice() {
 
 function ResetTabs() {
     $(".panel-left").empty();
-    $(".panel-left").append('<div id="ltabs" style="height:100%"><ul></ul></div>');
+    $(".panel-left").append('<div id="ltabs"><ul></ul></div>');
     $(".panel-right").empty();
-    $(".panel-right").append('<div id="rtabs" style="height:100%"><ul></ul></div>');
+    $(".panel-right").append('<div id="rtabs"><ul></ul></div>');
     $('#ltabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
@@ -377,15 +388,15 @@ function SetInvoiceDetails(controller) {
                 '<tr>' +
                 '   <td style="padding:0px;"><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "removeRow(this)" ></td > ' +
-                '   <td><input type="text" id=\'ItemNumber' + i + '\' placeholder="' + Item + '" value="' + Item + ' "title="' + Item + '"></div></td > ' +
-                '   <td><input type="text" id=\'Quantity' + i + '\' placeholder="' + Qty + '" value="' + Qty + '" ' +
+                '   <td style="text-align:left !important;"><input type="text" id=\'ItemNumber' + i + '\' value="' + Item + ' "title="' + Item + '"></td > ' +
+                '   <td><input type="text" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
-                '       onkeypress="return isNumberKey(event,this.id)" ></td> ' +
-                '   <td><input type="text" id=\'UnitPrice' + i + '\' placeholder="' + Price + '" value="' + Price + '" ' +
+                '       onkeypress="return isNumberKey(event,this.id)"></td> ' +
+                '   <td><input type="text" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
-                '       onkeypress="return isNumberKey(event,this.id)" ></td> ' +
-                '   <td><input type="text" id=\'Extension' + i + '\' placeholder="' + Amount + '" value="' + Amount + '" readonly="true"></td>' +
-                '   <td><input type="text" id=\'PONumber' + i + '\' placeholder="' + PONumber + '" value="' + PONumber.split("-").pop().trim() + ' "title="' + PONumber + '"' +
+                '       onkeypress="return isNumberKey(event,this.id)"></td> ' +
+                '   <td><input type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
+                '   <td><input type="text" id=\'PONumber' + i + '\' value="' + PONumber.split("-").pop().trim() + ' "title="' + PONumber + '"' +
                 '       onkeypress="return isNumberKey(event,this.id)"></div></td > ' +
                 "</tr>";
             // TableBody.append(htmlStr);
@@ -402,13 +413,13 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '   <td style="padding:0px";><img id="chk" src="UIControlLibrary/images/remove-button-red.png" ' +
             '        title="delete item" alt = "del" onclick = "removeRow(this)" ></td > ' +
-            '   <td><input type="text" id="ItemNumber0" placeholder="" value=""></td >' +
-            '   <td><input type="text" id="Quantity0"  placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '   <td style="text-align:left"><input type="text" id="ItemNumber0" value=""></td >' +
+            '   <td><input type="text" id="Quantity0" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
             '       onkeypress="return isNumberKey(event,this.id)" ></td>' +
-            '   <td><input type="text" id="UnitPrice0" placeholder="" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '   <td><input type="text" id="UnitPrice0" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
             '       onkeypress="return isNumberKey(event,this.id)" ></td> ' +
-            '   <td><input type="text" id="Extension0" placeholder="" value="" readonly="true"></td>' +
-            '   <td><input type="text" id="PONumber0" placeholder="" value="" onkeypress="return isNumberKey(event,this.id)"></td>' +
+            '   <td><input type="text" id="Extension0" value="" readonly="true"></td>' +
+            '   <td><input type="text" id="PONumber0" value="" onkeypress="return isNumberKey(event,this.id)"></td>' +
             "</tr>";
 
         TableBody.append(htmlStr);
@@ -421,8 +432,7 @@ function SetInvoiceDetails(controller) {
         '<td><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick=addRowToTable("invoice_details_table");><strong>+</strong></a ></td > ' +
         '<td colspan="3" style="text-align:right;"><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
-        '<td colspan="2"><input type="text" id="Total" placeholder="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
-        '" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
+        '<td colspan="2"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
         '</tr>'
     );
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal')
@@ -450,7 +460,7 @@ function SetPODetails(controller) {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="po_details_table" class="details">' +
-            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>REC</th><th>Unit $</th><th width="18%">Ext $</th><th>Account</th></tr>' +
+            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th width="18%">Ext $</th><th>Account</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -477,10 +487,9 @@ function SetPODetails(controller) {
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value;
             strTable = '<tr>' +
                 '<td style="text-align:center" title="' + PODetailName + '"><span id="LineNumber">' + LineNo + '</span></td>' +
-                '<td style="text-align:center" style="word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
+                '<td style="text-align:left; word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
                 '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
                 '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
-                '<td><input type="text" id=\'RECQuantity' + i + '\'" value="0"></td >' +
                 '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
                 '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
                 '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
@@ -493,7 +502,7 @@ function SetPODetails(controller) {
         TableBody.append(SortedList);
         TableBody.append(
             '<tr>' +
-            '<td colspan="8" style="border-bottom: none;border-left: none; text-align:right">' +
+            '<td colspan="7" style="border-bottom: none;border-left: none; text-align:right">' +
             '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +
             '</tr>'
         );
@@ -753,7 +762,6 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
         return controller.localization;
     };
 
-    // Create and initialize metadatacard widget.
     var metadatacard = $('#' + editor.cardname);
     metadatacard.metadatacard({});
     // Enable configurability, disable logging.
