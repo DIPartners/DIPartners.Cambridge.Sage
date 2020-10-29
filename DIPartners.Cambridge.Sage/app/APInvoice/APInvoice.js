@@ -10,8 +10,6 @@ function OnNewDashboard(dashboard) {
 
     if (isPopup) {
         dashboard.Window.Height = 880;
-        /*dashboard.Window.Resizable = false;
-        dashboard.Window.Maximizable = false;*/
     }
     // Initialize console.
     else console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
@@ -91,14 +89,8 @@ function SetDetails(dashboard) {
 
     var pch = $(".panel-container").innerHeight();
     var tabh = $(".ui-tabs-nav").outerHeight();
-    $(".ui-tabs-panel").height(pch - tabh - 10);
+    $(".ui-tabs-panel").height(pch - tabh);
 
-    //    $("#Invoice").css("height", "100%");
-    //if(isPopup) $(".mf-layout-vertical").attr({ style: 'width:60% !important; height:50% !important; position: relative !important;' });
-    //var calWidth = $(".mf-layout-vertical").width();
-    //   var calHeight = $(".mf-layout-vertical").height();
-    //    alert(calWidth);
-    //   alert(calHeight);
     if (!isPopup) CreatePopupIcon();
 }
 

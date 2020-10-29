@@ -2807,8 +2807,8 @@
 				//				saveas = $("#save-as").outerHeight(),
 				//				bar = this.element.find(".mf-header-bar").outerHeight(),
 				//				footer = this.element.find("#mf-footer").outerHeight(),
-				footer = $("#mf-footer").outerHeight(),
-				content = win - footer;
+			footer = $("#mf-footer").outerHeight(),
+			content = win - footer;
 			// Figure out property footer's height based on its visibility.
 			// var propFooter = 0;
 			//			if( $( ".mf-property-footer" ).css( "display" ) !== "none" )
@@ -2817,14 +2817,10 @@
 			// Set height of the content area.
 			var pch = $(".panel-container").innerHeight();
 			var tabh = $(".ui-tabs-nav").outerHeight();
-			$(".mf-layout-vertical").height(win - 10);
-			$(".panel-container").height(content - 20);
+			$(".mf-layout-vertical").height(win);
+			$(".panel-container").height(content - $("#titleLabel").height());
 			$(".ui-tabs-panel").height(pch - tabh);
 			$(".mf-section-properties>div").outerHeight($(".ui-tabs-panel").height());
-
-			//$(".page-container").height(content - 10);
-			//$(".mf-content").outerHeight(win);
-			//$("#preview-ctrl").height(50);
 		},
 
 		hidePreview: function () {
