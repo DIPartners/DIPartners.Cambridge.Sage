@@ -1,6 +1,8 @@
 //const { error } = require("jquery");
 var gDashboard;
 var isPopup;
+/*const int IDS_METADATACARD_COMMAND_SAVE = 27593;
+const int IDS_METADATACARD_BUTTON_DISCARD = 27614;*/
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
 
@@ -35,8 +37,6 @@ function SetDetails(dashboard) {
 
     // Show some information of the document.
     $('#message_placeholder').text(controller.ObjectVersion.Title + ' (' + controller.ObjectVersion.ObjVer.ID + ')');
-
-
     var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 
     controller.Invoice = {
@@ -92,6 +92,22 @@ function SetDetails(dashboard) {
     $(".ui-tabs-panel").height(pch - tabh);
 
     if (!isPopup) CreatePopupIcon();
+    ResizeContentArea();
+    SetButton();
+}
+
+function SetButton() {
+/*    this.localization = gDashboard.customData.getLocalization();
+    var localizationStrings = this.localization.strings;
+*/    var saveLabel = GetText("IDS_METADATACARD_COMMAND_SAVE");
+    var discardLabel = GetText("IDS_METADATACARD_BUTTON_DISCARD");
+
+    $("#save-data").text(saveLabel);
+    $("#discard-data").text(discardLabel);
+
+    $(window).resize(function () {
+        ResizeContentArea();
+    });
 }
 
 function GetColIndex(pptName) {
@@ -173,6 +189,7 @@ function CreateNewDetails(editor, Vault) {
         propertyValues.Add(-1, GetPropertyValue(Vault, "UnitPrice", i));            //1154
         propertyValues.Add(-1, GetPropertyValue(Vault, "InvoiceLineExtension", i)); //1157
 
+        // set PO Details
         var POValues = GetPOPropertyValue(Vault, i);
         if (POValues == -1) return false;
         if (POValues != null) propertyValues.Add(-1, POValues);      //PO Details
@@ -707,27 +724,6 @@ function setProperty(Vault, editor, propertyAlias) {
     return propertyObject
 }
 
-function setControlState(anyControlInEditMode, updateHighlights, updateTheme) {
-
-    this.anyControlInEditMode = anyControlInEditMode;
-
-    // If any control is in edit mode or model has modified values or this is uncreated object,
-    // set the metadata card to edit mode.
-    //RSS			if( anyControlInEditMode || this.controller.isModified() || this.controller.dataModel.UncreatedObject )
-    if (anyControlInEditMode)
-        this.editModeStarted(updateTheme);
-    else
-        this.viewModeStarted(updateTheme);
-
-    if (updateHighlights) {
-
-        var self = this;
-        // something may have returned to view mode... update highlighting
-        setTimeout(function () {
-            self.updateHighlights(self.controller.editor);
-        }, 0);
-    }
-}
 
 function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var self = this;
@@ -749,18 +745,19 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     $("#" + tablist).tabs("refresh");
 
     // Add localization to the controller
-    controller.localization = new localization();
+    /*if (!controller.localization)   controller.localization = new localization();
     controller.getLocalization = function () {
         return controller.localization;
-    };
+    };*/
 
-    var metadatacard = $('#' + editor.cardname);
+    //HKo removed metadatacard initialize
+    /*var metadatacard = $('#' + editor.cardname);
     metadatacard.metadatacard({});
     // Enable configurability, disable logging.
     initParameters = { enableConfigurability: true, enableLogging: false }
 
     // Set initial metadata card mode to view mode. Don't try to update theme yet, because configuration data is not yet ready.
-    metadatacard.metadatacard("initialize", controller, initParameters);
+    metadatacard.metadatacard("initialize", controller, initParameters);*/
 
     var MetaCard = $('div #' + editor.cardname);
     MetaCard.addClass("mf-card-docked");
@@ -810,7 +807,6 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
     editor.metadatacard = MetaCard;
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
-
 }
 
 function LoadPreview() {

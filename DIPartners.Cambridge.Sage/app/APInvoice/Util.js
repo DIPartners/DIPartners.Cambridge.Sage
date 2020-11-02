@@ -53,7 +53,6 @@
 }
 
 function Calculate(_qty, _unit, _ext) {
-
 	var Ext = document.getElementById(_ext);
 	var Qty = document.getElementById(_qty).value;
 
@@ -90,6 +89,7 @@ function isNumberKey(evt, id) {
 }
 
 function CalculateTotal() {
+
 	var tbl = document.getElementById('invoice_details_table');
 	var lastRow = tbl.rows.length - 1;	// header
 	var Ext = 0;
@@ -138,4 +138,63 @@ function removeRow(sender) {
 function ChangeValue(val) {
 	document.getElementById("save-data").disabled = val;
 	document.getElementById("discard-data").disabled = val;
+}
+
+function htmlencode(text, convertNewLine) {
+
+	// Handle null and undefined values.
+	if (text == null || text == undefined)
+		return "";
+
+	// Encode value.
+	var result = text.replace(/[&<>"']/g, function ($0) {
+		return "&" + { "&": "amp", "<": "lt", ">": "gt", '"': "quot", "'": "#39" }[$0] + ";";
+	});
+
+	// Convert also "new line" if requested.
+	if (convertNewLine)
+		result = result.replace(/\n/gi, "<br />");
+
+	// return encoded value;
+	return result;
+}
+
+function removeQuotes(text) {
+
+	// Remove quotes.
+	return text.replace(/["']/g, function ($0) {
+		return { '"': "", "'": "" }[$0];
+	});
+}
+
+
+function GetText(id) {
+	if (id == "IDS_METADATACARD_COMMAND_SAVE") id = 27593;
+	else if (id == "IDS_METADATACARD_BUTTON_DISCARD") id = 27614;
+
+	// Get localized text from MFShell.
+	var localizedString = null;
+	try {
+		localizedString = MFiles.GetStringResource(id);
+	}
+	catch (ex) {
+	}
+	return (localizedString != null) ? localizedString : "";
+}
+
+function ResizeContentArea() {
+
+	// Figure out all heights.
+	//			var headerExpanded = self.controller.editor.GetUIData("HeaderExpanded", true),
+	win = $(window).outerHeight(),
+		footer = $("#mf-footer").outerHeight(),
+		content = win - footer;
+
+	// Set height of the content area.
+	$(".panel-container").height(content - $("#titleLabel").height());
+	var pch = $(".panel-container").height();
+	var tabh = $(".ui-tabs-nav").height();
+	$(".mf-layout-vertical").height(win);
+	$(".ui-tabs-panel").height(pch - tabh);
+	$(".mf-section-properties").outerHeight($(".ui-tabs-panel").height());
 }

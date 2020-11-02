@@ -11,10 +11,11 @@
     <!-- To avoid display Date/Telephone number as hyperlink in edge browser. -->
     <meta name="format-detection" content="telephone=no,date=no" />
     <!-- Styles -->
+    <!--
+        <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery.ui.1.10.0.ie.css" />
+        <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/demo.css" />
+    -->
     <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css" />
-    <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery.ui.1.10.0.ie.css" />
-    <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/demo.css" />
-
     <!-- CSS for layout and style -->
     <link rel="Stylesheet" type="text/css" href="UIControlLibrary/uicontrollibrary-new.css" />
     <!-- CSS to allow overriding layout and style. -->
@@ -47,15 +48,16 @@
         <script type="text/javascript" src="UIControlLibrary/vaultoperations.js"></script>
         <script type="text/javascript" src="UIControlLibrary/utilities.js"></script>
         <script type="text/javascript" src="UIControlLibrary/main.js"></script>
-    -->
-    <script type="text/javascript" src="UIControlLibrary/configurationhelper.js"></script>
-    <script type="text/javascript" src="UIControlLibrary/propertygrouping.js"></script>
-    <script type="text/javascript" src="UIControlLibrary/configurationmanager.js"></script>
 
-    <script type="text/javascript" src="UIControlLibrary/metadatacard.js"></script>
+    <script type="text/javascript" src="UIControlLibrary/configurationhelper.js"></script>
+    <script type="text/javascript" src="UIControlLibrary/configurationmanager.js"></script>
+    <script type="text/javascript" src="UIControlLibrary/propertygrouping.js"></script>
     <script type="text/javascript" src="UIControlLibrary/utilities.js"></script>
     <script type="text/javascript" src="UIControlLibrary/editmanager.js"></script>
+    <script type="text/javascript" src="UIControlLibrary/metadatacard.js"></script>
     <script type="text/javascript" src="UIControlLibrary/localization.js"></script>
+    -->
+
     <script src="UIControlLibrary/jquery-resizable-dom/jquery-resizable.min.js"></script>
     <script src="APInvoice.js"></script>
     <script src="Util.js"></script>
@@ -76,18 +78,18 @@
 </head>
 <body style="zoom: 1;">
     <div class="page-container">
-        <label id="testLabel">Invoice Details:  <span id="message_placeholder"></span></label>
+        <label id="titleLabel">Invoice Details:  <span id="message_placeholder"></span></label>
         <div class="panel-container">
-            <div class="panel-left"></div>
+            <div class="panel-left" style="width:40%;"></div>
             <div class="splitter"></div>
-            <div class="panel-right"></div>
+            <div class="panel-right" style="width:60%;"></div>
         </div>
     </div>
     <!-- Footer begins -->
-    <div class="eclip" id="mf-footer">
+    <div class="eclip" id="mf-footer" style="padding-bottom:10px;">
         <div id="iv-buttons">
-            <button type="button" id="save-data" onclick="SaveInvoice();" disabled=""><span class="ui-button-text">Save</span></button>
-            <button type="button" id="discard-data" onclick="DiscardInvoice();" disabled=""><span class="ui-button-text">Discard</span></button>
+            <button type="button" id="save-data" onclick="SaveInvoice();" disabled=""></button>
+            <button type="button" id="discard-data" onclick="DiscardInvoice();" disabled=""></button>
         </div>
     </div>
 </body>
