@@ -1,0 +1,1963 @@
+@import url('.\\jquery.timeentry-1.4.9\\jquery.timeentry.css');
+
+/*
+Explicitly define a Segoe UI font-family so that we can assign Segoe UI 
+Semilight to an appropriate font-weight.
+*/
+
+
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-weight: 200;
+    src: local("Segoe UI Light");
+}
+
+
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-weight: 300;
+    src: local("Segoe UI Semilight");
+}
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-weight: 400;
+    src: local("Segoe UI");
+}
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-weight: 600;
+    src: local("Segoe UI Semibold");
+}
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-weight: 700;
+   
+    src: local("Segoe UI Semibold");
+}
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-style: italic;
+    font-weight: 400;
+    src: local("Segoe UI Italic");
+}
+@font-face {
+    font-family: "Segoe UI", Sans-Serif;
+    font-style: italic;
+    font-weight: 700;
+    src: local("Segoe UI Bold Italic");
+}
+
+
+
+/* Support for HTML5 elements in IE8 */
+header
+,nav
+,section
+,article
+,aside
+,footer
+,hgroup 
+{
+display: block;
+}
+
+
+html, body {
+    overflow-y: hidden;
+}
+    
+/* OVERALL LAYOUT (START) */
+
+/* Metadatacard */
+.mf-metadatacard { overflow:hidden; position: relative; color: #999999; }
+.mf-metadatacard.mf-layout-empty { display: none; }
+
+/* Header */
+
+
+/* Content */
+.mf-mode-comments #mf-properties-view { display:none }
+.mf-mode-properties #mf-comments-view { display:none }
+.ui-state-hidden { display: none !important;}
+
+/* Footer */
+
+
+/* OVERALL LAYOUT (END) */ 
+
+/* Hide metadata card description when comments view is visible */
+.mf-mode-comments .mf-metadatacard-description { display:none !important; }
+
+/* HEADER ELEMENTS (START) */
+.mf-file-header { position:relative; height: 130px; background-color:#f2f2f2; }
+.mf-header-collapsed .mf-file-header { display:none; }
+
+.mf-title-bar { height: 70px; line-height:70px; white-space:nowrap; padding-top:5px;}
+.mf-obj-icon-large { display:inline-block; position:relative; vertical-align:middle; width:48px; height:48px; margin:auto 1em; background: url('UIControlLibrary/blank16.png') no-repeat center; background-size: 100%; }
+
+/* Title. */
+.mf-filename{ display:inline-block; vertical-align:middle; font-size:23px; white-space:normal; max-height:2.6em; line-height:1.3em; color:#666666; overflow:hidden; text-overflow:clip; }
+html.mf-ltr .mf-filename{ margin-right: 140px; }
+html.mf-rtl .mf-filename{ margin-left:  140px; }
+
+.mf-obj-info-bar { position:relative; height:55px; margin:0em 1em; }
+
+/* Left part of the header. */
+.mf-header-left { position:absolute; bottom:.2em; max-width:45%; color:#808080; background:transparent; }
+html.mf-ltr .mf-header-left { left:  0em; }
+html.mf-rtl .mf-header-left { right: 0em; }
+
+/* Object ID. */
+.mf-header-left .mf-objectid { }
+html.mf-ltr .mf-header-left .mf-objectid { padding-right: .2em; }
+html.mf-rtl .mf-header-left .mf-objectid { padding-left:  .2em; }
+
+/* Right part of the header. */
+.mf-header-right { position:absolute; bottom:.2em; max-width:55%; font-style:italic; font-size:12px; color:#808080; background:transparent; }
+html.mf-ltr .mf-header-right { right: 0em; text-align: right; }
+html.mf-rtl .mf-header-right { left:  0em; text-align: left;  }
+
+/* Source files in the header. */
+.mf-obj-sourcefiles { background: #eeeeee; border:1px solid #ccc; position: absolute; top: 55px; height: 290px; width: 100%; overflow:auto; z-index: 9999; }
+html.mf-ltr .mf-obj-sourcefiles { padding: 5px 0px 0px 5px; left:  0px; }
+html.mf-rtl .mf-obj-sourcefiles { padding: 5px 5px 0px 0px; right: 0px; }
+
+.mf-header-bar { background:#318ccc; color:white; height:auto; line-height: 30px; white-space:nowrap; position:relative; min-height:32px; }
+.mf-editmode .mf-header-bar, .mf-layout-horizontal.mf-editmode #mf-buttons>button {background:none; filter:none; background-color:#0075c9; }
+
+.mf-header-bar .mf-sectionname { font-size: 15px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.mf-layout-horizontal .mf-header-bar .mf-sectionname, .mf-header-collapsed .mf-header-bar .mf-sectionname { display:none; }
+
+.mf-header-bar .mf-filename, .mf-header-bar .mf-obj-icon-large { display:none; }
+
+/* Icon in a collapsed header bar. */
+.mf-layout-horizontal .mf-header-bar .mf-obj-icon-large,
+.mf-header-collapsed .mf-header-bar .mf-obj-icon-large { display:block; position: absolute; width:18px; height:18px; top:6px; float:none; margin:0px; vertical-align:text-bottom; background-image: url('UIControlLibrary/blank16.png'); }
+html.mf-ltr .mf-layout-horizontal .mf-header-bar .mf-obj-icon-large,
+html.mf-ltr .mf-header-collapsed .mf-header-bar .mf-obj-icon-large { left:  .5em; }
+html.mf-rtl .mf-layout-horizontal .mf-header-bar .mf-obj-icon-large,
+html.mf-rtl .mf-header-collapsed .mf-header-bar .mf-obj-icon-large { right: .5em; }
+
+/* Title in a collapsed header bar. */
+.mf-layout-horizontal .mf-header-bar .mf-filename,
+.mf-header-collapsed .mf-header-bar .mf-filename { font-size: 15px; display:block; white-space:pre; overflow:hidden; text-overflow:ellipsis; color: #ffffff; }
+html.mf-ltr .mf-layout-horizontal .mf-header-bar .mf-filename,
+html.mf-ltr .mf-header-collapsed .mf-header-bar .mf-filename { margin-left:  2em; }
+html.mf-rtl .mf-layout-horizontal .mf-header-bar .mf-filename,
+html.mf-rtl .mf-header-collapsed .mf-header-bar .mf-filename { margin-right: 2em; }
+
+/* Icon bar. */
+.mf-icon-bar { display: inline-block; margin:0px; padding:0px; overflow:hidden; white-space:nowrap; line-height:26px;}
+html.mf-ltr .mf-icon-bar { float: right; }
+html.mf-rtl .mf-icon-bar { float: left;  }
+
+/* Icon bar div. */
+.mf-icon-bar>div { cursor: pointer; display: inline-block; width:24px; height:24px; border:0px; padding:0px; margin:0px 5px; background-repeat:no-repeat; background-position: center center; vertical-align:text-top;}
+
+.mf-icon-bar>.ui-button {display:none; vertical-align:text-top; margin:0px 2px; min-width:50px;}
+.mf-icon-bar>.ui-button .ui-button-text {font-size:11px;}
+.mf-layout-horizontal .mf-editmode .mf-icon-bar>.ui-button {display:inline-block;  }
+
+.mf-properties-button { width: 50px !important; height: 26px; font-size: 15px; }
+html.mf-ltr .mf-properties-button { background: url('images/small_properties.png') no-repeat  0px 0px !important; }
+html.mf-ltr .mf-header-collapsed .mf-properties-button { background: url('images/small_properties_white.png') no-repeat  0px 0px !important; }
+html.mf-rtl .mf-properties-button { background: url('images/rtl/small_properties.png') no-repeat  3px 0px !important; }
+html.mf-rtl .mf-header-collapsed .mf-properties-button { background: url('images/rtl/small_properties_white.png') no-repeat  3px 0px !important; }
+
+/* Suggestion bar, which contains analyze button and element to show analysis result. */
+.mf-suggestion-bar { display: inline-block; margin:0px; padding:0px; overflow:hidden; white-space:nowrap; line-height:0px;}
+html.mf-ltr .mf-suggestion-bar { float: left; }
+html.mf-rtl .mf-suggestion-bar { float: right;  }
+
+/* Hide suggestion bar when header is collapsed. */
+.mf-header-collapsed .mf-suggestion-bar { display: none !important; }
+
+/* Suggestion bar buttons. */
+.mf-suggestion-bar>.ui-button { vertical-align:text-top; margin:0; white-space:nowrap;}
+.mf-suggestion-bar>.ui-button .ui-button-text { font-size:11px; }
+
+/* Analyze button for LTR layout. */
+html.mf-ltr .mf-suggestion-bar>.ui-button.mf-analyze-button {
+	display:inline-block !important;
+	margin-right: 0px;
+	margin-left: 14px;
+	padding-left: 24px !important;
+	padding-right: 24px !important;
+	height: 32px !important;
+	position:relative;
+}
+
+/* Analyze button for RTL layout. */
+html.mf-rtl .mf-suggestion-bar>.ui-button.mf-analyze-button {
+	display:inline-block !important;
+	margin-right: 14px;
+	margin-left: 0px;
+	padding-left: 24px !important;
+	padding-right: 24px !important;
+	height: 32px !important;
+	position:relative;
+}
+.mf-suggestion-bar>.ui-button {
+	border: 0px solid #ccc !important;
+	color: #fff;
+	background-color: #3aabed;
+	filter: none;
+	border-radius:0;
+}
+/* Arrow bevel top right for LTR Suggestion bar button */
+html.mf-ltr .mf-suggestion-bar>.ui-button::before {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 16px 0px 16px 5px;
+	border-color: #318ccc transparent transparent transparent;
+	vertical-align: top;
+}
+/* Arrow bevel bottom right for LTR Suggestion bar button*/
+html.mf-ltr .mf-suggestion-bar>.ui-button::after {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 16px 0px 16px 5px;
+	border-color: transparent transparent #318ccc transparent;
+	vertical-align: top;
+}
+/* Arrow bevel top right for RTL Suggestion bar button */
+html.mf-rtl .mf-suggestion-bar>.ui-button::before {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 16px 5px 16px 0px;
+	border-color: #318ccc transparent transparent transparent;
+	vertical-align: top;
+}
+/* Arrow bevel bottom right for RTL Suggestion bar button*/
+html.mf-rtl .mf-suggestion-bar>.ui-button::after {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 16px 5px 16px 0px;
+	border-color: transparent transparent #318ccc transparent;
+	vertical-align: top;
+}
+
+.mf-editmode .mf-header-bar .mf-suggestion-bar>.ui-button::before {
+	border-color: #0075c9 transparent transparent transparent ;
+}
+.mf-editmode .mf-header-bar .mf-suggestion-bar>.ui-button::after {
+	border-color: transparent transparent #0075c9 transparent;
+}
+
+/* Hover/focus effect for analyze button. */
+.mf-suggestion-bar>.ui-button:hover, .mf-suggestion-bar>.ui-button:focus {
+    background-color: #86c7e3;
+	filter: none;
+}
+
+/* Spinner images and background for LTR view mode. */
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-0 { background: url('images/count10/count10_9.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-1 { background: url('images/count10/count10_8.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-2 { background: url('images/count10/count10_7.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-3 { background: url('images/count10/count10_6.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-4 { background: url('images/count10/count10_5.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-5 { background: url('images/count10/count10_4.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-6 { background: url('images/count10/count10_3.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-7 { background: url('images/count10/count10_2.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-8 { background: url('images/count10/count10_1.png') #318ccc no-repeat  left center; }
+html.mf-ltr .mf-suggestion-bar>.mf-analyze-button.step-9 { background: url('images/count10/count10_0.png') #318ccc no-repeat  left center; }
+
+/* Spinner images and background for LTR edit mode. */
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-0 { background: url('images/count10/count10_9.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-1 { background: url('images/count10/count10_8.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-2 { background: url('images/count10/count10_7.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-3 { background: url('images/count10/count10_6.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-4 { background: url('images/count10/count10_5.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-5 { background: url('images/count10/count10_4.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-6 { background: url('images/count10/count10_3.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-7 { background: url('images/count10/count10_2.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-8 { background: url('images/count10/count10_1.png') #0075c9 no-repeat  left center; }
+html.mf-ltr .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-9 { background: url('images/count10/count10_0.png') #0075c9 no-repeat  left center; }
+
+/* Spinner images and background for RTL view mode. */
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-0 { background: url('images/count10/count10_9.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-1 { background: url('images/count10/count10_8.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-2 { background: url('images/count10/count10_7.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-3 { background: url('images/count10/count10_6.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-4 { background: url('images/count10/count10_5.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-5 { background: url('images/count10/count10_4.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-6 { background: url('images/count10/count10_3.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-7 { background: url('images/count10/count10_2.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-8 { background: url('images/count10/count10_1.png') #318ccc no-repeat  right center; }
+html.mf-rtl .mf-suggestion-bar>.mf-analyze-button.step-9 { background: url('images/count10/count10_0.png') #318ccc no-repeat  right center; }
+
+/* Spinner images and background for RTL edit mode. */
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-0 { background: url('images/count10/count10_9.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-1 { background: url('images/count10/count10_8.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-2 { background: url('images/count10/count10_7.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-3 { background: url('images/count10/count10_6.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-4 { background: url('images/count10/count10_5.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-5 { background: url('images/count10/count10_4.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-6 { background: url('images/count10/count10_3.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-7 { background: url('images/count10/count10_2.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-8 { background: url('images/count10/count10_1.png') #0075c9 no-repeat  right center; }
+html.mf-rtl .mf-editmode .mf-suggestion-bar>.mf-analyze-button.step-9 { background: url('images/count10/count10_0.png') #0075c9 no-repeat  right center; }
+
+/* Analyze button style when analysis ongoing in view mode. */
+.mf-suggestion-bar>.mf-analyze-button.mf-analysis-ongoing {
+    border: 1px solid #318ccc;
+}
+
+/* Analyze button style when analysis ongoing in edit mode. */
+.mf-editmode .mf-suggestion-bar>.mf-analyze-button.mf-analysis-ongoing {
+    border: 1px solid #0075c9;
+}
+
+/* Hidden analyze button. */
+.mf-suggestion-bar>.mf-analyze-button.mf-analyze-button-hidden {
+	display:none !important;
+}
+
+/* Suggestion bar div. */
+.mf-suggestion-bar>div {
+	vertical-align:text-top;
+	margin:0px 0px;
+	font-size:11px;
+	margin:0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	display: inline-block;
+	height: 24px;
+	line-height: 24px;
+}
+
+/* Element to show analysis status text, LTR layout. */
+html.mf-ltr .mf-analyze-status {
+	vertical-align:text-top;
+	padding:4px 0px 0px 12px !important;
+}
+
+/* Element to show analysis status text, RTL layout. */
+html.mf-rtl .mf-analyze-status {
+	vertical-align:text-top;
+	padding:4px 12px 0px 0px !important;
+}
+
+/* Container elements for property suggestions. */
+.mf-property-suggestion-main-container {
+	padding-left: 5px;
+	color: #FF0000;
+}
+.mf-property-suggestion-container {
+	overflow: hidden;
+	white-space: normal;
+	height: auto;
+}
+
+/* List of property suggestions. */
+.mf-property-suggestion-list {
+	
+	display: inline-block;
+	vertical-align: top;
+	color: #ffffff;
+}
+
+/* Single property suggestion. */
+.mf-property-suggestion {
+	float: left;
+	margin-right: 3px;
+	margin-left: 2px;
+	margin-top: 2px;
+	margin-bottom: 4px;
+	display: inline-table;
+}
+
+/* Property suggestion value */
+.mf-property-suggestion-value {
+	padding-left: 6px;
+	padding-right: 6px;
+	background-color: #5d7dd0;
+	display: inline-block;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+/* The arrow head for the button */
+.mf-property-suggestion::after {
+	content: "";
+	width: 0;
+	height: 0;
+	border-top: 12px solid transparent;
+	border-bottom: 12px solid transparent;
+	border-left: 6px solid #5d7dd0;
+	display: inline-block;
+	vertical-align: top;
+}
+
+/* Property suggestion text content */
+.mf-property-suggestion-value-content {
+	white-space: normal;
+	word-wrap: normal;
+	overflow: hidden;
+	padding-top: 0.2em;
+	padding-bottom: 0.3em;
+	max-width: 300px;
+}
+
+.mf-comments-button { width: 51px !important; height: 26px; text-align: center; font-weight: 600; font-size: 15px; color: #404040; line-height: 22px; }
+html.mf-ltr .mf-comments-button { background: url('images/mf_ic_meta_com_bubble_blue.png')     no-repeat 0px 0px !important; }
+html.mf-rtl .mf-comments-button { background: url('images/rtl/mf_ic_meta_com_bubble_blue.png') no-repeat 3px 0px !important; }
+
+.mf-mode-properties .mf-properties-button, .mf-mode-comments .mf-comments-button { display:none; }
+.mf-header-bar .mf-properties-button, .mf-header-bar .mf-comments-button { display:none; }
+.mf-mode-comments.mf-header-collapsed .mf-header-bar .mf-properties-button, 
+.mf-mode-properties.mf-header-collapsed .mf-header-bar .mf-comments-button,
+.mf-layout-horizontal .mf-mode-comments .mf-header-bar .mf-properties-button, 
+.mf-layout-horizontal .mf-mode-properties .mf-header-bar .mf-comments-button { display: inline-block; }
+
+/* In minimized mode in bottom pane, always show the comments button regardless of the content mode (properties/comments). */
+/* The comments button will un-minimize the pane and will activate comments mode. */
+.mf-layout-horizontal .mf-mode-properties.mf-bottom-minimized .mf-header-bar .mf-comments-button { display: inline-block; }
+.mf-layout-horizontal .mf-mode-comments.mf-bottom-minimized .mf-header-bar .mf-comments-button { display: inline-block; }
+.mf-layout-horizontal .mf-mode-properties.mf-bottom-minimized .mf-header-bar .mf-properties-button { display: none; }
+.mf-layout-horizontal .mf-mode-comments.mf-bottom-minimized .mf-header-bar .mf-properties-button { display: none; }
+
+.mf-permission-button { background: url('images/title_permissions.png') no-repeat 0px 4px; width:24px; height:28px; }
+.mf-header-bar .mf-permission-button { display:none;}
+.mf-layout-horizontal .mf-header-bar .mf-permission-button { display:inline-block;}
+
+.mf-followthisobject-button { background-image: url('images/followthisobject-enabled-vert.png'); }
+.mf-followthisobject-button.ui-state-off { background-image: url('images/followthisobject-disabled-vert.png'); }
+
+.mf-pinnedobject-button { background-image: url('images/pin_s1_green.png'); }
+.mf-pinnedobject-button.ui-state-off { background-image: url('images/pin_s1.png'); }
+
+.mf-favoriteobject-button { background-image: url('images/favoriteobject-enabled-vert.png'); }
+.mf-favoriteobject-button.ui-state-off { background-image: url('images/favoriteobject-disabled-vert.png'); }
+
+.mf-settings-button { background-image: url('images/settings.png');}
+.mf-bottom-minimized .mf-settings-button { display: none; }
+.mf-card-poppedout .mf-settings-button { display: none; }
+
+.mf-toggleheader-button { background-image: url('images/arrow_expand.png'); }
+.mf-header-collapsed .mf-toggleheader-button { background-image: url('images/arrow_collapse.png'); }
+.mf-layout-horizontal .mf-toggleheader-button { display: none; }
+
+.mf-toggleminimized-button { background-image: url('images/minimize.png'); }
+.mf-bottom-minimized .mf-toggleminimized-button { background-image: url('images/restore.png'); }
+.mf-layout-vertical .mf-toggleminimized-button { display: none; }
+
+/* common comment/property button style*/
+.mf-toggleButton { font-weight: 600; white-space:nowrap; cursor: pointer !important;}
+html.mf-ltr .mf-toggleButton { float: right; margin: .2em .3em .2em .8em; }
+html.mf-rtl .mf-toggleButton { float: left;  margin: .2em .8em .2em .3em; }
+
+
+.mf-layout-horizontal .mf-mode-comments #mf-properties-view { display:block }
+.mf-layout-horizontal .mf-mode-comments .mf-dynamic-controls { display:none }
+
+
+/* header elements - horizontal */
+.mf-layout-horizontal .mf-file-header { display:none;}
+
+
+
+/* Horizontal layout: Highlighted title. */
+.mf-layout-horizontal .mf-filename span.highlight {color:#444;}
+
+/* Horizontal layout: Info bar. */
+.mf-layout-horizontal .mf-obj-info-bar { display: block; padding: .2em 0em; background: #e8e8e8; position: static; margin:0em; height:auto;}
+
+/* Horizontal layout: Left part of the header. */
+.mf-layout-horizontal .mf-header-left { clear:none; vertical-align:top; max-width:99%; position: static; background:transparent;}
+html.mf-ltr .mf-layout-horizontal .mf-header-left { float: left;  padding-left:  1em; }
+html.mf-rtl .mf-layout-horizontal .mf-header-left { float: right; padding-right: 1em; }
+
+/* Horizontal layout: Right part of the header. */
+.mf-layout-horizontal .mf-header-right { clear:none; vertical-align:top; max-width:99%; position: static; color:#222; background:transparent;}
+html.mf-ltr .mf-layout-horizontal .mf-header-right { float: left;  text-align: left;  }
+html.mf-rtl .mf-layout-horizontal .mf-header-right { float: right; text-align: right; }
+
+/* Horizontal layout: Primary text. */
+.mf-layout-horizontal .primary-text { font-size: 12px; color:#222;}
+
+/* Horizontal layout: Name field in the right part of the header. */
+.mf-layout-horizontal .mf-header-right .mf-namefield { color:#999; display:inline-block; }
+html.mf-ltr .mf-layout-horizontal .mf-header-right .mf-namefield { margin: 0px 8px 0px 4px; text-align: right; }
+html.mf-rtl .mf-layout-horizontal .mf-header-right .mf-namefield { margin: 0px 4px 0px 8px; text-align: left;  }
+
+.mf-layout-horizontal .left, .mf-layout-horizontal .right  { display: none;}
+
+
+
+
+
+
+/* HEADER ELEMENTS (END) */
+
+
+
+
+
+/* CONTENT ELEMENTS (START) */
+
+.mf-content { overflow:hidden; position: relative; width:100%; }
+.mf-mode-comments .mf-content { background: #fafafa;}
+.mf-mode-properties .mf-content { background: #fafafa;}
+.mf-layout-horizontal .mf-content {overflow:auto }
+
+/* section headers and content */
+.mf-section-header { cursor:default; color:white; font-size:15px; font-weight:600; line-height: 30px; background: #188ED6; border-top:1px solid #ccc; padding:0px 1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.mf-section-header:hover { background: #007DC6; }
+.mf-layout-horizontal .mf-section-header { display: none; }
+.mf-editmode .mf-section-header { background-color:#e6920c; }
+
+/* Section header part. */
+.mf-section-header>span { }
+html.mf-ltr .mf-section-header>span { padding-left:  13%; }
+html.mf-rtl .mf-section-header>span { padding-right: 13%; }
+
+/* Section header part, first child. */
+.mf-section-header>span:first-child { font-size:15px; }
+
+/* Section content. */
+.mf-section-content { position:relative; padding:1em 0em;}
+
+/* Horizontal layout: Section content. */
+.mf-layout-horizontal .mf-section-content { border-top-width: 0px; padding:0em;}
+
+
+/* custom section behavior */
+.mf-mode-properties .mf-section-header { cursor:pointer;}
+.mf-section-properties>div { position: relative; overflow:hidden; overflow-y:auto;}
+.mf-layout-horizontal .mf-section-workflow, .mf-layout-horizontal .mf-section-permissions { display: none; }
+
+/* dynamic properties Area */
+
+/* PROPERTY FOOTER */
+.mf-property-footer { background:#fafafa; display:table; table-layout:fixed; width:100%; border-top:2px solid #f2f2f2; }
+.mf-layout-horizontal .mf-property-footer { display:none;}
+.mf-property-footer>div { display:table-row;}
+.mf-property-footer>div>div { display:table-cell; width:50%; vertical-align:middle;  white-space:nowrap; position:relative;}
+/* First child in property footer. */
+.mf-property-footer>div>div:first-child { }
+html.mf-ltr .mf-property-footer>div>div:first-child { }
+html.mf-rtl .mf-property-footer>div>div:first-child { }
+
+/* layout permissions in property footer */
+.mf-permission-section { cursor:pointer; white-space:nowrap; overflow:hidden; color: #666666; }
+.mf-permission-section:hover { background: #e5f3ff; }
+.mf-permission-icon { position:absolute; z-index:2; top:-40%; background:transparent url('images/permissions.png') no-repeat center center;  display:inline-block; width:40px; height:250%; }
+
+
+/* Permissions. */
+.mf-permissions { display:block; white-space:nowrap; overflow:hidden; text-overflow: ellipsis; line-height:24px;}
+html.mf-ltr .mf-permissions { margin: .2em  1em .2em 50px; }
+html.mf-rtl .mf-permissions { margin: .2em 50px .2em  1em; }
+
+/* Adjust workflow table in property footer */
+
+.mf-workflow-section .mf-dynamic-properties { display:block; position:relative; color: #1a1a1a; }
+
+
+/* Workflow icon. */
+.mf-workflow-icon { position:absolute; z-index:2; background:transparent url('images/workflow.png') no-repeat center center; display:inline-block; width:40px; height:100%; }
+html.mf-ltr .mf-workflow-icon { right: 0em; }
+html.mf-rtl .mf-workflow-icon { left:  0em; }
+.mf-property-footer table.mf-dynamic-table { }
+.mf-property-footer table.mf-dynamic-table tr { background:#fafafa; }
+.mf-property-footer table.mf-dynamic-table tr.ui-state-hover.ui-footer-hover { background: #e5f3ff; }
+.mf-property-footer table.mf-dynamic-table td { display:none;}
+
+/* Dynamic controls. */
+.mf-property-footer table.mf-dynamic-table td.mf-dynamic-controlfield { display:table-cell; }
+html.mf-ltr .mf-property-footer table.mf-dynamic-table td.mf-dynamic-controlfield { padding: 0em 50px 0em  1em; }
+html.mf-rtl .mf-property-footer table.mf-dynamic-table td.mf-dynamic-controlfield { padding: 0em  1em 0em 50px; }
+
+
+
+/* comments */
+.mf-section-comments>h3, .mf-section-comments>h3>span {cursor:default;}
+.mf-section>div.mf-comment-area { padding:0em; position: relative;}
+/* CONTENT ELEMENTS (END) */
+
+
+
+
+
+
+/* FOOTER ELEMENTS (START) */
+#mf-footer { position:relative; padding: .2em 1em; white-space:normal; margin-top: 0; min-height:3em; color: #1a1a1a; background-color:#f2f2f2; }
+html.mf-ltr #mf-footer { text-align: right; }
+html.mf-rtl #mf-footer { text-align: left;  }
+.mf-layout-horizontal #mf-footer { display:none; min-height:3em; height:3em; }
+/* Buttons. */
+#mf-buttons{ display:inline; white-space:nowrap; margin: 0px;}
+html.mf-ltr #mf-buttons{ float: right; }
+html.mf-rtl #mf-buttons{ float: left;  }
+/* Buttons (disabled). */
+#mf-buttons>button.ui-state-disabled { display: none;}
+/* Footer button. */
+#mf-footer button {  min-width:100px;  padding: 0.3em 0px; margin-top:.4em; }
+/* Footer button text. */
+#mf-footer button .ui-button-text{display:block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+/* FOOTER ELEMENTS (END) */
+    
+    
+    
+.ui-widget-content { color: #444; }
+	
+.ui-autocomplete {
+    max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding-right: 0px;
+	z-index: 2000 !important;}
+
+.ui-autocomplete > ul.menu-inner {
+	position: relative;
+	margin: 0;
+}
+
+.ui-autocomplete .menu-inner .ui-menu-item {
+	float: none;
+	clear: none;
+	display: block;
+}
+
+/* Style to use for autocomplete menu when multiselection is active. */
+.ui-multiselect-active{
+    /*
+        There is a bug in IE: cursor url is evaluated relative to the page, not the CSS file.
+        I use both the correct and the workaround form here; it should work in non-broken browsers, too.
+    */
+    cursor: url('../../images/arrow_multiSelect.cur'), url('UIControlLibrary/images/arrow_multiSelect.cur'), copy;
+}
+
+/* Style to use for autocomplete menu when shift selection is active. */
+.ui-multiselect-shift {
+	/*
+        There is a bug in IE: cursor url is evaluated relative to the page, not the CSS file.
+        I use both the correct and the workaround form here; it should work in non-broken browsers, too.
+    */
+	cursor: url('../../images/arrow_multiSelect.cur'), url('UIControlLibrary/images/arrow_multiSelect.cur'), copy;
+}
+
+/*
+	Time for some CSS trickery related to shift-based multi-selection.
+
+	A. When using the keyboard, we want to highlight all items between the focused item and the last added item
+	   to indicate that those will be added.
+
+	B. When using the mouse, we want to highlight every item between the hovered item and the last added item.
+
+	We don't want to highlight both the keyboard and the mouse range at the same time, so we override the keyboard-based
+	styles with the mouse-based ones when the mouse hovers above the menu.
+
+	The CSS operator that can help us here is the generalized sibling selector, which allows us to target
+	elements that are after another element as long as they are siblings.
+	* We apply the class ui-multiselect-shift to the entire menu only when the shift key is down.
+	* We apply the class ui-state-has-lastadded to the entire menu only when some item has already been added.
+	  Thus we can enable all these rules only when there can be a range to select.
+	* We apply the class ui-state-lastadded to the list element that was last added.
+	* We apply the class ui-state-contains-focus to the list element that has the keyboard navigation focus, if any,
+	  and to the entire menu when some element has the keyboard navigation focus.
+
+	Using these classes, we can specify the behaviour we want using a series of conditions of the form:
+	"if an element is like this, apply these rules to all elements below it", which is the only form the
+	generalized sibling selector can provide.
+
+	The range to highlight is everything between the last added item and the new selection. There are two cases:
+	1) The new selection is above the last selected item, so we have to
+		1.1) highlight all after it
+		1.2) until the last selected.
+	2) The last selected is above the new selection, in which case we have to
+		2.1) highlight all after it
+		2.2) until the new selection
+*/
+
+/* A. Keyboard selection highlighting. */
+
+/* A.1.1 New selection that is not below the last selected => highlight all below this. */
+.ui-multiselect-shift.ui-state-has-lastadded.ui-state-contains-focus li.ui-state-contains-focus:not(.ui-state-lastadded) ~ li {
+	background-color: #d6ebff;
+}
+
+/* A.1.2 Last added below the new selection. Stop higlighting. */
+.ui-multiselect-shift.ui-state-has-lastadded.ui-state-contains-focus li.ui-state-contains-focus ~ .ui-state-lastadded ~ li {
+	background-color: white;
+}
+
+/* A.2.1 Last added that is not below the new selection => highlight all below this.
+	     skip when the last added item itself has the focus, there is no range that should be highlighted in that case.
+*/
+.ui-multiselect-shift.ui-state-has-lastadded.ui-state-contains-focus .ui-state-lastadded:not(.ui-state-contains-focus) ~ li {
+	background-color: #d6ebff;
+}
+
+/* A.2.2 New selection below last added. Stop highlighing. */
+.ui-multiselect-shift.ui-state-has-lastadded.ui-state-contains-focus .ui-state-lastadded ~ li.ui-state-contains-focus ~ li {
+	background-color: white;
+}
+
+/* B. Mouse selection highlighting. */
+
+/* B.1.1 Hover that is not below the last selected => highlight all below this. */
+.ui-multiselect-shift.ui-state-has-lastadded:not(.ui-state-contains-focus) .menu-inner:hover li:hover:not(.ui-state-lastadded) ~ li {
+	background-color: #d6ebff;
+}
+
+/* B.1.2 Last added below the hover. Stop highlighting. */
+.ui-multiselect-shift.ui-state-has-lastadded:not(.ui-state-contains-focus) .menu-inner:hover li:hover ~ .ui-state-lastadded ~ li {
+	background-color: white;
+}
+
+/* B.2.1 Last added that is not below the hover => highlight all below this. */
+.ui-multiselect-shift.ui-state-has-lastadded:not(.ui-state-contains-focus) .menu-inner:hover .ui-state-lastadded:not(:hover) ~ li {
+	background-color: #d6ebff;
+}
+
+/* B.2.2 Hover below last added. Stop highlighing. */
+.ui-multiselect-shift.ui-state-has-lastadded:not(.ui-state-contains-focus) .menu-inner:hover .ui-state-lastadded ~ li:hover ~ li {
+	background-color: white;
+}
+
+/* Subtly highlight disabled items in the autocomplete menu. */
+.ui-autocomplete .ui-state-disabled {
+	background-color: #eeeeee;
+}
+
+/* Highlight the last added item. */
+.ui-state-lastadded {
+	background-color: #d6ebff;
+}
+
+/* Styles for lookup items */
+ 
+
+
+
+
+
+
+/* Styles for focused icons. These are copied from ui-state-default values. */
+
+.ui-state-focus {
+	border: 1px solid #ccc;
+	border-bottom-color: #bbb;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	overflow: visible;
+}
+
+#mf-preview-pane {
+	display:none;
+}
+	
+.mf-preview-visible #mf-preview-pane {
+	display:block;
+	position:fixed; top:0em; bottom:0em; right:0em; left:0em;
+	overflow: hidden;
+	background-color: #ffffff;
+	cursor:text;
+}
+
+
+table td, table th {line-height:18px;}
+table td {
+	padding:1px 0px;
+	margin:0px;
+	border-top: 0px solid #ddd;/* verwite bootstrap*/
+	font-size:13px;
+	/*display:inline-block;*/
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+	white-space: nowrap;}
+table {margin-bottom:0px;table-layout:fixed;}
+/*Details view*/
+
+/* The message row. Located after actual property row in the property table. */
+.mf-message-row td {
+	white-space:normal;
+}
+
+/* The description row. Located before actual property row in the property table. */
+.mf-description-row td {
+	white-space:normal;
+	background-color: #f2f2f2;
+}
+
+/* Alignment element for description fields */
+tr.mf-alignment-header.mf-alignment {
+	background-color: #fafafa;
+	height: 1px;
+	margin: 0;
+	padding: 0;
+}
+tr.mf-alignment-header.mf-alignment td {
+	height: 1px;
+	margin: 0;
+	padding: 0;
+}
+
+/* Horizontal layout: Dynamic table. */
+.mf-layout-horizontal table.mf-dynamic-table { }
+html.mf-ltr .mf-layout-horizontal table.mf-dynamic-table { float: left;  border-right: 0px solid gray; }
+html.mf-rtl .mf-layout-horizontal table.mf-dynamic-table { float: right; border-left:  0px solid gray; }
+
+.mf-layout-horizontal td.mf-modify, .mf-layout-horizontal td.mf-modify:hover {width:4px; background:none !important; }
+/*.mf-layout-horizontal .mf-dynamic-namefield>div>span:first-child:after { content:":";}*/
+
+.mf-layout-horizontal td.mf-dynamic-namefield {min-width:100px; color: #888;}
+.mf-layout-horizontal td.mf-dynamic-controlfield {color: #222;}
+
+
+.mf-layout-horizontal table td,
+.mf-layout-horizontal input[type='text'], 
+.mf-layout-horizontal input[type='password'], 
+.mf-layout-horizontal .ui-autocomplete-input, 
+.mf-layout-horizontal textarea, 
+.mf-layout-horizontal .uneditable-input,
+.mf-layout-horizontal .mf-internal-text,
+.mf-layout-horizontal .mf-internal-text-state-prop
+{ font-size: 12px; color: #000000;}
+
+
+
+
+
+.mf-layout-horizontal .mf-dynamic-controls {position: absolute; overflow:auto; left:0px; right:0px; }
+.mf-layout-horizontal .ui-state-collapsed .mf-dynamic-controls {display:none; }
+.mf-layout-horizontal .ui-state-collapsed .content { overflow:hidden;}
+
+
+.mf-layout-horizontal .ui-datepicker { font-size:10px; }
+.mf-layout-horizontal .ui-datepicker td .ui-state-default,
+.mf-layout-horizontal .ui-datepicker td .ui-state-disabled,
+.mf-layout-horizontal .ui-datepicker th  { font-size:10px !important; padding:0px;}
+
+.mf-layout-horizontal li.ui-menu-item { line-height:12px; font-size:12px; min-height:1.4em;}
+
+ul#icons span.ui-icon{margin:0; position:static}
+.ui-accordion .ui-accordion-header .ui-icon-triangle-1-e{display:none; !important}
+.ui-accordion .ui-accordion-header {/*according header*/
+	background-position: 0 0;
+	border-width:1px 0px 1px 0px !important;}
+.ui-accordion .ui-accordion-header:hover {/*according header*/
+	background-position: 0 0;}
+	/*
+.ui-accordion .ui-accordion-header .mf-dynamic-namefield{
+	font-size:15px;}
+	*/
+.ui-accordion .ui-accordion-header .mf-header-mainfield{/*according header*/
+	font-size:15px;}
+	.ui-accordion .ui-accordion-header .mf-header-mainfield-left{/*according header*/
+	font-size:15px;}
+
+table.accordion-header{ width:100%;/*according table*/}
+table.accordion-header td {/*according tabel cell*/
+	padding: 0.45em 1.5em 0.45em 1.5em;}
+	/*
+table.accordion-header td.mf-dynamic-namefield {
+	font-weight:600;width: 27%}
+	*/
+table.accordion-header td.mf-header-leftfield {/*according header table 2st cell*/
+	font-weight:600;width: 13%}	
+
+table.accordion-header td.mf-header-mainfield {/*according header table 2st cell*/
+	font-weight:600;width: 87%}
+table.accordion-header td.mf-header-mainfield-left {/*according header table 2st cell*/
+	font-weight:600;width: 40%}
+table.accordion-header td.mf-header-mainfield-right {/*according header table 2st cell*/
+	font-weight:600;width: 47%}
+	
+
+/*	
+table.accordion-header td.mf-dynamic-controlfield {}
+*/
+/*
+.ui-accordion .ui-accordion-header:hover .mf-dynamic-controlfield {
+	background: transparent url(images/icon-edit.png) no-repeat 0em 0.5em;}
+*/	
+	
+table.accordion-header td.mf-dynamic-statfield{/*according header table 3rd cell*/
+	width:25%}
+	
+	/*
+table.accordion-header td.mf-header-emptyfield{
+	width:1%}	
+	*/
+.ui-accordion .ui-accordion-header{/*according debug*/
+	margin-top:-2px !important;}
+.ui-accordion .ui-accordion-content{/*according debug*/
+	margin-bottom:0  !important;
+	border:0;
+	padding: 1em 0;}
+	
+table.mf-dynamic-table {/* Table for dynamic controls */
+	/*table-layout: fixed;*/
+	width: 100%;}
+	
+table.mf-dynamic-table tr {
+	cursor: pointer;
+	background-color: #fafafa;
+}
+
+table.mf-dynamic-table tr.mf-editable.ui-state-hover {
+	cursor: pointer;
+	background-color: #e5f3ff;
+}
+
+table.mf-dynamic-table tr.mf-editable.ui-state-hover .mf-modify {
+	background: transparent url(images/icon-edit.png) no-repeat center 0.25em;}
+	
+table.mf-dynamic-table tr.mf-editable.mf-property-modified .mf-modify {
+	/*ORANGE PENCIL BEHAVIOR*/ /*background: transparent url(images/icon-modified.png) no-repeat 0.5em 0.25em; */ }	
+	
+/* Approved-icon removed from properties, which are in edit mode. */
+table.mf-dynamic-table tr.mf-editable.mf-accept-viewmode.ui-state-hover .mf-modify {
+	 background: transparent;
+	/*background: transparent url(images/approved.png) no-repeat center 0.25em;*/
+}
+	
+td.mf-modify {
+	width:22px;	
+}
+
+.ui-tooltip { position:absolute; z-index:1; }
+.mf-revert { padding:0.5em; background:#F5FCFF;}
+.mf-revert div { font-size:11px; color:#666;}
+
+tr.mf-dynamic-row {
+	outline:none;}
+
+.mf-separator { height: 9px; background-color: #fafafa; }
+.mf-error{display:inline-block;border:1px solid yellow; padding:2px 10px ; position:relative;top:-100%; background-color:#FFFFDD; font-style:italic;}
+.mf-error-global{margin-top:2em;text-align:center; font-style:italic;font-size:150%;}
+
+/* The description text for the property */
+.mf-property-description {
+	display:inline-block;
+	border:1px solid #effaff;
+	padding:2px 4px;
+	position:relative;
+	top:-100%;
+	background-color:#effaff;
+	font-style:italic;
+}
+
+/* The description area for the metadata card */
+.mf-metadatacard-description {
+	display: none;
+	background-color:#EFFAFF;
+	font-style:italic;
+}
+
+/* The description text for the metadata card. */
+#mf-metadatacard-description {
+	padding: 7px 14px;
+	margin: 0;
+}
+
+.mf-description-image {
+	width:200px;
+	height:200px;
+}
+
+.mf-description-image-container {
+	margin: 10px 10px 10px 10px;
+}
+
+div.main-section {
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	width: 100%;
+}
+
+div.mf-description-image-area {
+	float: left;
+	width: 220px;
+}
+
+div.mf-description-image-area-rtl {
+	float: right;
+	width: 220px;
+}
+
+div.mf-description-text-area {
+	margin-left: 220px;
+}
+
+div.mf-description-text-area-rtl {
+	margin-right: 220px;
+}
+
+/* The "more info" area for the metadata card */
+.mf-metadatacard-moreinfo {
+	display: none;
+	background-color: #E5F3FF;
+	color: #404040;
+}
+
+.mf-moreinfo-container {
+	display: inline-block;
+	height: 52px;
+}
+
+.mf-moreinfo-image {
+	margin: 10px 10px 10px 10px;
+	float: left;
+	vertical-align: middle;
+}
+
+.mf-moreinfo-image-rtl {
+	margin: 10px 10px 10px 10px;
+	float: right;
+	vertical-align: middle;
+}
+
+.mf-moreinfo-text {
+	display: table-cell;
+	vertical-align: middle;
+	height: 52px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Required field indicator. */
+.mf-required-indicator { position:absolute; }
+html.mf-ltr .mf-required-indicator { right: 0px; }
+html.mf-rtl .mf-required-indicator { left:  0px; }
+
+.mf-fixed-row{}
+td.mf-dynamic-namefield {
+	width: 25%;
+	position:relative;
+	text-overflow:clip;
+	}
+html.mf-ltr td.mf-dynamic-namefield { text-align: right; }
+html.mf-rtl td.mf-dynamic-namefield { text-align: left;  }
+
+/* Name field. */
+td.mf-dynamic-namefield>div { padding-top:4px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+html.mf-ltr td.mf-dynamic-namefield>div { padding-right: .4em; }
+html.mf-rtl td.mf-dynamic-namefield>div { padding-left:  .4em; }
+
+/* Horizontal layout: Name field. */
+.mf-layout-horizontal td.mf-dynamic-namefield>div {padding-top:2px;}
+
+td.mf-header-leftfield {
+	vertical-align:top;
+	padding-top:3px;}
+html.mf-ltr td.mf-header-leftfield { text-align: right; }
+html.mf-rtl td.mf-header-leftfield { text-align: left;  }
+
+/* Left field in header. */
+td.mf-header-leftfield  div{
+	display:inline}
+	
+/* Main field. */
+td.mf-header-mainfield {
+	vertical-align:top;
+	padding-top:3px;}
+html.mf-ltr td.mf-header-mainfield { text-align: left;  }
+html.mf-rtl td.mf-header-mainfield { text-align: right; }
+
+/* Main field div. */
+td.mf-header-mainfield  div{
+	display:inline}
+	
+/* Main field left. */	
+td.mf-header-mainfield-left {
+	vertical-align:top;
+	padding-top:3px;}
+html.mf-ltr td.mf-header-mainfield-left { text-align: left;  }
+html.mf-rtl td.mf-header-mainfield-left { text-align: right; }
+
+/* Main field left div. */	
+td.mf-header-mainfield-left div{
+	display:inline}
+	
+/* Main field right. */	
+td.mf-header-mainfield-right {
+	vertical-align:top;
+	padding-top:3px;}
+html.mf-ltr td.mf-header-mainfield-right { text-align: left;  }
+html.mf-rtl td.mf-header-mainfield-right { text-align: right; }
+
+/* Main field right div. */	
+td.mf-header-mainfield-right div{
+	display:inline}
+	
+	
+	
+	
+	
+/* Dynamic control fields. */	
+td.mf-dynamic-controlfield { }
+html.mf-ltr td.mf-dynamic-controlfield { text-align: left;  }
+html.mf-rtl td.mf-dynamic-controlfield { text-align: right; }
+
+td.mf-dynamic-lastfield { width: 10px; height:24px; }
+.mf-layout-horizontal td.mf-dynamic-lastfield { height:22px; }
+	
+.mf-internal-openlink{ display:block;}
+td ul#icons li{ margin:0;}
+.mf-lookup-item-container {display: table; border-spacing: 0; width:100%; padding:0px; /*table-layout:fixed;*/}
+.mf-lookup-item-row {display: table-row;/*padding:0;margin:0;*/ }
+.mf-lookup-item-cell-content {display: table-cell; vertical-align:top;/*width: 100%; margin:0; */ }
+.mf-control-container{width:100%;}
+
+.mf-lookup-item-cell-image {display: table-cell; width:24px; padding:0px;vertical-align:top;float: none; /* padding: 0px 0px 0px 0px;*/ }
+.mf-layout-horizontal .mf-lookup-item-cell-image { width:22px;}
+/* Lookup item cell image. */
+.mf-lookup-item-cell-image #icons li:first-child { }
+html.mf-ltr .mf-lookup-item-cell-image #icons li:first-child { border-left-width:  0px; }
+html.mf-rtl .mf-lookup-item-cell-image #icons li:first-child { border-right-width: 0px; }
+/* Lookup item cell image, special cases. */
+.mf-lookup-item-cell-image.mf-assignee-state, .mf-lookup-item-cell-image.mf-object-link { width:100%; margin: 0px; height:24px; }
+/* Lookup item cell image, special cases (img). */
+.mf-lookup-item-cell-image.mf-assignee-state>img { width:16px; height:16px; margin: 4px 0px 0px 0px; padding: 0; }
+
+.mf-lookup-item-cell-image.mf-object-link>img { width:16px; height:16px; margin: 3px 0px 0px 0px; padding: 0; }
+
+
+
+.mf-layout-horizontal .mf-lookup-item-cell-image.mf-assignee-state, .mf-layout-horizontal .mf-lookup-item-cell-image.mf-object-link {height:22px;}
+.mf-layout-horizontal .mf-lookup-item-cell-image.mf-assignee-state>img {margin-top:2px;}
+
+.mf-layout-horizontal .mf-lookup-item-cell-image.mf-object-link>img {margin-top:1px;}
+
+.mf-lookup-item-cell-image-assignedto {display: table-cell; width:48px; padding:0px;vertical-align:top;float: none; /* padding: 0px 0px 0px 0px;*/ }
+.mf-layout-horizontal .mf-lookup-item-cell-image-assignedto { width:44px;}
+.mf-lookup-item-cell-image-assignedto #icons li:first-child { }
+html.mf-ltr .mf-lookup-item-cell-image-assignedto #icons li:first-child { border-left-width:  0px; }
+html.mf-rtl .mf-lookup-item-cell-image-assignedto #icons li:first-child { border-right-width: 0px; }
+.mf-lookup-item-cell-image-assignedto.mf-assignee-state, .mf-lookup-item-cell-image-assignedto.mf-object-link { width:100%; margin: 0px; height:24px; }
+.mf-lookup-item-cell-image-assignedto.mf-assignee-state>img { width:16px; height:16px; margin: 4px 0px 0px 0px; padding: 0; }
+.mf-lookup-item-cell-image-assignedto.mf-object-link>img { width:16px; height:16px; margin: 3px 0px 0px 0px; padding: 0; }
+
+.mf-layout-horizontal .mf-lookup-item-cell-image-assignedto.mf-assignee-state, .mf-layout-horizontal .mf-lookup-item-cell-image-assignedto.mf-object-link {height:22px;}
+.mf-layout-horizontal .mf-lookup-item-cell-image-assignedto.mf-assignee-state>img {margin-top:2px;}
+.mf-layout-horizontal .mf-lookup-item-cell-image-assignedto.mf-object-link>img {margin-top:1px;}
+
+.mf-internal-lookups-condensed {/*cndesed height*/
+	border-bottom: 1px solid #999;}
+
+.mf-internal-lookups-condensed input{/*cndesed height*/ 
+	padding:0 2px !important; 
+	border-bottom-width: 0px !important;}
+.mf-internal-lookups-condensed ul#icons li {
+	padding: 1px;
+	border-bottom-width: 0px;}
+
+/* Extended parts of lookups. */
+.mf-internal-lookups-extended .mf-lookup-item-cell-content { }
+html.mf-ltr .mf-internal-lookups-extended .mf-lookup-item-cell-content { padding: 4px 6px 2px   0; }
+html.mf-rtl .mf-internal-lookups-extended .mf-lookup-item-cell-content { padding: 4px   0 2px 6px; }
+
+/* Horizontal layout: Extended parts of lookups. */
+.mf-layout-horizontal .mf-internal-lookups-extended .mf-lookup-item-cell-content {padding-top: 2px;}
+	
+.mf-internal-container{display: block;}
+.mf-internal-empty-lookup-list { padding:3px;}
+.mf-layout-horizontal .mf-internal-empty-lookup-list { padding:2px;}
+
+/* Empty lookup list for workflow and state.*/
+.mf-property-39 .mf-internal-empty-lookup-list,
+.mf-property-38 .mf-internal-empty-lookup-list,
+.mf-property-99 .mf-internal-empty-state-prop,
+.mf-property-99 .mf-internal-empty-lookup-list { }
+html.mf-ltr .mf-property-39 .mf-internal-empty-lookup-list,
+html.mf-ltr .mf-property-38 .mf-internal-empty-lookup-list,
+html.mf-ltr .mf-property-99 .mf-internal-empty-state-prop,
+html.mf-ltr .mf-property-99 .mf-internal-empty-lookup-list { padding-left:  20px; }
+html.mf-rtl .mf-property-39 .mf-internal-empty-lookup-list,
+html.mf-rtl .mf-property-38 .mf-internal-empty-lookup-list,
+html.mf-rtl .mf-property-99 .mf-internal-empty-state-prop,
+html.mf-rtl .mf-property-99 .mf-internal-empty-lookup-list { padding-right: 20px; }
+ 
+  
+ .mf-dynamic-control {margin:0;}
+/* overide styles of JQuery form obajects*/
+input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .uneditable-input {
+	display: block;
+	padding: 1px 2px;
+	border: 1px solid #999 !important;
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	}
+.ui-widget-content, .ui-menu{
+	border: 0px solid #999;
+	border-radius: 0px;
+	padding:1px}
+
+/*Comments view*/
+.mf-comments-control{ /*comment input box control*/
+	position:relative;
+	width:100%;
+}
+
+div.textarea-wrapper textarea {
+	font-family: inherit;
+	outline: none; resize: none;
+	margin: 0; border:0;
+	-webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;}
+html.mf-ltr div.textarea-wrapper textarea { padding: 0   0 0 1em; }
+html.mf-rtl div.textarea-wrapper textarea { padding: 0 1em 0   0; }
+
+.mf-control-container-for-comment .mf-textarea {
+	min-height:5em;
+	border: 0px solid transparent !important;
+	background-color:transparent;
+	color: #333;
+}
+
+	
+
+
+.mf-comments { overflow:auto; }
+
+/* Make sure there are no focus borders anywhere in the comment control */
+.mf-comments * { outline:0; }
+.mf-layout-horizontal .mf-comments { font-size:12px;}
+
+	
+.mf-comment-header 
+{
+	font-size: 18px;
+	color:#666;
+	border-bottom:1px solid #ccc;
+}	
+html.mf-ltr .mf-comment-header { padding: 1.5em 2em 0em 1em; }
+html.mf-rtl .mf-comment-header { padding: 1.5em 1em 0em 2em; }
+	
+ul#mf-comments-list{ padding:0; margin:0.5em 1em; }
+.mf-layout-horizontal ul#mf-comments-list { max-width: 800px;}
+.mf-layout-horizontal .mf-internal-container-for-comment { max-width: 800px; }
+
+/* Side-by-side comments. */
+.mf-sidebyside ul#mf-comments-list{ }
+html.mf-ltr .mf-sidebyside ul#mf-comments-list { margin-left:  1em; }
+html.mf-rtl .mf-sidebyside ul#mf-comments-list { margin-right: 1em; }
+	
+ul#mf-comments-list li{
+	list-style:none;
+	border-top: 1px solid #ccc;
+	clear:both;
+	color:#444;
+	background-repeat:no-repeat;
+}
+html.mf-ltr ul#mf-comments-list li { background-position:   0px 1.5em; }
+html.mf-rtl ul#mf-comments-list li { background-position: right 1.5em; }
+
+ul#mf-comments-list li:first-child { border-top: 1px solid transparent; }
+   
+
+html.mf-ltr .mf-commentbubble-1 { background-image: url('images/bubble_yellow.png');     }
+html.mf-rtl .mf-commentbubble-1 { background-image: url('images/rtl/bubble_yellow.png'); }
+html.mf-ltr .mf-commentbubble-2 { background-image: url('images/bubble_green.png');      }
+html.mf-rtl .mf-commentbubble-2 { background-image: url('images/rtl/bubble_green.png');  }
+html.mf-ltr .mf-commentbubble-3 { background-image: url('images/bubble_orange.png');     }
+html.mf-rtl .mf-commentbubble-3 { background-image: url('images/rtl/bubble_orange.png'); }
+html.mf-ltr .mf-commentbubble-4 { background-image: url('images/bubble_pink.png');       }
+html.mf-rtl .mf-commentbubble-4 { background-image: url('images/rtl/bubble_pink.png');   }
+html.mf-ltr .mf-commentbubble-5 { background-image: url('images/bubble_purple.png');     }
+html.mf-rtl .mf-commentbubble-5 { background-image: url('images/rtl/bubble_purple.png'); }
+html.mf-ltr .mf-commentbubble-6 { background-image: url('images/bubble_blue.png');       }
+html.mf-rtl .mf-commentbubble-6 { background-image: url('images/rtl/bubble_blue.png');   }
+
+ul#mf-comments-list li>div {
+}  
+html.mf-ltr ul#mf-comments-list li>div { margin: 1.5em 20px 1.5em 40px; }  
+html.mf-rtl ul#mf-comments-list li>div { margin: 1.5em 40px 1.5em 20px; }
+   
+.mf-comment-info {
+	font-weight: bold;
+	margin-bottom:0.5em;
+	color:#333;
+}
+.mf-comment-content { white-space:pre-wrap }
+
+/* Layout for static control which handles comment property */
+.mf-comment-control {padding:10px 10px; }
+
+/* Side-by-side comments. */
+.mf-sidebyside .mf-comment-control { }
+html.mf-ltr .mf-sidebyside .mf-comment-control { padding-right: 0px }
+html.mf-rtl .mf-sidebyside .mf-comment-control { padding-left:  0px }
+
+.mf-internal-container-for-comment {
+	border: 3px solid #cccccc !important;
+	background-color:#fafafa;
+}
+html.mf-ltr .mf-internal-container-for-comment { padding: .4em 0em .4em 1em !important; }
+html.mf-rtl .mf-internal-container-for-comment { padding: .4em 1em .4em 0em !important; }
+
+.mf-editmode .mf-internal-container-for-comment { border: 3px solid #999999 !important; }
+
+/* Control container for comment. */
+.mf-control-container-for-comment { }
+html.mf-ltr .mf-control-container-for-comment { padding-right: 5px; }
+html.mf-rtl .mf-control-container-for-comment { padding-left:  5px; }
+
+/* Empty comment text. */
+.mf-comment-empty-text { position: absolute; color: #bbb;}
+
+.mf-layout-horizontal .mf-comment-header { display: none;}
+.mf-layout-horizontal #mf-properties-button { display: none;}
+.mf-layout-horizontal .content.mf-comment-area { overflow: auto; }
+.mf-layout-horizontal #mf-comments-control {position:static;}
+
+/* Horizontal layout: Comment background bottom left. */
+.mf-layout-horizontal .mf-comment-bg-bottom-left { bottom:-1px;}
+html.mf-ltr .mf-layout-horizontal .mf-comment-bg-bottom-left { left:  -11px; }
+html.mf-rtl .mf-layout-horizontal .mf-comment-bg-bottom-left { right: -11px; }
+
+/* Horizontal layout: Comment control, multi-line text. */
+.mf-layout-horizontal .mf-comment-control .mf-multilinetext { position:relative; }
+.mf-layout-horizontal .mf-comment-control .mf-multilinetext .mf-internal-text .mf-internal-text-state-prop { position:relative;}
+
+/* In Progress... full column width MLTEXT fields in bottom pane...*/
+.mf-layout-horizontal .mf-dynamic-control.mf-multilinetext{ position:relative; top:22px; margin-bottom:25px;}
+html.mf-ltr .mf-layout-horizontal .mf-dynamic-control.mf-multilinetext { left:  0px; }
+html.mf-rtl .mf-layout-horizontal .mf-dynamic-control.mf-multilinetext { right: 0px; }
+
+/* Horizontal layout: Dynamic name field. */
+.mf-layout-horizontal .mf-dynamic-namefield.left{ display:inherit; overflow:visible;}
+html.mf-ltr .mf-layout-horizontal .mf-dynamic-namefield.left{ text-align: left;  }
+html.mf-rtl .mf-layout-horizontal .mf-dynamic-namefield.left{ text-align: right; }
+
+/* Horizontal layout: Dynamic name field div. */
+.mf-layout-horizontal .mf-dynamic-namefield.left>div { overflow:visible; }
+html.mf-ltr .mf-layout-horizontal .mf-dynamic-namefield.left>div { padding-left:  4px; }
+html.mf-rtl .mf-layout-horizontal .mf-dynamic-namefield.left>div { padding-right: 4px; }
+
+
+/* end layout structure */
+
+/* layout style control utilities*/
+#overlay {
+	display:none; /*Switch it on by change to display:block, or use Jquery show();/ hide();*/
+	position:absolute; top:0;left:0;
+	height:100%;width:100%; 
+	background:rgba(255,255,255,0.75) url(images/loading.gif) no-repeat center;}
+
+.mf-default-padding{
+	padding:1em;
+	padding-left:5em;}
+.mf-default-indent-left{
+	padding-left:3em;}
+.mf-default-indent-right{
+	padding-right: 3em;}
+.font-normal{
+	font-weight:normal; line-height: normal;}
+.font-normal-weight{
+	font-weight:normal;}
+.align-left{text-align:left}
+.align-right{text-align:right}
+.primary-text{font-size:14px;}
+
+/* Name field. */
+.mf-namefield { cursor: default; }
+html.mf-ltr .mf-namefield { padding-right: .2em; }
+html.mf-rtl .mf-namefield { padding-right: .2em; }  /* This is intentionally exactly the same as for the LTR layout. This affects spacing between e.g. the ID label and the ID number. */
+
+.eclip {
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+	white-space: nowrap; }
+.noeclip { /*switch ellipse on/off */
+	overflow: visible;
+	text-overflow: ellipsis;
+	white-space: normal;}
+.ui-button-text {font-size:14px;}
+.ui-button , ul#icons li {
+	border: 1px solid #ccc;
+	-webkit-box-shadow: inset 0 0px 0px rgba(255, 255, 255, 0.3), 0 0px 0px rgba(0, 0, 0, 0.25);
+	-moz-box-shadow: inset 0 0px 0px rgba(255, 255, 255, 0.3), 0 0px 0px rgba(0, 0, 0, 0.25);
+	box-shadow: inset 0 0px 0px rgba(255, 255, 255, 0.3), 0 0px 0px rgba(0, 0, 0, 0.25);
+	background-color: #e6e6e6;
+	background-repeat: no-repeat;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), color-stop(25%, #ffffff), to(#f2f2f2));
+	background-image: -webkit-linear-gradient(#ffffff, #ffffff 25%, #f2f2f2);
+	background-image: -moz-linear-gradient(top, #ffffff, #ffffff 25%, #f2f2f2);
+	background-image: -ms-linear-gradient(#ffffff, #ffffff 25%, #f2f2f2);
+	background-image: -o-linear-gradient(#ffffff, #ffffff 25%, #f2f2f2);
+	background-image: linear-gradient(#ffffff, #ffffff 25%, #f2f2f2);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f2f2f2', GradientType=0);
+	padding: 3px;
+	border-radius:0;
+	}
+	
+	ul#icons li { border: 1px solid #999; }
+	.mf-layout-horizontal ul#icons li { padding: 2px;}
+	
+/* Commented out by RSS
+.ui-state-hover, .ui-state-focus, .ui-widget-header .ui-state-hover, .ui-widget-header .ui-state-focus,
+.ui-button:hover , ul#icons li:hover {
+	background-color: #ddd;
+	background-repeat: no-repeat;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eee), color-stop(25%, #eee), to(#ddd));
+	background-image: -webkit-linear-gradient(#eee, #eee 25%, #ddd);
+	background-image: -moz-linear-gradient(top, #eee, #eee 25%, #ddd);
+	background-image: -ms-linear-gradient(#eee, #eee 25%, #ddd);
+	background-image: -o-linear-gradient(#eee, #eee 25%, #ddd);
+	background-image: linear-gradient(#eee, #eee 25%, #ddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd', GradientType=0);
+	border-radius: 0px;
+	}
+*/
+/* Keyboard selection and mouse hover effects. */
+	
+/* Blue effect for selected list item AND hovered mouse item when mouse button is down */
+.ui-widget-content .ui-state-focus,
+.ui-widget-content.mf-ui-state-mouse-button-down .mf-ui-state-hover
+{
+	filter: none;
+	background-color: #add6ff;
+	background-image: none;
+	border-radius: 0px;	
+}
+	
+/* Light blue effect for hovered list item. */
+.ui-widget-content .mf-ui-state-hover
+{ 
+	filter: none;
+	background-color: #d6ebff;
+	background-image: none;
+	border-radius: 0px;	
+}
+
+/* Dark blue effect for hovered AND selected list item. */
+.ui-widget-content .mf-ui-state-hover.ui-state-focus,
+.ui-widget-content.mf-ui-state-mouse-button-down .mf-ui-state-hover.ui-state-focus
+{ 
+filter: none;
+	background-color: #99ccff;
+	background-image: none;
+	border-radius: 0px;	
+}
+
+/* No effect for selected list item when mouse button is down. */
+.ui-widget-content.mf-ui-state-mouse-button-down .ui-state-focus
+{
+filter: none;
+	background-color: transparent;
+	background-image: none;
+	border-radius: 0px;	
+}
+
+/* Keyboard selection and mouse hover effects - end. */
+
+
+.ui-button-primary, .mf-icon-bar>.ui-button {
+	border: 1px solid #ccc !important;
+	color: #fff;
+	background-color: #318ccc;
+	filter: none;
+	border-radius:0;
+}
+
+.ui-button-primary:hover, .mf-icon-bar>.ui-button:hover, .ui-button-primary:focus, .mf-icon-bar>.ui-button:focus {
+	background-color: #86c7e3;
+	filter: none;
+}
+/* icon remodel*/
+
+/*
+.ui-icon-trash{
+	background-position-x:-32px;
+	background-position-y:-192px;}	
+*/	
+	
+/* The white background content wrapper */
+
+
+/* Page header tweaks */
+.page-header {
+background-color: #f5f5f5;
+padding: 20px 20px 10px;
+margin: -20px -20px 20px;
+}
+
+/* Styles you shouldn't keep as they are for displaying this base example only */
+.content .span10,
+.content .span4 {
+min-height: 500px;
+}
+
+/* Give a quick and non-cross-browser friendly divider */
+.content .span4 {
+margin-left: 0;
+padding-left: 19px;
+border-left: 1px solid #eee;
+}
+
+.topbar .btn {
+border: 0;
+}
+
+/* focus switchers */
+
+
+#focus-begin {
+position:absolute;
+top:-9999px;
+left:0px;
+width:10px;
+height:10px;
+}
+
+#focus-end {
+position:absolute;
+top:-9999px;
+right:0px;
+width:10px;
+height:10px;
+}
+
+.mf-addproperty { color: #0069D6; font-style: italic; padding-bottom: 10px; }
+
+
+/* Test buttons are hidden by default. To show them, comment the following lines. 
+#mf-refresh-button { display:none; }
+#mf-export-button { display:none; }
+*/
+
+/* Internal text. */
+div.mf-internal-text, span.mf-internal-text, div.mf-internal-text-state-prop, span.mf-internal-text-state-prop, .mf-autovalue { }
+html.mf-ltr div.mf-internal-text, html.mf-ltr span.mf-internal-text, html.mf-ltr div.mf-internal-text-state-prop, html.mf-ltr span.mf-internal-text-state-prop, html.mf-ltr .mf-autovalue { padding: 4px 0px 2px 3px; }
+html.mf-rtl div.mf-internal-text, html.mf-rtl span.mf-internal-text, html.mf-rtl div.mf-internal-text-state-prop, html.mf-rtl span.mf-internal-text-state-prop, html.mf-rtl .mf-autovalue { padding: 4px 3px 2px 0px; }
+
+/* Horizontal layout: Internal text. */
+.mf-layout-horizontal div.mf-internal-text, .mf-layout-horizontal span.mf-internal-text, .mf-layout-horizontal div.mf-internal-text-state-prop, .mf-layout-horizontal span.mf-internal-text-state-prop, .mf-layout-horizontal .mf-autovalue {padding-top:2px;}
+
+/* Internal text. */
+div.mf-internal-text, div.mf-internal-text-state-prop, div.mf-lookup-item-cell-content { overflow: hidden; text-overflow: ellipsis; white-space:no-wrap; color: #1a1a1a; }
+
+/* Internal text in multiline text control. */
+.mf-multilinetext .mf-internal-text { word-wrap: break-word; white-space:pre-wrap; text-overflow: clip; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;}
+html.mf-ltr .mf-multilinetext .mf-internal-text { padding: 4px 6px 3px 3px; }
+html.mf-rtl .mf-multilinetext .mf-internal-text { padding: 4px 3px 3px 6px; }
+
+/* Text area in multiline text control. */
+.mf-multilinetext .mf-textarea.mf-internal-text { padding:2px; white-space:pre; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;}
+
+/* Horizontal layout: Text area in multiline text control. */
+.mf-layout-horizontal .mf-multilinetext .mf-textarea.mf-internal-text { padding: 1px 2px;}
+
+/* Multi-line text */
+.mf-textarea {
+	height: 6em;
+}
+
+input[type='text'], input[type='password'], .ui-autocomplete-input, textarea, .uneditable-input { height:24px; width:100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; font-family:Segoe UI, Tahoma, Arial, sans-serif; color: #000000; }
+.mf-layout-horizontal input[type='text'] { height:22px; }
+
+input[type='text'], input[type='password'], .ui-autocomplete-input, .uneditable-input {  }
+
+.mf-permissionschangedindicator {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.mf-internal-lookups { width: 100%; color: #1a1a1a; }
+
+.mf-toolbar  {
+    display: none;
+	background-color:#ffffff;
+	position:absolute;
+    z-index: 1;
+	border: 1px solid #0094db;
+    overflow: hidden;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	cursor:pointer;
+	white-space:nowrap;
+}
+.mf-mode-comments .mf-toolbar{ display: none !important;}
+
+.mf-toolbar-button
+{
+	display: none;
+	position: static;
+	height: 24px;
+	width: 24px;
+	margin: 0px 0px 0px 0px;
+	padding: 4px 10px 4px 10px;
+	cursor:pointer;
+}
+html.mf-ltr .mf-toolbar-button { border-right: 1px solid #999; }
+html.mf-rtl .mf-toolbar-button { border-left:  1px solid #999; }
+
+.mf-toolbar-button.ui-state-enabled { display: inline-block; }
+
+.mf-layout-horizontal .mf-toolbar { line-height:0px;}
+.mf-layout-horizontal .mf-toolbar-button { padding:0px; }
+
+.mf-removebutton { display: none; }
+
+/* Remove button. */
+.ui-state-hover .mf-removebutton { width:16px; height:16px; display: inline-block; vertical-align:text-bottom; background-image: url('images/remove-button.png'); }
+html.mf-ltr .ui-state-hover .mf-removebutton { margin: 0px 4px 0px 0px; }
+html.mf-rtl .ui-state-hover .mf-removebutton { margin: 0px 0px 0px 4px; }
+
+/* Remove button (disabled). */
+.ui-state-disabled.mf-removebutton { display:none;}
+
+/* ie only calculates the width right when the filter is set (it's invisible) */
+.ui-autocomplete.ui-menu { padding:0px;}
+
+/* Menu item. */
+.ui-menu-item { white-space:nowrap; line-height:10px; overflow:hidden;}
+
+/* Menu item A tag. */
+.ui-menu-item a { display: inline-block !important; position:relative; border: 1px solid transparent; color:#000; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#00ffffff', GradientType=0); width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:1.4em;}
+html.mf-ltr .ui-menu-item a { right: 0px; }
+html.mf-rtl .ui-menu-item a { left:  0px; }
+
+/* Menu item A IMG tag. */
+.ui-menu-item a img, .mf-internal-image, .mf-internal-image-state-prop { width:16px; height:16px; vertical-align:text-bottom;}
+.mf-internal-image-trans-prop { width:16px; height:16px; vertical-align:text-bottom; margin-left:6px; margin-right:0px}
+html.mf-ltr .ui-menu-item a img, html.mf-ltr .mf-internal-image, html.mf-ltr .mf-internal-image-trans-prop, html.mf-ltr .mf-internal-image-state-prop { margin-right: 4px; }
+html.mf-rtl .ui-menu-item a img, html.mf-rtl .mf-internal-image, html.mf-rtl .mf-internal-image-trans-prop, html.mf-rtl .mf-internal-image-state-prop { margin-left:  4px; }
+
+/* Menu item without icons. */
+.no-icons .ui-menu-item a img {display: none;}
+
+.indenter {display:inline-block; width:16px; margin:4px 2px;}
+.mf-autocomplete-addSubItem {position:relative; width:16px; display: inline-block; vertical-align:text-bottom; margin: 0px 8px; left:-1000px;}
+
+.ui-state-focus .mf-autocomplete-addSubItem, .mf-ui-state-hover .mf-autocomplete-addSubItem { left:0px; }
+
+.mf-autocomplete-item-action { font-weight: bold;}
+.mf-multiselectlookup { position: relative; }
+/*
+.mf-toolbar-add-lookup { position: absolute; top:-4; }
+*/
+.mf-autocomplete-info {position:absolute; background:#ccc; font-size:12px; z-index:2000; }
+.mf-autocomplete-info div {margin:3px 6px;}
+
+a {
+	/*color: 0069D6; */ /*TODO: Override normal link color?*/
+}
+a.mf-link{ font-style:italic; font-size:12px; color: #0069D6; }
+
+/* NOTE: The height of this element must be equal to indicatorHeight defined in multilinetextcontrol.js */
+.mf-height-control { height: 24px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+
+/* More button. */
+.mf-more-button { }
+html.mf-ltr .mf-more-button { padding: 2px 20px 6px  0px; }
+html.mf-rtl .mf-more-button { padding: 2px  0px 6px 20px; }
+
+/* Less button. */
+.mf-less-button { }
+html.mf-ltr .mf-less-button { padding: 2px 20px 6px  0px; }
+html.mf-rtl .mf-less-button { padding: 2px  0px 6px 20px; }
+
+/* Error info. */
+.mf-error-info { padding: 20px 20px 20px 20px; }
+
+/* New object controls. */
+#mf-newobject-controls { padding-bottom:.3em;}
+html.mf-ltr #mf-newobject-controls { text-align: left;  float: left;  }
+html.mf-rtl #mf-newobject-controls { text-align: right; float: right; }
+
+
+span.highlight { background: #FFFFAA !important}
+.mf-header-bar span.highlight { color: black;}
+.no-highlight span.highlight { background: transparent !important; }
+
+/* Show Preview button. */
+.mf-preview-button { width:16px; height:16px; }
+html.mf-ltr .mf-preview-button { background-image: url('images/Show_preview.png');     clear: right; margin-right: 1em; }
+html.mf-rtl .mf-preview-button { background-image: url('images/rtl/Show_preview.png'); clear: left;  margin-left:  1em; }
+
+/* Hide Preview button. */
+.mf-preview-visible .mf-preview-button { }
+html.mf-ltr .mf-preview-visible .mf-preview-button { background-image: url('images/Hide_preview.png');     }
+html.mf-rtl .mf-preview-visible .mf-preview-button { background-image: url('images/rtl/Hide_preview.png'); }
+
+/* Previewer resizer. */
+#mf-preview-sizer { position:absolute; width:4px; display:inline-block; background: #ccc; cursor:w-resize; top:0px; bottom:0px; height:100%; }
+html.mf-ltr #mf-preview-sizer { border: 0px 1px 0px 0px solid #898C95; }
+html.mf-rtl #mf-preview-sizer { border: 0px 0px 0px 1px solid #898C95; }
+
+/* Dragged previewer resizer. */
+#mf-preview-sizer.ui-draggable-dragging { background:#aaa;}
+
+/* Preview pane. */
+#mf-preview-pane { }
+html.mf-ltr #mf-preview-pane { padding-left:  4px; }
+html.mf-rtl #mf-preview-pane { padding-right: 4px; }
+
+/* Previewer control. */
+#mf-previewer { height:100%; width:100%; }
+
+/* The following might no longer be used. */
+#mf-checkedout-overlay-icon { display:none; position:absolute; bottom:0; right:0; }
+#mf-checkedoutother-overlay-icon { display:none; position:absolute; bottom:0; right:0; }
+#mf-previousversion-overlay-icon { display:none; position:absolute; bottom:0; right:0; }
+
+/*Big icon overlays*/
+.mf-icon-overlay {position:absolute; display:inline-block; width:48px; height:48px; bottom:0; right:0; background: transparent no-repeat;}
+.mf-state-CheckOutUs .mf-icon-overlay { background-image: url('images/overlays/CheckedOutCurrent48c32.png') }
+.mf-state-CheckOutOther .mf-icon-overlay { background-image: url('images/overlays/CheckedOutOther48c32.png') }
+.mf-state-PreviousVersion .mf-icon-overlay { background-image: url('images/overlays/PreviousVersion48c32.png') }
+.mf-state-Shortcut .mf-icon-overlay { background-image: url('images/overlays/Shortcut48c32.png') }
+.mf-state-SharedFilesUs .mf-icon-overlay { background-image: url('images/overlays/CheckedOutCurrent48c32.png') }
+.mf-state-SharedFilesOther .mf-icon-overlay { background-image: url('images/overlays/SharedFilesOther48c32.png') }
+.mf-state-Conflict .mf-icon-overlay { background-image: url('images/overlays/Conflict48c32.png') }
+.mf-state-MoreInfo .mf-icon-overlay { background-image: url('images/overlays/MoreInfo48c32.png') }
+
+/*Small icon overlays*/
+.mf-layout-horizontal .mf-icon-overlay, .mf-header-collapsed .mf-header-bar .mf-icon-overlay {width:16px; height:16px; }
+.mf-layout-horizontal .mf-state-CheckOutUs .mf-icon-overlay, .mf-header-collapsed.mf-state-CheckOutUs .mf-icon-overlay { background-image: url('images/overlays/CheckedOutCurrent.png') }
+.mf-layout-horizontal .mf-state-CheckOutOther .mf-icon-overlay, .mf-header-collapsed.mf-state-CheckOutOther .mf-icon-overlay { background-image: url('images/overlays/CheckedOutOther.png') }
+.mf-layout-horizontal .mf-state-PreviousVersion .mf-icon-overlay, .mf-header-collapsed.mf-state-PreviousVersion .mf-icon-overlay { background-image: url('images/overlays/PreviousVersion.png') }
+.mf-layout-horizontal .mf-state-Shortcut .mf-icon-overlay, .mf-header-collapsed.mf-state-Shortcut .mf-icon-overlay { background-image: url('images/overlays/Shortcut.png') }
+.mf-layout-horizontal .mf-state-SharedFilesUs .mf-icon-overlay, .mf-header-collapsed.mf-state-SharedFilesUs .mf-icon-overlay { background-image: url('images/overlays/CheckedOutCurrent.png') }
+.mf-layout-horizontal .mf-state-SharedFilesOther .mf-icon-overlay, .mf-header-collapsed.mf-state-SharedFilesOther .mf-icon-overlay { background-image: url('images/overlays/SharedFilesOther.png') }
+.mf-layout-horizontal .mf-state-Conflict .mf-icon-overlay, .mf-header-collapsed.mf-state-Conflict .mf-icon-overlay { background-image: url('images/overlays/Conflict.png') }
+.mf-layout-horizontal .mf-state-MoreInfo .mf-icon-overlay, .mf-header-collapsed.mf-state-MoreInfo .mf-icon-overlay { background-image: url('images/overlays/MoreInfo.png') }
+
+/* keeps disabled items from look to light - normal jquery opacity is 35*/
+.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled  {
+	filter: Alpha(Opacity=50);
+	opacity: 0.50;
+}
+
+#ui-datepicker-div .ui-state-highlight {
+	background: #E6E6E6;
+	color: #555555;
+}
+
+.ui-size-calculation-dummy { position:absolute !important; top:0px; left:-10000px; z-index:9999; }
+.mf-internal-text.ui-size-calculation-dummy, .mf-internal-text-state-prop.ui-size-calculation-dummy { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+/* Prevents any selection from being seen unless it's the current activeSelectArea */ 
+*::selection { background: transparent }
+
+.activeSelectArea::selection, .activeSelectArea *::selection, input::selection, textarea::selection { background: inherit }
+.mf-comment-empty-text::selection { background: transparent !important}
+
+
+
+/* visual feedback indicating that internal text (propertyValue values) can be selected */
+.mf-internal-text,.mf-internal-text-state-prop{ cursor: text !important; white-space:pre }
+.mf-internal-text a{ outline: 0px; }
+.mf-internal-text-state-prop a{ outline: 0px; }
+
+#mf-settings-menu { background: white;}
+#mf-settings-menu>li { padding:.2em 0em; cursor:pointer; font-size:12px; line-height:12px; min-height:1.4em; color:#000; }
+#mf-settings-menu>li:hover {
+
+	filter: none;
+	background-color: #add6ff;
+	background-image: none;
+	border-radius: 0px;	
+/*	
+	background-color: #ddd;
+	background-repeat: no-repeat;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eee), color-stop(25%, #eee), to(#ddd));
+	background-image: -webkit-linear-gradient(#eee, #eee 25%, #ddd);
+	background-image: -moz-linear-gradient(top, #eee, #eee 25%, #ddd);
+	background-image: -ms-linear-gradient(#eee, #eee 25%, #ddd);
+	background-image: -o-linear-gradient(#eee, #eee 25%, #ddd);
+	background-image: linear-gradient(#eee, #eee 25%, #ddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd', GradientType=0);
+	border-radius: 0px;
+*/
+}
+
+.mf-info-bubble { padding-bottom:15px; background:url('images/info-bubble-tail.png') no-repeat 10px bottom; position:absolute; }
+.mf-info-bubble div{ padding:8px ; font-style:italic; border-radius: 10px; max-width:300px; text-align:center; background:#ffff55;}
+
+/*
+.mf-layout-horizontal .mf-remotevault .mf-dynamic-controlfield { padding-top:10px;}
+.mf-remotevault-link:focus { outline:0px; }
+*/
+
+/* Hide done-button in datepicker */
+button.ui-datepicker-close { display: none; }
+
+/* Remove grayed effect from today-button in datepicker */
+.ui-datepicker div.ui-datepicker-buttonpane button.ui-datepicker-current {
+    opacity: 1;
+    filter:Alpha(Opacity=100);
+}
+
+/* Today button for horizontal layout. */
+.mf-layout-horizontal .ui-datepicker div.ui-datepicker-buttonpane button.ui-datepicker-current {
+ height: 20px;
+ margin: 2px 0px 1px 0px;
+ padding: 0px 2px 1px 2px;
+}
+
+/* Internals of the tbody elements */
+.mf-dynamic-tbody {}
+
+/* Property group */
+.mf-dynamic-tbody .mf-propertygroup-title { background-color: #fafafa; color: #5a5a5a; }
+
+/* Property group which is collapsible */
+.mf-dynamic-tbody.mf-propertygroup-collapsible .mf-propertygroup-title {
+    background-image: url('images/arrow_drop_up_s1_grey.png');
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+}
+
+/* Property group header */
+.mf-dynamic-tbody .mf-propertygroup-title > th { 
+    line-height:14px;
+    font-size:14px; 
+    font-weight:500;
+    border-style: none; 
+    padding-left: 30px;
+}
+
+.mf-dynamic-tbody .mf-propertygroup-title > th::after{
+	content: " " ;
+	display: inline-block;
+	height: 4px; /* Make div top 4px height above baseline, since inline element can't be vetical aligned. */ 
+	border-top:#cccccc 1px solid; /* Render the div top border only. */
+	width: 0;
+	margin-right: -100%; /* Lock div to the very right and not wrapping. */
+	padding-right: 100%; /* Push line outside of own div. */
+	margin-left:10px; /* Keep 10px margin from text on its left. */
+}
+
+/* rtl in Property group: */
+html.mf-rtl .mf-dynamic-tbody.mf-propertygroup-collapsible .mf-propertygroup-title { background-position: right 10px center; }
+html.mf-rtl .mf-dynamic-tbody .mf-propertygroup-title > th { text-align: right; padding-left: 0px; padding-right: 30px; }
+html.mf-rtl .mf-dynamic-tbody .mf-propertygroup-title > th::after { display: none; }
+
+/* Collapsed property group. */
+.mf-dynamic-tbody.mf-propertygroup-collapsible.mf-propertygroup-collapsed .mf-propertygroup-title { background-image: url('images/arrow_drop_down_s1_grey.png'); }
+
+/* Common property group. (not visible)*/
+.mf-dynamic-tbody.mf-propertygroup-common .mf-propertygroup-title { visibility: hidden; }
+.mf-dynamic-tbody.mf-propertygroup-common .mf-propertygroup-title > th { display: none; border-style: none; height: 0px; padding: 0px; }
+
+/* Property group without header */
+.mf-dynamic-tbody.mf-propertygroup-no-header .mf-propertygroup-title { display: none; }
+
+/* Separator for property group */
+.mf-propertygroup-separator {}
+.mf-propertygroup-separator > td { padding: 1px 0px 0px 0px; }
+
+/* Value suggestion related style settings */
+
+/* Overall container */
+.mf-suggestion-container {
+	padding-left: 5px;
+	color: #FF0000;
+}
+
+/* Button container */
+.mf-suggestion-button-container {
+	overflow: hidden;
+	white-space: normal;
+	height: auto;
+}
+
+/* Value suggestion button */
+.mf-value-suggestion-button {
+	display: inline-block;
+	vertical-align: top;
+	color: #FFFFFF;
+}
+
+/* The actual value suggestion */
+.mf-value-suggestion {
+	float: left;
+	margin-right: 3px;
+	margin-left: 2px;
+	margin-top: 2px;
+	margin-bottom: 4px;
+	display: inline-table;
+}
+
+/* Value suggestion value */
+.mf-value-suggestion-value {
+	padding-left: 6px;
+	padding-right: 6px;
+	background-color: #8E9FB3;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+/* The arrow head for the button */
+.mf-value-suggestion::after {
+	content: "";
+	width: 0;
+	height: 0;
+	border-top: 12px solid transparent;
+	border-bottom: 12px solid transparent;
+	border-left: 6px solid #8E9FB3;
+	display: inline-block;
+	vertical-align: top;
+}
+
+/* Value suggestion text content */
+.mf-value-suggestion-value-content {
+	white-space: normal;
+	word-wrap: normal;
+	overflow: hidden;
+	padding-top: 0.2em;
+	padding-bottom: 0.3em;
+	max-width: 300px;
+}
+
+/* "More" and "less" toggle */
+.mf-suggestion-container-less-toggle,
+.mf-suggestion-container-more-toggle {
+	margin-left: 0.25em;
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+	font-style: italic;
+	font-size: 12px
+}
+
+/* Logging */
+#debug {
+	border: 1px solid #ccc;
+	padding-left: 4px;
+	padding-top: 2px;
+	min-height: 100px;
+}

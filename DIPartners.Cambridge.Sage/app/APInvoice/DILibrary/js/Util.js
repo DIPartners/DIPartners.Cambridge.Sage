@@ -1,14 +1,15 @@
-﻿function addRowToTable(tableID) {
+function addRowToTable(tableID)
+{
 	var tbl = document.getElementById(tableID);
 	var lastRow = tbl.rows.length;
-	var row = tbl.insertRow(lastRow - 1);
+	var row = tbl.insertRow(lastRow-1);
 	var iteration = lastRow - 2;
 
-	iteration = (lastRow == 2) ? 1 : Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, "")) + 1;
+	iteration = (lastRow == 2) ? 1 : Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, ""))+1;
 
 	var cellLeft = row.insertCell(0);
 	var el = document.createElement('IMG');
-	el.setAttribute('src', 'UIControlLibrary/images/remove-button-red.png');
+	el.setAttribute('src', 'DILibrary/images/remove-button-red.png');
 	el.setAttribute('style', 'padding-left:0px;text-align:center;');
 	el.setAttribute('id', 'chk');
 	el.setAttribute('onclick', 'removeRow(this)');
@@ -19,7 +20,8 @@
 
 	var startCell = iteration / iteration;
 
-	for (var i = iteration; i < iteration + 5; i++) {
+	for (var i = iteration; i < iteration + 5; i++)
+	{
 		var id = "";
 		var cellRight = row.insertCell(startCell);
 		var el = document.createElement('input');
@@ -45,14 +47,15 @@
 
 		/*el.setAttribute("placeholder", '');
 		el.setAttribute("value", '');*/
-
+			
 		cellRight.appendChild(el);
 		startCell++;
 	}
 	ChangeValue(false);
 }
 
-function Calculate(_qty, _unit, _ext) {
+function Calculate(_qty, _unit, _ext)
+{
 	var Ext = document.getElementById(_ext);
 	var Qty = document.getElementById(_qty).value;
 
@@ -96,7 +99,7 @@ function CalculateTotal() {
 	for (var i = 0; i <= lastRow; i++) {
 		if (document.getElementById('Extension' + i) != undefined) {
 			var currency = document.getElementById('Extension' + i).value;
-
+			
 			Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
 		}
 	}
@@ -179,18 +182,22 @@ function isRequired(assocPropDefs, propertyNumber) {
 function SetButton() {
 	var saveLabel = GetText("IDS_METADATACARD_COMMAND_SAVE");
 	var discardLabel = GetText("IDS_METADATACARD_BUTTON_DISCARD");
+	var saveTooltip = GetText("IDS_METADATACARD_BUTTON_TOOLTIP_SAVE");
 
 	$("#save-data").text(saveLabel);
+	$("#save-data").attr("title", saveTooltip);
 	$("#discard-data").text(discardLabel);
-
 	$(window).resize(function () {
 		ResizeContentArea();
 	});
 }
 
 function GetText(id) {
-	if (id == "IDS_METADATACARD_COMMAND_SAVE") id = 27593;
-	else if (id == "IDS_METADATACARD_BUTTON_DISCARD") id = 27614;
+    switch (id) {
+		case id = "IDS_METADATACARD_COMMAND_SAVE": id = 27593; break;
+		case id = "IDS_METADATACARD_BUTTON_DISCARD": id = 27614; break;
+		case id = "IDS_METADATACARD_BUTTON_TOOLTIP_SAVE": id = 27929; break;	
+	}
 
 	// Get localized text from MFShell.
 	var localizedString = null;
@@ -206,8 +213,8 @@ function ResizeContentArea() {
 
 	// Figure out all heights.
 	win = $(window).outerHeight(),
-		footer = $("#mf-footer").outerHeight(),
-		content = win - footer;
+	footer = $("#mf-footer").outerHeight(),
+	content = win - footer;
 	$(".panel-container").height(content - $("#titleLabel").height());
 
 	// Set height of the content area.

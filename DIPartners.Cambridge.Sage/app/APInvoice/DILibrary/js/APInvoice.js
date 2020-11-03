@@ -22,60 +22,63 @@ function OnNewDashboard(dashboard) {
     }
 }
 
-function SetDetails(dashboard) {
-    var Vault = dashboard.Vault;
-    var controller = dashboard.CustomData;
+function SetDetails(dashboard)
+{
+    var Vault=dashboard.Vault;
+    var controller=dashboard.CustomData;
     controller.Vault = Vault;
     var editor = controller.Invoice;
 
     // Apply vertical layout.
-    $("body").addClass("mf-layout-vertical");
+    $( "body" ).addClass( "mf-layout-vertical" );
     ResetTabs();
-
+    
     // Show some information of the document.
     $('#message_placeholder').text(controller.ObjectVersion.Title + ' (' + controller.ObjectVersion.ObjVer.ID + ')');
     var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
-
-    controller.Invoice = {
-        ObjectVersion: controller.ObjectVersion,
-        ObjectVersionProperties: ObjectVersionProperties,
-        Events: dashboard.Events
+        
+    controller.Invoice={
+        ObjectVersion:controller.ObjectVersion, 
+        ObjectVersionProperties:ObjectVersionProperties,
+        Events:dashboard.Events
     };
-
+    
     var PONO = ObjectVersionProperties.SearchForPropertyByAlias(dashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
-    if (PONO != "") {
+    if (PONO != "")
+    {
         var ObjectSearchResults = dashboard.Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-            FindObjects(dashboard.Vault, 'vOjbect.PurchaseOrder', 'vProperty.PONumber', MFDatatypeText, PONO), MFSearchFlagNone, true);
-        if (ObjectSearchResults.Count == 1) {
+    			FindObjects(dashboard.Vault,'vOjbect.PurchaseOrder','vProperty.PONumber',MFDatatypeText,PONO), MFSearchFlagNone, true);
+        if (ObjectSearchResults.Count == 1)
+    	{
             var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(ObjectSearchResults[0].ObjVer);
-            /*
-                        var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
-                        var ObjectSearchResultsProperties = dashboard.Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-            */
-            controller.PurchaseOrder = {
-                ObjectVersion: ObjectSearchResults[0],
-                ObjectVersionProperties: ObjectVersionProperties,
-                PropertyControls: PropertyControls,
-                Events: dashboard.Events
+/*
+            var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
+            var ObjectSearchResultsProperties = dashboard.Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+*/
+            controller.PurchaseOrder={
+                ObjectVersion:ObjectSearchResults[0],
+                ObjectVersionProperties:ObjectVersionProperties,
+                PropertyControls:PropertyControls,
+                Events:dashboard.Events
             };
             var editor = controller.PurchaseOrder;
-            var PropertyControls = new Array();
+            var PropertyControls=new Array();
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.PONumber'));
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.Vendor'));
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.PODate'));
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.PORequiredDate'));
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.Currency'));
             editor.PropertyControls = PropertyControls;
-
+            
             var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-                FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
+                FindObjects(Vault,'vObject.PurchaseOrderDetail','vProperty.PurchaseOrder',MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
         }
     }
-    controller.PackingSlip = {
-        ObjectVersion: null,
-        ObjectVersionProperties: null,
-        PropertyControls: null,
-        Events: dashboard.Events
+    controller.PackingSlip={
+        ObjectVersion:null,
+        ObjectVersionProperties:null,
+        PropertyControls:null,
+        Events:dashboard.Events
     };
 
     SetInvoiceDetails(controller);
@@ -89,27 +92,28 @@ function SetDetails(dashboard) {
     SetButton();
 }
 
-function SetInvoiceDetails(controller) {
-    var editor = controller.Invoice;
-    var Vault = controller.Vault;
-    var tabname = 'Invoice';
+function SetInvoiceDetails(controller)
+{
+    var editor=controller.Invoice;
+    var Vault=controller.Vault;
+    var tabname='Invoice';
     var tabdisplayname = tabname;
     var ArrayVal = [];
 
     var self = this;
 
-    CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.InvoiceNumber')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Date')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
+    CreateMetadataCard(controller,editor,"ltabs", tabname,tabdisplayname);
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.InvoiceNumber')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Date')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
 
-    // HKo
+// HKo
     SetInvoicePreview();
     LoadPreview();
 
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+			FindObjects(Vault,'vObject.InvoiceDetail','vProperty.Invoice',MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
     editor.table.append(
         '<tr><td colspan="5" align="center">' +
@@ -122,7 +126,8 @@ function SetInvoiceDetails(controller) {
     var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
     var Total = 0
 
-    if (ObjectSearchResults.Count > 0) {
+    if (ObjectSearchResults.Count > 0)
+    {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
@@ -131,25 +136,25 @@ function SetInvoiceDetails(controller) {
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
-
+            
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
 
             var htmlStr =
                 '<tr>' +
-                '   <td style="padding:0px;"><img id="chk" src="UIControlLibrary/images/remove-button-red.png" title="delete item"' +
+                '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "removeRow(this)" ></td > ' +
                 '   <td><input type="text" id=\'ItemNumber' + i + '\' value="' + Item + ' "title="' + Item + '"></td > ' +
-                '   <td><input style="text-align:right" type="text" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
+                '   <td><input type="text" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return isNumberKey(event,this.id)"></td> ' +
-                '   <td><input style="text-align:right" type="text" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
+                '   <td><input type="text" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
                 '       onkeyup="Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return isNumberKey(event,this.id)"></td> ' +
-                '   <td><input style="text-align:right" type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td><input style="text-align:right" type="text" id=\'PONumber' + i + '\' value="' + PONumber.split("-").pop().trim() + ' "title="' + PONumber + '"' +
+                '   <td><input type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
+                '   <td><input style="text-align:center" type="text" id=\'PONumber' + i + '\' value="' + PONumber.split("-").pop().trim() + ' "title="' + PONumber + '"' +
                 '       onkeypress="return isNumberKey(event,this.id)"></div></td > ' +
                 "</tr>";
-            // TableBody.append(htmlStr);
+           // TableBody.append(htmlStr);
 
             // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
             ArrayVal[i] = PONumber + ", " + htmlStr;
@@ -158,10 +163,11 @@ function SetInvoiceDetails(controller) {
         var SortedList = SortLineNo(ArrayVal).join();
         TableBody.append(SortedList);
     }
-    else {
-        var htmlStr =
+    else
+    {
+         var htmlStr =
             '<tr>' +
-            '   <td style="padding:0px";><img id="chk" src="UIControlLibrary/images/remove-button-red.png" ' +
+            '   <td style="padding:0px";><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
             '        title="delete item" alt = "del" onclick = "removeRow(this)" ></td > ' +
             '   <td style="text-align:left"><input type="text" id="ItemNumber0" value=""></td >' +
             '   <td><input type="text" id="Quantity0" value="" onkeyup="Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
@@ -174,39 +180,41 @@ function SetInvoiceDetails(controller) {
 
         TableBody.append(htmlStr);
     }
-
+  
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
     var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
     TableBody.append(
         '<tr>' +
         '<td><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick=addRowToTable("invoice_details_table");><strong>+</strong></a ></td > ' +
-        '<td colspan="3" style="text-align:right;"><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
+        '<td colspan="3" style="text-align:right; border-right: none; "><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
         '<td colspan="2"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
         '</tr>'
     );
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified')
 }
 
-function SetPODetails(controller) {
+function SetPODetails(controller)
+{
     var editor = controller.PurchaseOrder;
     if (editor == undefined) return;
-    var Vault = controller.Vault;
-    var tabname = 'PO' + editor.ObjectVersion.Title;
-    var tabdisplayname = 'PO ' + editor.ObjectVersion.Title;
+    var Vault=controller.Vault;
+    var tabname='PO' + editor.ObjectVersion.Title;
+    var tabdisplayname='PO ' + editor.ObjectVersion.Title;
 
-    CreateMetadataCard(controller, editor, "rtabs", tabname, tabdisplayname);
-
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PONumber')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PODate')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PORequiredDate')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Currency')
+    CreateMetadataCard(controller, editor,"rtabs",tabname,tabdisplayname);
+    
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PONumber')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PODate')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.PORequiredDate')
+	generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Currency')
 
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-        FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
-    if (ObjectSearchResults.Count > 0) {
+			FindObjects(Vault,'vObject.PurchaseOrderDetail','vProperty.PurchaseOrder',MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
+    if (ObjectSearchResults.Count > 0)
+    {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="po_details_table" class="details">' +
@@ -215,13 +223,14 @@ function SetPODetails(controller) {
             '</td></tr>' +
             '');
 
-        var TableBody = editor.table.find('#po_details_table');
+        var TableBody=editor.table.find('#po_details_table');
         var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         var Total = 0;
         var ArrayVal = [];
         var strTable = "";
-        for (var i = 0; i < ObjectSearchResults.Count; i++) {
+        for (var i = 0; i < ObjectSearchResults.Count; i++)
+        {
             var props = ObjectSearchResultsProperties[i];
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
             var PODetailName = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
@@ -244,7 +253,7 @@ function SetPODetails(controller) {
                 '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
                 '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
                 "</tr>";
-            // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
+// HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
             ArrayVal[i] = LineNo + ", " + strTable;
         }
         var SortedList = SortLineNo(ArrayVal).join();
@@ -252,22 +261,23 @@ function SetPODetails(controller) {
         TableBody.append(SortedList);
         TableBody.append(
             '<tr>' +
-            '<td colspan="7" style="border-bottom: none;border-left: none; text-align:right">' +
+            '<td colspan="7" style="text-align:right">' +
             '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td>' +
             '</tr>'
         );
     }
 }
 
-function SetPSDetails(controller) {
-    /* var editor=controller.PackingSlip;
-     var Vault=controller.Vault;
-     var tabname='PackingSlip';
-     var tabdisplayname='Packing Slip';
- 
-     CreateMetadataCard(controller,editor,"rtabs",tabname,tabdisplayname);
- 
-     editor.table.append('<span>Packing Slip Details!</span>')*/
+function SetPSDetails(controller)
+{
+   /* var editor=controller.PackingSlip;
+    var Vault=controller.Vault;
+    var tabname='PackingSlip';
+    var tabdisplayname='Packing Slip';
+
+    CreateMetadataCard(controller,editor,"rtabs",tabname,tabdisplayname);
+
+    editor.table.append('<span>Packing Slip Details!</span>')*/
 
 }
 
@@ -489,7 +499,7 @@ function DiscardInvoice() {
 
 // A helper function to compile the search conditions needed for running the search in the
 // vault using M-Files API.
-function FindObjects(Vault, OTAlias, PDAlias, PDType, Value) {
+function FindObjects(Vault,OTAlias,PDAlias,PDType,Value) {
     // We need a few IDs based on aliases defined in the M-Files Admin tool for object types, properties, etc.
     // Note that all these methods could be run asynchronously as well, if it seems they take a long time and block the UI.
     var OT = Vault.ObjectTypeOperations.GetObjectTypeIDByAlias(OTAlias);
@@ -531,52 +541,53 @@ function SetInvoicePreview() {
     $("#" + tablist).tabs("refresh");
 }
 
-function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
-    var propertyNumber = ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).PropertyDef;
-    var PropertyDef = Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
-    var propertyName = PropertyDef.Name;
-    var propertyType = PropertyDef.DataType;
-    var propertyValue = ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).Value.DisplayValue;
-    var propertyEditable = (PropertyDef.AutomaticValueType == 0 ? 1 : 0);
-    var classID = ObjVerProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
-    var assocPropDefs = Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
-    var propertyRequired = isRequired(assocPropDefs, propertyNumber);
-    if (propertyType == 8)
-        propertyValue = ((propertyValue == 'Yes') ? 'Yes' : 'No');
-    if (propertyType == 3)
-        propertyValue = '$' + propertyValue;
+function generate_row(tableID, Vault, ObjVerProperties, propertyAlias)
+{
+	var propertyNumber=ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).PropertyDef;
+	var PropertyDef=Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
+	var propertyName=PropertyDef.Name;
+	var propertyType=PropertyDef.DataType;
+	var propertyValue=ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).Value.DisplayValue;
+	var propertyEditable=(PropertyDef.AutomaticValueType==0 ? 1 : 0);
+	var classID=ObjVerProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
+	var assocPropDefs=Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
+	var propertyRequired=isRequired(assocPropDefs,propertyNumber);
+	if (propertyType==8)
+		propertyValue=((propertyValue == 'Yes') ? 'Yes' : 'No');
+	if (propertyType==3)
+		propertyValue='$'+propertyValue;
     // Create container element
-    var propertyLine = $('<tr>');
-    propertyLine.addClass('mf-dynamic-row mf-property-' + propertyNumber);
-    propertyLine.attr('id', propertyNumber)
+	var propertyLine=$('<tr>');
+	propertyLine.addClass('mf-dynamic-row mf-property-'+propertyNumber);
+    propertyLine.attr('id',propertyNumber)
     // Check if field is editable. If it is, add class 'mf-editable'
     if (propertyEditable)
-        propertyLine.addClass('mf-editable');
-    //	$(tableID).append(propertyLine);
-    tableID.append(propertyLine);
+    	propertyLine.addClass('mf-editable');
+//	$(tableID).append(propertyLine);
+	tableID.append(propertyLine);
 
-    // Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
-    propertyLine.hover(
-        function () {
+	// Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
+	propertyLine.hover(
+		function() {
 
-            // Set the hover theme. The special theme is set for workflow and workstates properties.
-            $(this).addClass("ui-state-hover");
-            if (propertyNumber == 38 || propertyNumber == 99)
-                $(this).addClass("ui-footer-hover");
-        },
-        function () {
+			// Set the hover theme. The special theme is set for workflow and workstates properties.
+			$( this ).addClass( "ui-state-hover" );
+			if( propertyNumber == 38 || propertyNumber == 99 )
+				$( this ).addClass( "ui-footer-hover" );
+		},
+		function() {
 
-            // Remove the hover theme, as well as the special theme workflow and workstate properties.
-            $(this).removeClass("ui-state-hover");
-            if (propertyNumber == 38 || propertyNumber == 99)
-                $(this).removeClass("ui-footer-hover");
-        }
-    );
+			// Remove the hover theme, as well as the special theme workflow and workstate properties.
+			$( this ).removeClass( "ui-state-hover" );
+			if( propertyNumber == 38 || propertyNumber == 99 )
+				$( this ).removeClass( "ui-footer-hover" );
+		}
+	);
     var sub = (propertyName == "Subtotal") ?
         '                <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + propertyValue + '" disabled ></div > ' : "";
 
     propertyLine.append(
-        '        <td class="mf-dynamic-namefield ">' +
+        '        <td class="mf-dynamic-namefield">' +
         '            <div>' +
         '                <span class="mf-property-' + propertyNumber + '-label">' + propertyName + '</span>' +
         '                <span class="mf-required-indicator">*</span>' +
@@ -593,27 +604,28 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
 
 
     if (!propertyRequired)
-        requiredspan = propertyLine.find('.mf-required-indicator').hide();
+        requiredspan=propertyLine.find('.mf-required-indicator').hide();
 }
 
-function setProperty(Vault, editor, propertyAlias) {
-    var ObjectVersionProperties = editor.ObjectVersionProperties
-    var PropertyInfo = ObjectVersionProperties.SearchForPropertyByAlias(Vault, propertyAlias, true);
-    var propertyNumber = PropertyInfo.PropertyDef;
-    var PropertyDef = Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
-    var propertyName = PropertyDef.Name;
-    var propertyType = PropertyDef.DataType;
-    var propertyValue = PropertyInfo.Value.DisplayValue;
-    var propertyReadOnly = (PropertyDef.AutomaticValueType == 0 ? false : true);
-    var classID = ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
-    var assocPropDefs = Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
-    var propertyRequired = isRequired(assocPropDefs, propertyNumber);
-    if (propertyType == 8)
-        propertyValue = ((propertyValue == 'Yes') ? 'Yes' : 'No');
-    if (propertyType == 3)
-        propertyValue = '$' + propertyValue;
+function setProperty(Vault, editor, propertyAlias)
+{
+    var ObjectVersionProperties=editor.ObjectVersionProperties
+    var PropertyInfo=ObjectVersionProperties.SearchForPropertyByAlias(Vault, propertyAlias, true);
+	var propertyNumber=PropertyInfo.PropertyDef;
+	var PropertyDef=Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
+	var propertyName=PropertyDef.Name;
+	var propertyType=PropertyDef.DataType;
+	var propertyValue=PropertyInfo.Value.DisplayValue;
+	var propertyReadOnly=(PropertyDef.AutomaticValueType==0 ? false : true);
+	var classID=ObjectVersionProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
+	var assocPropDefs=Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
+	var propertyRequired=isRequired(assocPropDefs,propertyNumber);
+	if (propertyType==8)
+		propertyValue=((propertyValue == 'Yes') ? 'Yes' : 'No');
+	if (propertyType==3)
+		propertyValue='$'+propertyValue;
 
-    var propertyObject = {
+    var propertyObject={
         AllowAdding: false,
         Events: editor.Events,
         Hierarchical: false,
@@ -636,22 +648,23 @@ function setProperty(Vault, editor, propertyAlias) {
     return propertyObject
 }
 
-function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
+function CreateMetadataCard(controller,editor,tablist,tabid,tabtitle)
+{
     var self = this;
-    var Vault = controller.Vault;
-    controller.editor = editor;
-    if (typeof controller.cards === 'undefined')
-        cardid = 0;
+    var Vault=controller.Vault;
+    controller.editor=editor;
+    if(typeof controller.cards === 'undefined')
+        cardid=0;
     else
-        cardid = controller.cards + 1;
-    controller.cards = cardid;
+        cardid=controller.cards + 1;
+    controller.cards=cardid;    
 
-    editor.cardname = 'metadatacard-' + cardid;
-    editor.tabname = tabid;
-    editor.tabdisplayname = tabtitle;
+    editor.cardname='metadatacard-'+cardid;
+    editor.tabname=tabid;
+    editor.tabdisplayname=tabtitle;
 
     // Add the tab to the tab list
-    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<li><a href="#'+editor.tabname+'">'+editor.tabdisplayname+'</a></li>').appendTo("#" + tablist + " ul");
     $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
@@ -742,7 +755,7 @@ function LoadPreview() {
 function CreatePopupIcon() {
 
     $('<li style="float:right"><a href="#" target="popup" onclick="PopupDashboard(); return false;");">' +
-        '<img src="UIControlLibrary/images/openlink_16.png"></a></li>').appendTo("#ltabs ul");
+        '<img src="DILibrary/images/openlink_16.png"></a></li>').appendTo("#ltabs ul");
 }
 
 function PopupDashboard() {
