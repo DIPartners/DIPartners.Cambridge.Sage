@@ -1,44 +1,69 @@
 
-table.mf-dynamic-table tr {
-    cursor: auto !important;
-    background-color: #fafafa;
-}
+/* table.mf-dynamic-table tr {
+	cursor:  auto !important;
+	background-color: #fafafa;
+} */
 
-table.details th, table.details td {
+table#invoice_details_table th,
+table#invoice_details_table td,
+table#po_details_table th,
+table#po_details_table td {
     border: 1px solid rgb(109, 109, 109) !important;
     padding: 5px 5px 5px 5px;
 }
 
-table.details tr:nth-child(even) {
+table#invoice_details_table tr:nth-child(even),
+table#po_details_table tr:nth-child(even) {
     background-color: #eff5fa !important;
 }
 
-table.details th {
+table#invoice_details_table th,
+table#po_details_table th {
     background-color: #c9c9ce !important;
     color: rgb(88, 88, 88) !important;
 }
 
-table.details td {
+table#invoice_details_table td,
+table#po_details_table td {
     color: black !important;
 }
 
-table#invoice_details_table td input {
-    text-align: right !important;
-    outline: none !important;
-    border-color: transparent !important;
-    background-color: transparent;
+    table#invoice_details_table td input,
+    table#po_details_table td input {
+        outline: none !important;
+        border-color: transparent !important;
+        background-color: transparent;
+    }
+
+#po_details_table tr td:nth-child(2), td:nth-child(7), td:nth-child(8) {
+    cursor: pointer;
 }
 
-table#po_details_table td input {
-    text-align: right !important;
-    outline: none !important;
-    border-color: transparent !important;
-    background-color: transparent;
+#po_details_table td {
+    height: 24px;
+}
+
+table#invoice_details_table tr td:nth-child(2) {
+    text-align: left !important;
+}
+
+
+#invoice_details_table tr td:nth-child(1), td:nth-child(6) {
+    text-align: center !important;
 }
 
 input[type="text"]:disabled {
     background: #fafafa;
 }
+
+#po_details_table {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    color: #000000;
+}
+
 
 .Balance {
     -webkit-border-radius: 20px;
@@ -63,20 +88,4 @@ input[type="text"]:disabled {
 #chk {
     cursor: pointer;
     text-align: center;
-}
-
-#po_details_table tr td:nth-child(5) {
-    background-color: white;
-}
-
-#po_details_table tr td:nth-child(2), td:nth-child(7), td:nth-child(8) {
-    cursor: pointer;
-}
-
-#invoice_details_table tr td:nth-child(1) {
-    text-align: center !important;
-}
-
-#invoice_details_table tr td:nth-child(2), td:nth-child(3), td:nth-child(4) {
-    background-color: white;
 }

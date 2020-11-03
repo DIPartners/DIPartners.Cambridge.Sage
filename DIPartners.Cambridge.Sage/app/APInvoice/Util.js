@@ -140,33 +140,53 @@ function ChangeValue(val) {
 	document.getElementById("discard-data").disabled = val;
 }
 
-function htmlencode(text, convertNewLine) {
-
-	// Handle null and undefined values.
-	if (text == null || text == undefined)
-		return "";
-
-	// Encode value.
-	var result = text.replace(/[&<>"']/g, function ($0) {
-		return "&" + { "&": "amp", "<": "lt", ">": "gt", '"': "quot", "'": "#39" }[$0] + ";";
+function SortLineNo(ArrayVal) {
+	ArrayVal.sort(function (a, b) {
+		return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 	});
-
-	// Convert also "new line" if requested.
-	if (convertNewLine)
-		result = result.replace(/\n/gi, "<br />");
-
-	// return encoded value;
-	return result;
+	return ArrayVal;
 }
 
-function removeQuotes(text) {
+function GetColIndex(pptName) {
 
-	// Remove quotes.
-	return text.replace(/["']/g, function ($0) {
-		return { '"': "", "'": "" }[$0];
-	});
+	if (pptName == "ItemNumber") return 1;
+	else if (pptName == "Quantity") return 2;
+	else if (pptName == "UnitPrice") return 3;
+	else if (pptName == "InvoiceLineExtension") return 4;
+	else if (pptName == "PONumber") return 5;
 }
 
+function CheckNull() {
+	var tbl = document.getElementById('invoice_details_table');
+	document.getElementById('invoice_details_table').rows.length
+	for (var i = 1; i < tbl.rows.length - 1; i++) {
+		for (var j = 1; j < 4; j++) {
+			var val = tbl.rows[i].cells[j].querySelector('input').value;
+			if (val === "" || val === 0 || val === "$") return false;
+		}
+	}
+
+	return true;
+}
+
+function isRequired(assocPropDefs, propertyNumber) {
+	for (var i = 0; i < assocPropDefs.Count; i++) {
+		if (assocPropDefs[i].PropertyDef == propertyNumber)
+			return assocPropDefs[i].Required;
+	}
+	return false;
+}
+function SetButton() {
+	var saveLabel = GetText("IDS_METADATACARD_COMMAND_SAVE");
+	var discardLabel = GetText("IDS_METADATACARD_BUTTON_DISCARD");
+
+	$("#save-data").text(saveLabel);
+	$("#discard-data").text(discardLabel);
+
+	$(window).resize(function () {
+		ResizeContentArea();
+	});
+}
 
 function GetText(id) {
 	if (id == "IDS_METADATACARD_COMMAND_SAVE") id = 27593;
@@ -185,13 +205,12 @@ function GetText(id) {
 function ResizeContentArea() {
 
 	// Figure out all heights.
-	//			var headerExpanded = self.controller.editor.GetUIData("HeaderExpanded", true),
 	win = $(window).outerHeight(),
 		footer = $("#mf-footer").outerHeight(),
 		content = win - footer;
+	$(".panel-container").height(content - $("#titleLabel").height());
 
 	// Set height of the content area.
-	$(".panel-container").height(content - $("#titleLabel").height());
 	var pch = $(".panel-container").height();
 	var tabh = $(".ui-tabs-nav").height();
 	$(".mf-layout-vertical").height(win);

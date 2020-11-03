@@ -26,7 +26,7 @@ label {
     flex: 0 0 auto; /* only manually resize */
     padding: 0px;
     min-height: 200px;
-    width: 50%;
+    width: 40%;
 /* Used to be stubbed out, to not show splitter and right pane */
 /*
     width: 100%;
