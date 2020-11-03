@@ -104,6 +104,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="app\APInvoice\DILibrary\css\" />
+    <Folder Include="app\APInvoice\DILibrary\images\" />
+    <Folder Include="app\APInvoice\DILibrary\js\" />
     <Folder Include="app\APInvoice\UIControlLibrary\bootstrap\" />
     <Folder Include="app\APInvoice\UIControlLibrary\images\" />
     <Folder Include="app\APInvoice\UIControlLibrary\jquery-ui-bootstrap\third-party\jQuery-UI-Date-Range-Picker\css\" />
