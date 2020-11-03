@@ -1,0 +1,144 @@
+/* Style for metadata card. */
+
+.page-container {
+    margin: 0px;
+}
+
+label {
+    font-family:Segoe UI, Tahoma, Arial, sans-serif; 
+    color: #000000;
+    display: block;
+}
+.panel-container {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid silver;
+    overflow: hidden;
+    height: 100%;
+}
+
+.panel-left {
+    flex: 0 0 auto; /* only manually resize */
+    padding: 0px;
+    min-height: 200px;
+    width: 40%;
+    min-width: 200px;
+    white-space: nowrap;
+}
+
+.splitter {
+    flex: 0 0 auto;
+    width: 1px;
+    border-left: 1px solid silver;
+    min-height: 200px;
+    cursor: col-resize;
+}
+
+.panel-right {
+    flex: 1 1 auto; /* resizable */
+    padding: 0px;
+    width: 100%;
+    min-height: 200px;
+}
+
+.details {
+    border-collapse: collapse;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 0;
+}
+#mf-preview-ctrl-container {
+	min-height: 100%; 
+	position: relative
+}
+
+#preview-ctrl {
+	flex: 0 0 auto;
+	position: relative; 
+	top: 0; 
+	left: 0; 
+	width: 100%;
+	height: 100%;
+    min-height: 750px;
+}
+
+.details th, .details td{
+	border: 1px solid rgb(109, 109, 109);
+	padding: 5px 5px 5px 5px;
+}
+
+.details tr:nth-child(even) {
+	background-color: #eff5fa;
+}
+
+.details th {
+	background-color: #c9c9ce;
+	color: rgb(88, 88, 88);
+}
+
+.details td {
+	color: black !important;
+}
+
+.details td input {
+	outline: none !important;
+	border-color: transparent !important;
+	background-color: transparent;
+}
+
+#invoice_details_table tr td:nth-child(2) input,
+#invoice_details_table tr td:nth-child(6) input{
+	cursor: pointer !important;
+}
+
+#invoice_details_table tr td:nth-child(n+3) input{
+	text-align: right !important;	
+}
+
+#po_details_table td {
+	height:24px; 
+} 
+
+input[type="text"]:disabled {
+	background: #fafafa;
+}
+
+#po_details_table tr td:nth-child(3),
+#po_details_table tr td:nth-child(4),
+#po_details_table tr td:nth-child(5){
+	cursor: default;
+}
+
+#po_details_table { 
+	-moz-box-sizing: border-box; 
+	-webkit-box-sizing: border-box; 
+	box-sizing: border-box; 
+	font-family:Segoe UI, Tahoma, Arial, sans-serif; 
+	color: #000000; 
+}
+
+.Balance{
+	-webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+	 border-radius: 25px;
+	 text-align: center;
+	 float: right;
+}
+
+.Balanced{
+	color: green;
+	background: rgb(223, 248, 223);
+	width: 60px;
+}
+
+.NotBalanced{
+	color:red;
+	background: rgb(250, 215, 215);
+	width: 85px;
+}
+
+#chk{
+	cursor: pointer !important;
+	text-align: center !important;
+}
