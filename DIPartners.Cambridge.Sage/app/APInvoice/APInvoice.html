@@ -11,57 +11,22 @@
     <!-- To avoid display Date/Telephone number as hyperlink in edge browser. -->
     <meta name="format-detection" content="telephone=no,date=no" />
     <!-- Styles -->
-    <!--
-        <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery.ui.1.10.0.ie.css" />
-        <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/demo.css" />
-    -->
-    <link rel="stylesheet" type="text/css" href="UIControlLibrary/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css" />
+    <link rel="stylesheet" type="text/css" href="DILibrary/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css" />
     <!-- CSS for layout and style -->
-    <link rel="Stylesheet" type="text/css" href="UIControlLibrary/uicontrollibrary-new.css" />
-    <!-- CSS to allow overriding layout and style. -->
-    <link rel="Stylesheet" type="text/css" href="UIControlLibrary/uicontrollibrary-new_branding.css" />
-    <!-- CSS for Tabs -->
-    <link rel="Stylesheet" type="text/css" href="style.css" />
-
+    <link rel="Stylesheet" type="text/css" href="DILibrary/css/uicontrollibrary-new.css" />
+    <link rel="Stylesheet" type="text/css" href="DILibrary/css/style.css" />
     <!-- JavaScript -->
-
-    <script type="text/javascript" src="UIControlLibrary/jquery-ui-1.10.0.custom/js/jquery-1.9.0.js"></script>
-    <script type="text/javascript" src="UIControlLibrary/jquery-ui-1.10.0.custom/js/jquery-ui-1.10.0.custom.js"></script>
-    <script type="text/javascript" src="UIControlLibrary/jquery.timeentry-1.5.0-1/jquery.timeentry.m-files.js"></script>
-
-    <script src="console-dashboard.js"></script>
+    <script type="text/javascript" src="DILibrary/js/jquery-ui-1.10.0.custom/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="DILibrary/js/jquery-ui-1.10.0.custom/jquery-ui-1.10.0.custom.js"></script>
+    <script type="text/javascript" src="DILibrary/js/jquery.timeentry-1.5.0-1/jquery.timeentry.m-files.js"></script>
     <!-- Patch the jQuery UI Button widget against script injection. -->
     <script type="text/javascript" src="UIControlLibrary/jQuery.ui.button.safe.1.10.0.js"></script>
-    <!-- UI Control Library -->
-    <!--
-        <script type="text/javascript" src="UIControlLibrary/basecontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/booleancontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/datecontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/dynamiccontrolcontainer.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/labelcontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/lookupcontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/metadatacard.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/multiselectlookupcontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/numbercontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/textcontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/timecontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/timestampcontrol.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/vaultoperations.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/utilities.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/main.js"></script>
+    <!-- DIP Library -->
+    <script src="DILibrary/js/jquery-resizable-dom/jquery-resizable.min.js"></script>
+    <script src="DILibrary/js/console-dashboard.js"></script>
+    <script src="DILibrary/js/APUtility.js"></script>
+    <script src="DILibrary/js/APInvoice.js"></script>
 
-        <script type="text/javascript" src="UIControlLibrary/configurationhelper.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/configurationmanager.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/propertygrouping.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/utilities.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/editmanager.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/metadatacard.js"></script>
-        <script type="text/javascript" src="UIControlLibrary/localization.js"></script>
-    -->
-
-    <script src="UIControlLibrary/jquery-resizable-dom/jquery-resizable.min.js"></script>
-    <script src="APInvoice.js"></script>
-    <script src="Util.js"></script>
     <script>
 
         $(document).ready(function () {
@@ -89,8 +54,8 @@
     <!-- Footer begins -->
     <div class="eclip" id="mf-footer" style="padding-bottom:10px;">
         <div id="iv-buttons">
-            <button type="button" id="save-data" onclick="SaveInvoice();" disabled=""></button>
-            <button type="button" id="discard-data" onclick="DiscardInvoice();" disabled=""></button>
+            <button type="button" id="save-data" onclick="SaveInvoice();"></button>
+            <button type="button" id="discard-data" onclick="DiscardInvoice();"></button>
         </div>
     </div>
 </body>
