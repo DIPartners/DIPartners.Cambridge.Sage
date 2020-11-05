@@ -311,7 +311,10 @@ function SaveInvoice() {
 };
 
 function DiscardInvoice() {
-    var result = gDashboard.Parent.shellFrame.ShowMessage({
+    var result;
+    var obj = (isPopup) ? gDashboard : gDashboard.Parent.shellFrame;
+
+    result = obj.ShowMessage({
         caption: "Unsaved Changes",
         message: "You have unsaved changes to \"" + gDashboard.customData.ObjectVersion.Title + "\".",
         button1_title: "Save",
@@ -319,7 +322,6 @@ function DiscardInvoice() {
         button3_title: "Cancel",
         defaultButton: 1
     });
-
     if (result == 1) SaveInvoice();     // save
     else if (result == 2) RefreshTab(); // don't save
 }
