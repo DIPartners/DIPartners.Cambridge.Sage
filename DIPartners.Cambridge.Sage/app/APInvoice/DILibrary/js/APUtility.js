@@ -53,6 +53,7 @@ function APUtil(Vault, controller, editor) {
 		else if (pptName == "UnitPrice") return 3;
 		else if (pptName == "InvoiceLineExtension") return 4;
 		else if (pptName == "PONumber") return 5;
+		else if (pptName == "GLAccount") return 6;
 	}
 
 	this.DestroyOldDetails = function () {
@@ -154,6 +155,31 @@ function APUtil(Vault, controller, editor) {
 		}
 	}
 
+	this.GetGLPropertyValue = function (no) {
+
+		var tbl = document.getElementById('invoice_details_table');
+		var value = tbl.rows[no + 1].cells[this.GetColIndex('GLAccount')].querySelector('input').value;
+		if (value.trim() === "") return null;
+
+		value = parseInt(value);
+
+		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.GLAccount', 'vProperty.GLAccountName', MFDatatypeText, value), MFSearchFlagNone, true);
+
+		var newGL = new MFiles.Lookup();
+		newGL.ObjectType = ObjectSearchResults[0].ObjVer.Type;
+		newGL.Item = ObjectSearchResults[0].ObjVer.ID;
+		newGL.DisplayValue = ObjectSearchResults[0].Title;
+
+		var propertyValue = new MFiles.PropertyValue();
+		var VaultOp = Vault.PropertyDefOperations;
+
+		propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty.GLAccount");
+		propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, newGL);
+
+		return propertyValue;
+	}
+
 	this.CreateNewDetails = function () {
 		var ci = controller.Invoice;
 		if (this.DuplicatedPOValue()) return false;
@@ -204,6 +230,11 @@ function APUtil(Vault, controller, editor) {
 			if (POValues == -1) return false;
 			if (POValues != null) propertyValues.Add(-1, POValues);      //PO Details
 
+			// set GL Account
+			var GLValues = this.GetGLPropertyValue(i);
+			if (GLValues != null) propertyValues.Add(-1, GLValues);      //GL Details
+
+			// CreateNewObject
 			var oObjectVersionAndProperties = Vault.ObjectOperations.CreateNewObject(
 				Vault.ObjectTypeOperations.GetObjectTypeIDByAlias("vObject.InvoiceDetail"),
 				propertyValues,
@@ -407,5 +438,65 @@ function APUtil(Vault, controller, editor) {
 		}
 		return (localizedString != null) ? localizedString : "";
 	};
+
+	this.SearchGL = function (no) {
+		document.getElementById("GLDropdown" + no).classList.toggle("show");
+	};
+
+	this.filterGL = function (no) {
+		var input, filter, ul, li, a, i;
+		input = document.getElementById("myInput");
+		filter = input.value.toUpperCase();
+		div = document.getElementById("GLDropdown" + no);
+		a = div.getElementsByTagName("a");
+		for (i = 0; i < a.length; i++) {
+			txtValue = a[i].textContent || a[i].innerText;
+			if (txtValue.toUpperCase().indexOf(filter) > -1) {
+				a[i].style.display = "";
+			} else {
+				a[i].style.display = "none";
+			}
+		}
+	};
+
+	this.GetGLAccount = function () {
+
+		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			gUtil.FindGLObjects('vObject.GLAccount'), MFSearchFlagNone, true);
+		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var dropValue;
+		dropValueHtml = "";
+		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+		for (var i = 0; i < ObjectSearchResults.Count; i++) {
+			var props = ObjectSearchResultsProperties[i];
+			dropValue = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccountName", true).Value.DisplayValue;
+			var val = dropValue.split("-");
+			dropValueHtml += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
+		}
+	}
+
+	this.FindGLObjects = function (OTAlias) {
+
+		var OT = Vault.ObjectTypeOperations.GetObjectTypeIDByAlias(OTAlias);
+
+		var oSC = new MFiles.SearchCondition();
+		var oSCs = new MFiles.SearchConditions();
+
+		// Search condition that defines the object is not marked as deleted.
+		oSC.ConditionType = MFConditionTypeEqual;
+		oSC.Expression.SetStatusValueExpression(MFStatusTypeDeleted, new MFiles.DataFunctionCall());
+		oSC.TypedValue.SetValue(MFDatatypeBoolean, false);
+		oSCs.Add(-1, oSC);
+
+		// Search condition that defines the object type 
+		oSC.ConditionType = MFConditionTypeEqual;
+		oSC.Expression.SetStatusValueExpression(MFStatusTypeObjectTypeID, new MFiles.DataFunctionCall());
+		oSC.TypedValue.SetValue(MFDatatypeLookup, OT);
+		oSCs.Add(-1, oSC);
+
+		return oSCs;
+	}
+
+
 
 }

@@ -2,6 +2,7 @@
 var gDashboard;
 var gUtil;
 var isPopup;
+var dropValueHtml;
 
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
@@ -96,6 +97,8 @@ function SetInvoiceDetails(controller) {
     var tabdisplayname = tabname;
     var ArrayVal = [];
 
+    gUtil.GetGLAccount();
+
     var self = this;
 
     CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
@@ -112,14 +115,14 @@ function SetInvoiceDetails(controller) {
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
     editor.table.append(
-        '<tr><td colspan="5" align="center">' +
+        '<tr><td colspan="6" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details">' +
-        '       <tr><th width="5%">-</th><th width="30%">Item</th><th width="15%">Qty</th><th width="20%">Unit $</th><th width="20%">Ext $</th><th width="10%">PO#</th></tr>' +
+        '       <tr><th width="5%">-</th><th width="20%">Item</th><th width="10%">Qty</th><th width="15%">Unit $</th><th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%">GL<br>Account</th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
     var TableBody = editor.table.find('#invoice_details_table');
-    var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers()
+    var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
     var Total = 0
 
     if (ObjectSearchResults.Count > 0) {
@@ -131,6 +134,7 @@ function SetInvoiceDetails(controller) {
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
+            var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
 
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
 
@@ -146,9 +150,32 @@ function SetInvoiceDetails(controller) {
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td><input type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td><input style="text-align:center" class=\'inputData\' type="text" id=\'PONumber' + i + '\' value="' + PONumber.split("-").pop().trim() + ' "title="' + PONumber + '"' +
+                '   <td><input style="text-align:center" class=\'inputData\' type="text" id=\'PONumber' + i + '\' value="' + PONumber.split("-").pop().trim() + '" title="' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></div></td > ' +
-                "</tr>";
+/*                '   <td><div class="dropdown"> ' +
+                        '<button onclick = "gUtil.SearchGL('+i+')" class="btn dropbtn">Search...</button > ' +
+                '           <div id="GLDropdown'+i+'" class="dropdown-content dropdown-toggle"> ' +
+                '               <input type="text" id="myInput" value="ddd" onkeyup="gUtil.filterGL('+i+')"> ' + dropValueHtml +
+                '           </div></div></td>' +
+*/                '   <td><label for="GLAccount' + i + '"></label>' +
+                '           <input type="text" id="GLAccount' + i + '" list="GLAccountList" value="' + GLAccount.split("-")[0].trim() + '" class=\'inputData\' style="text-align:left" > ' +
+                '           <datalist id="GLAccountList">' + dropValueHtml +
+                '           </datalist> </td>' +
+/*
+                '   <td><div class="btn-group"> ' +
+                '       <button type="button" class="btn btn-danger">Search</button> ' +
+                '       <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"> ' +
+                '           <span class="caret"></span>' +
+                '           <span class="sr-only"> Toggle Dropdown</span>' +
+                '           </button>' +
+                '               <ul class="dropdown-menu" role="menu">' +
+                '                   <li><a href="#">Action</a></li >' +
+                '                   <li><a href="#">Another action</a></li>' +
+                '                   <li><a href="#">Something else here</a></li>' +
+                '                   <li class="divider"></li>' +
+                '                   <li><a href="#">Separated link</a></li>' +
+                '               </ul></div></td>' +
+*/               "</tr>";
             // TableBody.append(htmlStr);
 
             // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
@@ -170,6 +197,7 @@ function SetInvoiceDetails(controller) {
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
             '   <td><input type="text" id="Extension0" value="" readonly="true"></td>' +
             '   <td><input type="text" class=\'inputData\' id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td><input type="text" class=\'inputData\' id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
             "</tr>";
 
         TableBody.append(htmlStr);
@@ -181,7 +209,7 @@ function SetInvoiceDetails(controller) {
         '<tr>' +
         '<td><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick=gUtil.addRowToTable("invoice_details_table");><strong>+</strong></a ></td > ' +
-        '<td colspan="3" style="text-align:right; border-right: none; "><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
+        '<td colspan="4" style="text-align:right; border-right: none; "><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
         '<td colspan="2"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
         '</tr>'
     );
@@ -302,12 +330,8 @@ function SaveInvoice() {
         return;
     }
 
-    var controller = gDashboard.customData;
-    var editor = controller.Invoice;
-    var Vault = controller.Vault;
-
-    gUtil.DestroyOldDetails(editor, Vault);
-    if (gUtil.CreateNewDetails(editor, Vault)) RefreshTab();
+    gUtil.DestroyOldDetails();
+    if (gUtil.CreateNewDetails()) RefreshTab();
 };
 
 function DiscardInvoice() {
@@ -350,7 +374,7 @@ function FindObjects(Vault, OTAlias, PDAlias, PDType, Value) {
     oSCs.Add(-1, oSC);
 
     // Search condition that defines that the object must refer to the given object.
-    oSC.ConditionType = MFConditionTypeEqual;
+    oSC.ConditionType = (PDAlias == "vProperty.GLAccountName") ? MFConditionTypeContains : MFConditionTypeEqual;
     oSC.Expression.DataPropertyValuePropertyDef = PD;
     oSC.TypedValue.SetValue(PDType, Value);
     oSCs.Add(-1, oSC);
