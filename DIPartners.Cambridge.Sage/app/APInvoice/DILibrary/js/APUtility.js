@@ -41,6 +41,8 @@ function APUtil(Vault, controller, editor) {
 	this.Vault = Vault;
 	this.controller = controller;
 	this.editor = editor;
+	this.GLAccountList = "";
+	this.GLAccountArr = [];
 
 	this.toggleButton = function (val) {
 		$("#save-data, #discard-data").toggleClass("ui-state-hidden", val);
@@ -161,10 +163,40 @@ function APUtil(Vault, controller, editor) {
 		var value = tbl.rows[no + 1].cells[this.GetColIndex('GLAccount')].querySelector('input').value;
 		if (value.trim() === "") return null;
 
-		value = parseInt(value);
-
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
 			FindObjects(Vault, 'vObject.GLAccount', 'vProperty.GLAccountName', MFDatatypeText, value), MFSearchFlagNone, true);
+
+
+		///////////////////////////////////////
+		if (ObjectSearchResults.Count == 0) {
+			alert("GL Account is not found");
+			return null;
+		}
+		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
+		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
+
+		if (PONO == "") return null;
+		var GLResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
+
+		var GLResultsObjVers = GLResults.GetAsObjectVersions().GetAsObjVers()
+		var GLSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(GLResultsObjVers);
+		var bFound = false;
+
+		for (var i = 0; i < GLSearchResultsProperties.Count; i++) {
+			var props = GLSearchResultsProperties[i];
+			var GLfromPO = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+			if (GLfromPO == ObjectSearchResults[0].Title) {
+				bFound = true;
+				break;
+			}
+		}
+
+		if (!bFound) {
+			alert("Entered GL Account does not belong to PO");
+			return null;
+		}
+		///////////////////////////////////////
 
 		var newGL = new MFiles.Lookup();
 		newGL.ObjectType = ObjectSearchResults[0].ObjVer.Type;
@@ -246,6 +278,22 @@ function APUtil(Vault, controller, editor) {
 		return true;
 	}
 
+	this.GetGLAccount = function () {
+
+		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			gUtil.FindGLObjects('vObject.GLAccount'), MFSearchFlagNone, true);
+		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var dropValue;
+		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+		for (var i = 0; i < ObjectSearchResults.Count; i++) {
+			var props = ObjectSearchResultsProperties[i];
+			dropValue = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccountName", true).Value.DisplayValue;
+			var val = dropValue.split("-");
+			this.GLAccountList += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
+			this.GLAccountArr[i] = dropValue;
+		}
+	}
+
 	this.CheckNull = function () {
 		var tbl = document.getElementById('invoice_details_table');
 		document.getElementById('invoice_details_table').rows.length
@@ -286,7 +334,7 @@ function APUtil(Vault, controller, editor) {
 
 		var startCell = iteration / iteration;
 
-		for (var i = iteration; i < iteration + 5; i++) {
+		for (var i = iteration; i < iteration + 6; i++) {
 			var id = "";
 			var cellRight = row.insertCell(startCell);
 			var el = document.createElement('input');
@@ -296,6 +344,7 @@ function APUtil(Vault, controller, editor) {
 			else if (startCell == 3) id = "UnitPrice";
 			else if (startCell == 4) id = "Extension";
 			else if (startCell == 5) id = "PONumber";
+			else if (startCell == 6) id = "GLAccount";
 
 			el.setAttribute('type', 'text');
 			el.setAttribute('id', id + iteration);
@@ -308,6 +357,19 @@ function APUtil(Vault, controller, editor) {
 			if (startCell == 4) {
 				el.setAttribute("readonly", 'true');
 				el.classList.remove("inputData");
+			}
+			if (startCell == 6) {
+				el.classList.remove("inputData");
+				el.setAttribute('list', 'GLAccountList');
+				var dlist = document.createElement('datalist');
+				dlist.setAttribute('id', GLAccountList);
+
+				for (; i < this.GLAccountArr.length; i += 1) {
+					var option = document.createElement('option');
+					option.value = this.GLAccountArr[i];
+					dlist.appendChild(option);
+				}
+				cellRight.appendChild(dlist);
 			}
 
 			cellRight.appendChild(el);
@@ -459,22 +521,6 @@ function APUtil(Vault, controller, editor) {
 		}
 	};
 
-	this.GetGLAccount = function () {
-
-		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			gUtil.FindGLObjects('vObject.GLAccount'), MFSearchFlagNone, true);
-		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
-		var dropValue;
-		dropValueHtml = "";
-		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-		for (var i = 0; i < ObjectSearchResults.Count; i++) {
-			var props = ObjectSearchResultsProperties[i];
-			dropValue = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccountName", true).Value.DisplayValue;
-			var val = dropValue.split("-");
-			dropValueHtml += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
-		}
-	}
-
 	this.FindGLObjects = function (OTAlias) {
 
 		var OT = Vault.ObjectTypeOperations.GetObjectTypeIDByAlias(OTAlias);
@@ -496,7 +542,5 @@ function APUtil(Vault, controller, editor) {
 
 		return oSCs;
 	}
-
-
 
 }

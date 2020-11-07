@@ -2,7 +2,6 @@
 var gDashboard;
 var gUtil;
 var isPopup;
-var dropValueHtml;
 
 // Entry point of the dashboard.
 function OnNewDashboard(dashboard) {
@@ -11,7 +10,10 @@ function OnNewDashboard(dashboard) {
     // Parent is a shell pane container (tab), when dashboard is shown in right pane.
     var tab = dashboard.Parent;
 
-    if (isPopup) dashboard.Window.Height = 880;
+    if (isPopup) {
+        dashboard.Window.width = 1024;
+        dashboard.Window.Height = 880;
+    }
     // Initialize console.
     else console.initialize(tab.ShellFrame.ShellUI, "APInvoice");
 
@@ -39,7 +41,6 @@ function SetDetails(dashboard) {
     var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 
     gUtil = new APUtil(Vault, controller, editor);
-
     controller.Invoice = {
         ObjectVersion: controller.ObjectVersion,
         ObjectVersionProperties: ObjectVersionProperties,
@@ -80,6 +81,8 @@ function SetDetails(dashboard) {
         Events: dashboard.Events
     };
 
+    gUtil.ResizeContentArea();
+    gUtil.GetGLAccount();
     SetInvoiceDetails(controller);
     SetPODetails(controller);
     SetPSDetails(controller);
@@ -87,7 +90,6 @@ function SetDetails(dashboard) {
     $("#rtabs").tabs("option", "active", 0);
 
     if (!isPopup) CreatePopupIcon();
-    gUtil.ResizeContentArea();
 }
 
 function SetInvoiceDetails(controller) {
@@ -96,10 +98,6 @@ function SetInvoiceDetails(controller) {
     var tabname = 'Invoice';
     var tabdisplayname = tabname;
     var ArrayVal = [];
-
-    gUtil.GetGLAccount();
-
-    var self = this;
 
     CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.InvoiceNumber')
@@ -150,32 +148,15 @@ function SetInvoiceDetails(controller) {
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td><input type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td><input style="text-align:center" class=\'inputData\' type="text" id=\'PONumber' + i + '\' value="' + PONumber.split("-").pop().trim() + '" title="' + PONumber + '"' +
+                '   <td><input style="text-align:center" class=\'inputData\' type="text" id=\'PONumber' + i + '\' ' +
+                '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></div></td > ' +
-/*                '   <td><div class="dropdown"> ' +
-                        '<button onclick = "gUtil.SearchGL('+i+')" class="btn dropbtn">Search...</button > ' +
-                '           <div id="GLDropdown'+i+'" class="dropdown-content dropdown-toggle"> ' +
-                '               <input type="text" id="myInput" value="ddd" onkeyup="gUtil.filterGL('+i+')"> ' + dropValueHtml +
-                '           </div></div></td>' +
-*/                '   <td><label for="GLAccount' + i + '"></label>' +
-                '           <input type="text" id="GLAccount' + i + '" list="GLAccountList" value="' + GLAccount.split("-")[0].trim() + '" class=\'inputData\' style="text-align:left" > ' +
-                '           <datalist id="GLAccountList">' + dropValueHtml +
-                '           </datalist> </td>' +
-/*
-                '   <td><div class="btn-group"> ' +
-                '       <button type="button" class="btn btn-danger">Search</button> ' +
-                '       <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"> ' +
-                '           <span class="caret"></span>' +
-                '           <span class="sr-only"> Toggle Dropdown</span>' +
-                '           </button>' +
-                '               <ul class="dropdown-menu" role="menu">' +
-                '                   <li><a href="#">Action</a></li >' +
-                '                   <li><a href="#">Another action</a></li>' +
-                '                   <li><a href="#">Something else here</a></li>' +
-                '                   <li class="divider"></li>' +
-                '                   <li><a href="#">Separated link</a></li>' +
-                '               </ul></div></td>' +
-*/               "</tr>";
+                '   <td><label for="GLAccount' + i + '"></label>' +
+                '       <input type="text" id="GLAccount' + i + '" list="GLAccountList" value="' + GLAccount.split("-")[0].trim() + '" ' +
+                '           class=\'inputData\' style="text-align:left" > ' +
+                '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
+                '       </datalist> </td>' +
+                "</tr>";
             // TableBody.append(htmlStr);
 
             // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
@@ -197,7 +178,9 @@ function SetInvoiceDetails(controller) {
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
             '   <td><input type="text" id="Extension0" value="" readonly="true"></td>' +
             '   <td><input type="text" class=\'inputData\' id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
-            '   <td><input type="text" class=\'inputData\' id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td><input type="text" id="GLAccount0" list="GLAccountList" value="" class=\'inputData\' style="text-align:left" > ' +
+            '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
+            '       </datalist> </td>' +
             "</tr>";
 
         TableBody.append(htmlStr);
