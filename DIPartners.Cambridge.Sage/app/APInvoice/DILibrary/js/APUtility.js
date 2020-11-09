@@ -166,12 +166,12 @@ function APUtil(Vault, controller, editor) {
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
 			FindObjects(Vault, 'vObject.GLAccount', 'vProperty.GLAccountName', MFDatatypeText, value), MFSearchFlagNone, true);
 
-
-		///////////////////////////////////////
 		if (ObjectSearchResults.Count == 0) {
 			alert("GL Account is not found");
 			return null;
 		}
+
+		/*///////////////////////////////////////
 		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
 
@@ -196,7 +196,7 @@ function APUtil(Vault, controller, editor) {
 			alert("Entered GL Account does not belong to PO");
 			return null;
 		}
-		///////////////////////////////////////
+		///////////////////////////////////////*/
 
 		var newGL = new MFiles.Lookup();
 		newGL.ObjectType = ObjectSearchResults[0].ObjVer.Type;
