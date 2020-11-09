@@ -1,6 +1,7 @@
 //const { error } = require("jquery");
 var gDashboard;
 var gUtil;
+var gNo;
 var isPopup;
 
 // Entry point of the dashboard.
@@ -151,15 +152,21 @@ function SetInvoiceDetails(controller) {
                 '   <td><input style="text-align:center" class=\'inputData\' type="text" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></div></td > ' +
-                '   <td><label for="GLAccount' + i + '"></label>' +
-                '       <input type="text" id="GLAccount' + i + '" list="GLAccountList" value="' + GLAccount.split("-")[0].trim() + '" ' +
-                '           class=\'inputData\' style="text-align:left" > ' +
-                '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
-                '       </datalist> </td>' +
-                "</tr>";
-            // TableBody.append(htmlStr);
+                /*               '   <td><label for="GLAccount' + i + '"></label>' +
+                               '       <input type="text" id="GLAccount' + i + '" list="GLAccountList" value="' + GLAccount.split("-")[0].trim() + '" ' +
+                               '           class=\'inputData\' style="text-align:left" > ' +
+                               '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
+                               '       </datalist> </td>' +
+               */
+                '   <td><input class=\'inputData\' type="text" id="GLAccount' + i + '" onclick="gUtil.SearchGL(' + i + ')" onkeyup="gUtil.filterGL()"/> ' +
+                '       <div id="GLOption">' +
+                '           <ul id="ulGL">' + gUtil.GLAccountList +
+                '           </ul>' +
+                '       </div>' +
+                '   </td>' +
 
-            // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
+                '</tr>';
+
             ArrayVal[i] = PONumber + ", " + htmlStr;
         }
 
@@ -178,10 +185,17 @@ function SetInvoiceDetails(controller) {
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
             '   <td><input type="text" id="Extension0" value="" readonly="true"></td>' +
             '   <td><input type="text" class=\'inputData\' id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
-            '   <td><input type="text" id="GLAccount0" list="GLAccountList" value="" class=\'inputData\' style="text-align:left" > ' +
-            '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
-            '       </datalist> </td>' +
-            "</tr>";
+            /*           '   <td><input type="text" id="GLAccount0" list="GLAccountList" value="" class=\'inputData\' style="text-align:left" > ' +
+                       '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
+                       '       </datalist> </td>' +
+           */
+            '   <td><input type="text" id="GLAccount0" onclick="gUtil.SearchGL(0)" onkeyup="gUtil.filterGL()" /> ' +
+            '       <div id="GLOption">' +
+            '           <ul id="ulGL">' + gUtil.GLAccountList +
+            '           </ul>' +
+            '       </div>' +
+            '   </td>' +
+            '</tr>';
 
         TableBody.append(htmlStr);
     }
@@ -190,7 +204,7 @@ function SetInvoiceDetails(controller) {
     var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
     TableBody.append(
         '<tr>' +
-        '<td><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
+        '<td style="text-align:center"><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick=gUtil.addRowToTable("invoice_details_table");><strong>+</strong></a ></td > ' +
         '<td colspan="4" style="text-align:right; border-right: none; "><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
         '<td colspan="2"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
@@ -510,7 +524,7 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
     var mfcontentDiv = $('<div>');
     mfcontentDiv.addClass('mf-content');
-    mfcontentDiv.css('height', '100%');
+    mfcontentDiv.css('height', '700px');
     MetaCard.append(mfcontentDiv);
 
     var mfpropertiesviewDiv = $('<div>');
@@ -531,7 +545,7 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
     var mfscrollableDiv = $('<div>');
     mfscrollableDiv.addClass('ui-scrollable');
-    mfscrollableDiv.css('height', '100%');
+    mfscrollableDiv.css('height', '700px');
     mfsectionDiv.append(mfscrollableDiv);
 
     var mfsectioncontentDiv = $('<div>');

@@ -156,62 +156,32 @@ input[type="text"]:disabled {
 }
 
 /*dropdown list*/
-.dropbtn {
-	background-color: #4CAF50;
-	color: white;
-	font-size: 6px;
-	border: none;
-	cursor: pointer;
+#GLOption {
+	display: none;
+	width: 100%;
+	text-align: left;
+	position: absolute;
+	left: 38%;
 }
 
-	.dropbtn:hover, .dropbtn:focus {
-		background-color: #3e8e41;
+#ulGL {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	overflow: scroll;
+	max-width: 400px;
+	max-height: 200px;
+}
+
+	#ulGL li a {
+		border: 1px solid #ddd;
+		margin-top: -1px; /* Prevent double borders */
+		background-color: #eefca2;
+		text-decoration: none;
+		color: black;
+		display: block;
 	}
 
-#myInput {
-	box-sizing: border-box;
-	/*background-image: url('filter.png');*/
-	background-position: 4px 2px;
-	background-repeat: no-repeat;
-	font-size: 12px;
-	padding: 14px 10px 12px 5px;
-	border: none;
-	border-bottom: 1px solid #ddd;
-}
-
-#myInput:focus {
-	outline: 3px solid #ddd;
-}
-
-.dropdown {
-	position: relative;
-	display: inline-block;
-}
-
-.dropdown-content {
-	display: none;
-	position: relative;
-	background-color: #f6f6f6;
-	min-width: 230px;
-	height: 200px;
-	overflow: auto;
-	border: 1px solid #ddd;
-	z-index: 1;
-}
-
-.dropdown-content a {
-	color: black;
-	padding: 2px 2px;
-	text-decoration: none;
-	display: block;
-	font-size: 12px;
-	overflow: auto;
-}
-
-.dropdown a:hover {
-	background-color: #ddd;
-}
-
-.show {
-	display: block;
-}
+		#ulGL li a:hover:not(.header) {
+			background-color: rgb(250, 163, 136);
+		}

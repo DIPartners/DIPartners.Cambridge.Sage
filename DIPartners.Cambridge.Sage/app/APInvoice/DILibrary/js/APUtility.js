@@ -1,6 +1,7 @@
 
 (function ($, undefined) {
 	$.widget("mfiles.metadatacard", {
+
 		initialize: function (ap) {
 			var self = ap.apUtil;
 			var saveLabel = ap.apUtil.GetText("IDS_METADATACARD_COMMAND_SAVE");
@@ -26,12 +27,22 @@
 				event.stopPropagation();
 			});
 
+			$('li.gl').on('click', function (no) {
+				var content = $(this).text();
+				var val = content.split("-");
+				$('#GLAccount' + no).val(val[0].trim());
+				document.getElementById("GLOption").style.display = "none";
+			});
+
 			$(window).resize(function () {
+
 				self.ResizeContentArea();
 			});
 
 			self.toggleButton(true);
+
 		},
+
 	});
 })(jQuery);
 
@@ -171,8 +182,7 @@ function APUtil(Vault, controller, editor) {
 			return null;
 		}
 
-		/*///////////////////////////////////////
-		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
+		/*var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
 
 		if (PONO == "") return null;
@@ -195,8 +205,7 @@ function APUtil(Vault, controller, editor) {
 		if (!bFound) {
 			alert("Entered GL Account does not belong to PO");
 			return null;
-		}
-		///////////////////////////////////////*/
+		}*/
 
 		var newGL = new MFiles.Lookup();
 		newGL.ObjectType = ObjectSearchResults[0].ObjVer.Type;
@@ -278,6 +287,12 @@ function APUtil(Vault, controller, editor) {
 		return true;
 	}
 
+	this.setGL = function (dropValue) {
+		var val = dropValue.split("-");
+		$('#GLAccount' + gNo).val(val[0].trim());
+		document.getElementById("GLOption").style.display = "none";
+	}
+
 	this.GetGLAccount = function () {
 
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
@@ -289,7 +304,14 @@ function APUtil(Vault, controller, editor) {
 			var props = ObjectSearchResultsProperties[i];
 			dropValue = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccountName", true).Value.DisplayValue;
 			var val = dropValue.split("-");
-			this.GLAccountList += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
+			//this.GLAccountList += '<option value=\"' + dropValue + '\">' + dropValue + '</option>';
+			//this.GLAccountList += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
+
+			/*var glList = '<input type="text" id="GLAccount' + i + '" onclick="gUtil.SearchGL()" onkeyup="gUtil.filterGL()" />' +
+				'			<div id="GLOption">' +
+				'				<ul id="ulGL"><li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li></ul>';*/
+			this.GLAccountList += '<li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li>';
+
 			this.GLAccountArr[i] = dropValue;
 		}
 	}
@@ -358,7 +380,7 @@ function APUtil(Vault, controller, editor) {
 				el.setAttribute("readonly", 'true');
 				el.classList.remove("inputData");
 			}
-			if (startCell == 6) {
+			/*if (startCell == 6) {
 				el.classList.remove("inputData");
 				el.setAttribute('list', 'GLAccountList');
 				var dlist = document.createElement('datalist');
@@ -370,6 +392,26 @@ function APUtil(Vault, controller, editor) {
 					dlist.appendChild(option);
 				}
 				cellRight.appendChild(dlist);
+			}*/
+
+			if (startCell == 6) {
+				el.setAttribute('onclick', 'gUtil.SearchGL(\'' + iteration + '\')');
+				el.setAttribute('onkeyup', 'gUtil.filterGL()');
+				var glDiv = document.createElement('div');
+				glDiv.setAttribute('id', 'GLOption');
+				var glUL = document.createElement('ul');
+				glUL.setAttribute('id', 'ulGL');
+
+				for (; i < this.GLAccountArr.length; i += 1) {
+					var glLi = document.createElement('li');
+					glLi.setAttribute('onclick', 'gUtil.setGL(\'' + this.GLAccountArr[i] + '\')');
+					var anchor = document.createElement('a');
+					anchor.href = '#';
+					glLi.appendChild(anchor);
+					glUL.appendChild(glLi);
+				}
+				glDiv.appendChild(glUL);
+				cellRight.appendChild(glDiv);
 			}
 
 			cellRight.appendChild(el);
@@ -482,6 +524,7 @@ function APUtil(Vault, controller, editor) {
 		$(".mf-layout-vertical").height(win);
 		$(".ui-tabs-panel").height(pch - tabh);
 		$(".mf-section-properties").outerHeight($(".ui-tabs-panel").height());
+
 	};
 
 	this.GetText = function (id) {
@@ -502,21 +545,36 @@ function APUtil(Vault, controller, editor) {
 	};
 
 	this.SearchGL = function (no) {
-		document.getElementById("GLDropdown" + no).classList.toggle("show");
+		gNo = "";
+		document.getElementById("GLAccount" + no).value = "";
+		gNo = no;
+		var x = document.getElementById("GLOption");
+		if (x.style.display === "block") {
+			x.style.display = "none";
+		} else {
+			var div = document.querySelector('#GLOption');
+			var inp = document.querySelector('#GLAccount' + no);
+			var rect = inp.getClientRects();
+			div.style.display = 'block';
+			div.style.left = (rect[0].right - 405) + 'px';
+			div.style.top = (rect[0].top - 40) + 'px';
+		}
 	};
 
-	this.filterGL = function (no) {
-		var input, filter, ul, li, a, i;
-		input = document.getElementById("myInput");
+	this.filterGL = function () {
+		var input, filter, ul, li, a, i, txtValue;
+		input = document.getElementById("GLAccount" + gNo);
+		input.value = input.value;
 		filter = input.value.toUpperCase();
-		div = document.getElementById("GLDropdown" + no);
-		a = div.getElementsByTagName("a");
-		for (i = 0; i < a.length; i++) {
-			txtValue = a[i].textContent || a[i].innerText;
+		ul = document.getElementById("ulGL");
+		li = ul.getElementsByTagName("li");
+		for (i = 0; i < li.length; i++) {
+			a = li[i].getElementsByTagName("a")[0];
+			txtValue = a.textContent || a.innerText;
 			if (txtValue.toUpperCase().indexOf(filter) > -1) {
-				a[i].style.display = "";
+				li[i].style.display = "";
 			} else {
-				a[i].style.display = "none";
+				li[i].style.display = "none";
 			}
 		}
 	};
@@ -541,6 +599,6 @@ function APUtil(Vault, controller, editor) {
 		oSCs.Add(-1, oSC);
 
 		return oSCs;
-	}
+	};
 
 }
