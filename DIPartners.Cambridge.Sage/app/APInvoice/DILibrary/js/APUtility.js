@@ -1,52 +1,4 @@
 
-(function ($, undefined) {
-	$.widget("mfiles.metadatacard", {
-
-		initialize: function (ap) {
-			var self = ap.apUtil;
-			var saveLabel = ap.apUtil.GetText("IDS_METADATACARD_COMMAND_SAVE");
-			var saveTooltip = ap.apUtil.GetText("IDS_METADATACARD_BUTTON_TOOLTIP_SAVE");
-			var discardLabel = ap.apUtil.GetText("IDS_METADATACARD_BUTTON_DISCARD");
-
-			$("#save-data").button({ label: saveLabel });
-			$("#save-data").attr("title", saveTooltip);
-			$("#discard-data").button({ label: discardLabel });
-
-			$("#save-data").mouseenter(function () {
-				$(this).css("background", "#7ecaf0");
-			}).mouseleave(function () { $(this).css("background", "#318CCC"); });
-			$("#discard-data").mouseenter(function () {
-				$(this).css("background", "#7ecaf0");
-			}).mouseleave(function () { $(this).css("background", "#318CCC"); });
-
-			$(".inputData").click(function (event) {
-				// Discard metadata.
-				self.toggleButton(false);
-
-				// Stop event propagation.
-				event.stopPropagation();
-			});
-
-			$('li.gl').on('click', function (no) {
-				var content = $(this).text();
-				var val = content.split("-");
-				$('#GLAccount' + no).val(val[0].trim());
-				document.getElementById("GLOption").style.display = "none";
-			});
-
-			$(window).resize(function () {
-
-				self.ResizeContentArea();
-			});
-
-			self.toggleButton(true);
-
-		},
-
-	});
-})(jQuery);
-
-
 function APUtil(Vault, controller, editor) {
 
 	this.Vault = Vault;
@@ -55,9 +7,58 @@ function APUtil(Vault, controller, editor) {
 	this.GLAccountList = "";
 	this.GLAccountArr = [];
 
+	this.GetText = function (id) {
+		switch (id) {
+			case id = "IDS_METADATACARD_COMMAND_SAVE": id = 27593; break;
+			case id = "IDS_METADATACARD_BUTTON_DISCARD": id = 27614; break;
+			case id = "IDS_METADATACARD_BUTTON_TOOLTIP_SAVE": id = 27929; break;
+			case id = "IDS_CONTROLHELPER_DROPDOWN_SEARCHING_INDICATOR": id = 28069; break; //Searching...
+			case id = "IDS_METADATACARD_AUTOMATIC_VALUE": id = 27648; break;
+		}
+
+		// Get localized text from MFShell.
+		var localizedString = null;
+		try {
+			localizedString = MFiles.GetStringResource(id);
+		}
+		catch (ex) {
+		}
+		return (localizedString != null) ? localizedString : "";
+	};
+
 	this.toggleButton = function (val) {
 		$("#save-data, #discard-data").toggleClass("ui-state-hidden", val);
 	};
+
+	var saveLabel = this.GetText("IDS_METADATACARD_COMMAND_SAVE");
+	var saveTooltip = this.GetText("IDS_METADATACARD_BUTTON_TOOLTIP_SAVE");
+	var discardLabel = this.GetText("IDS_METADATACARD_BUTTON_DISCARD");
+	var search = this.GetText("IDS_CONTROLHELPER_DROPDOWN_SEARCHING_INDICATOR");
+	var auto = this.GetText("IDS_METADATACARD_AUTOMATIC_VALUE");
+
+	$("#save-data").button({ label: saveLabel });
+	$("#save-data").attr("title", saveTooltip);
+	$("#discard-data").button({ label: discardLabel });
+
+	$("#save-data").mouseenter(function () {
+		$(this).css("background", "#7ecaf0");
+	}).mouseleave(function () { $(this).css("background", "#318CCC"); });
+	$("#discard-data").mouseenter(function () {
+		$(this).css("background", "#7ecaf0");
+	}).mouseleave(function () { $(this).css("background", "#318CCC"); });
+
+	$('li.gl').on('click', function (no) {
+		var content = $(this).text();
+		var val = content.split("-");
+		$('#GLAccount' + no).val(val[0].trim());
+		document.getElementById("GLOption").style.display = "none";
+	});
+
+	$(window).resize(function () {
+		gUtil.ResizeContentArea();
+	});
+
+	this.toggleButton(true);
 
 	this.GetColIndex = function (pptName) {
 
@@ -171,7 +172,8 @@ function APUtil(Vault, controller, editor) {
 	this.GetGLPropertyValue = function (no) {
 
 		var tbl = document.getElementById('invoice_details_table');
-		var value = tbl.rows[no + 1].cells[this.GetColIndex('GLAccount')].querySelector('input').value;
+		var value = tbl.rows[no + 1].cells[this.GetColIndex('GLAccount')].querySelector('select').value;
+
 		if (value.trim() === "") return null;
 
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
@@ -293,24 +295,30 @@ function APUtil(Vault, controller, editor) {
 		document.getElementById("GLOption").style.display = "none";
 	}
 
-	this.GetGLAccount = function () {
+	this.GetGLAccount = function (id) {
 
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
 			gUtil.FindGLObjects('vObject.GLAccount'), MFSearchFlagNone, true);
 		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
 		var dropValue;
 		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+		if (id == "")
+			this.GLAccountList = "<option value=''></option>";
 		for (var i = 0; i < ObjectSearchResults.Count; i++) {
 			var props = ObjectSearchResultsProperties[i];
 			dropValue = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccountName", true).Value.DisplayValue;
 			var val = dropValue.split("-");
-			//this.GLAccountList += '<option value=\"' + dropValue + '\">' + dropValue + '</option>';
+
+			if (dropValue == id)
+				this.GLAccountList += '<option value=\"' + dropValue + '\" selected>' + dropValue + '</option>';
+			else
+				this.GLAccountList += '<option value=\"' + dropValue + '\">' + dropValue + '</option>';
 			//this.GLAccountList += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
 
 			/*var glList = '<input type="text" id="GLAccount' + i + '" onclick="gUtil.SearchGL()" onkeyup="gUtil.filterGL()" />' +
 				'			<div id="GLOption">' +
 				'				<ul id="ulGL"><li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li></ul>';*/
-			this.GLAccountList += '<li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li>';
+			//this.GLAccountList += '<li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li>';
 
 			this.GLAccountArr[i] = dropValue;
 		}
@@ -341,8 +349,6 @@ function APUtil(Vault, controller, editor) {
 		var row = tbl.insertRow(lastRow - 1);
 		var iteration = lastRow - 2;
 
-		//iteration = (lastRow == 2) ? 1 : Number(tbl.rows[lastRow - 2].cells[4].firstChild.id.replace(/[^0-9.-]+/g, "")) + 1;
-
 		var cellLeft = row.insertCell(0);
 		var el = document.createElement('IMG');
 		el.setAttribute('src', 'DILibrary/images/remove-button-red.png');
@@ -358,9 +364,6 @@ function APUtil(Vault, controller, editor) {
 
 		for (var i = iteration; i < iteration + 6; i++) {
 			var id = "";
-			var cellRight = row.insertCell(startCell);
-			var el = document.createElement('input');
-
 			if (startCell == 1) id = "ItemNumber";
 			else if (startCell == 2) id = "Quantity";
 			else if (startCell == 3) id = "UnitPrice";
@@ -368,53 +371,38 @@ function APUtil(Vault, controller, editor) {
 			else if (startCell == 5) id = "PONumber";
 			else if (startCell == 6) id = "GLAccount";
 
-			el.setAttribute('type', 'text');
-			el.setAttribute('id', id + iteration);
-			el.classList.add("inputData");
+			var cellRight = row.insertCell(startCell);
 
-			if (startCell == 2 || startCell == 3) {
-				el.setAttribute('onkeyup', 'gUtil.Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'Extension' + iteration + '\')');
-				el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
-			}
-			if (startCell == 4) {
-				el.setAttribute("readonly", 'true');
-				el.classList.remove("inputData");
-			}
-			/*if (startCell == 6) {
-				el.classList.remove("inputData");
-				el.setAttribute('list', 'GLAccountList');
-				var dlist = document.createElement('datalist');
-				dlist.setAttribute('id', GLAccountList);
+			if (startCell != 6) {
+				var el = document.createElement('input');
 
-				for (; i < this.GLAccountArr.length; i += 1) {
-					var option = document.createElement('option');
-					option.value = this.GLAccountArr[i];
-					dlist.appendChild(option);
+				el.setAttribute('type', 'text');
+				el.setAttribute('id', id + iteration);
+				el.classList.add("inputData");
+
+				if (startCell == 2 || startCell == 3) {
+					el.setAttribute('onkeyup', 'gUtil.Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'Extension' + iteration + '\')');
+					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
 				}
-				cellRight.appendChild(dlist);
-			}*/
-
-			if (startCell == 6) {
-				el.setAttribute('onclick', 'gUtil.SearchGL(\'' + iteration + '\')');
-				el.setAttribute('onkeyup', 'gUtil.filterGL()');
-				var glDiv = document.createElement('div');
-				glDiv.setAttribute('id', 'GLOption');
-				var glUL = document.createElement('ul');
-				glUL.setAttribute('id', 'ulGL');
-
-				for (; i < this.GLAccountArr.length; i += 1) {
-					var glLi = document.createElement('li');
-					glLi.setAttribute('onclick', 'gUtil.setGL(\'' + this.GLAccountArr[i] + '\')');
-					var anchor = document.createElement('a');
-					anchor.href = '#';
-					glLi.appendChild(anchor);
-					glUL.appendChild(glLi);
+				if (startCell == 4) {
+					el.setAttribute("readonly", 'true');
+					el.classList.remove("inputData");
 				}
-				glDiv.appendChild(glUL);
-				cellRight.appendChild(glDiv);
+				cellRight.appendChild(el);
 			}
+			else {
+				var glSel = document.createElement('select');
+				glSel.setAttribute('id', 'GLAccount' + iteration);
+				glSel.className = "SelectGL";
 
-			cellRight.appendChild(el);
+				for (i = 0; i < this.GLAccountArr.length; i++) {
+					var glOpt = document.createElement('option');
+					glOpt.value = glOpt.text = this.GLAccountArr[i];
+					glSel.appendChild(glOpt);
+				}
+				cellRight.appendChild(glSel);
+				$("#GLAccount" + iteration).select2({ width: '260px', placeholder: { text: '' } });
+			}
 			startCell++;
 		}
 		this.toggleButton(false);
@@ -527,23 +515,6 @@ function APUtil(Vault, controller, editor) {
 
 	};
 
-	this.GetText = function (id) {
-		switch (id) {
-			case id = "IDS_METADATACARD_COMMAND_SAVE": id = 27593; break;
-			case id = "IDS_METADATACARD_BUTTON_DISCARD": id = 27614; break;
-			case id = "IDS_METADATACARD_BUTTON_TOOLTIP_SAVE": id = 27929; break;
-		}
-
-		// Get localized text from MFShell.
-		var localizedString = null;
-		try {
-			localizedString = MFiles.GetStringResource(id);
-		}
-		catch (ex) {
-		}
-		return (localizedString != null) ? localizedString : "";
-	};
-
 	this.SearchGL = function (no) {
 		gNo = "";
 		document.getElementById("GLAccount" + no).value = "";
@@ -564,6 +535,7 @@ function APUtil(Vault, controller, editor) {
 	this.filterGL = function () {
 		var input, filter, ul, li, a, i, txtValue;
 		input = document.getElementById("GLAccount" + gNo);
+		if (input == null) return;
 		input.value = input.value;
 		filter = input.value.toUpperCase();
 		ul = document.getElementById("ulGL");

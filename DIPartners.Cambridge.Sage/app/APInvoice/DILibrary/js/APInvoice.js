@@ -12,7 +12,7 @@ function OnNewDashboard(dashboard) {
     var tab = dashboard.Parent;
 
     if (isPopup) {
-        dashboard.Window.width = 1024;
+        dashboard.Window.width = 1920;
         dashboard.Window.Height = 880;
     }
     // Initialize console.
@@ -42,6 +42,7 @@ function SetDetails(dashboard) {
     var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 
     gUtil = new APUtil(Vault, controller, editor);
+
     controller.Invoice = {
         ObjectVersion: controller.ObjectVersion,
         ObjectVersionProperties: ObjectVersionProperties,
@@ -83,13 +84,12 @@ function SetDetails(dashboard) {
     };
 
     gUtil.ResizeContentArea();
-    gUtil.GetGLAccount();
+    //    gUtil.GetGLAccount();
     SetInvoiceDetails(controller);
     SetPODetails(controller);
     SetPSDetails(controller);
     $("#ltabs").tabs("option", "active", 0);
     $("#rtabs").tabs("option", "active", 0);
-
     if (!isPopup) CreatePopupIcon();
 }
 
@@ -105,6 +105,33 @@ function SetInvoiceDetails(controller) {
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Date')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
+    /*
+        //var control = $('<div class="mf-control mf-dynamic-control mf-lookup"></div>');
+        var controlField = $('<td class="mf-dynamic-controlfield"></td>');
+        editor.table.append(controlField);
+        controlField.append($('<div class="mf-autovalue">(automatic)</div>').hide());
+        editor.table.find(".mf-autovalue").after($('<div class="mf-control mf-dynamic-control mf-lookup"></div>'));
+        //controlField.after(control);
+    
+        controlField.lookupcontrolcontainer({
+            editmode: true,
+            readonly: false,
+            metadatacard: editor.metadatacard,
+            arrowkeyhandler: true,
+            itemselected: true
+        });
+    
+        var GLLookup = gUtil.FindGLObjects('vObject.GLAccount');
+        var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+            GLLookup, MFSearchFlagNone, true);
+    
+        var model = {
+            PropertyDef: 1117,
+            ID: "33554303-551e-4e14-810a-cb793fd5a6cd"
+        };
+        
+        controlField.lookupcontrolcontainer("setModel", model, editor.metadatacard);
+     */
 
     // HKo
     SetInvoicePreview();
@@ -134,40 +161,28 @@ function SetInvoiceDetails(controller) {
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
             var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
-
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
+            gUtil.GetGLAccount(GLAccount);
 
             var htmlStr =
                 '<tr>' +
                 '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
-                '       alt="del" onclick = "gUtil.removeRow(this)" ></td > ' +
-                '   <td><input type="text" class=\'inputData\' id=\'ItemNumber' + i + '\' value="' + Item + ' "title="' + Item + '"></td > ' +
-                '   <td><input type="text" class=\'inputData\' id=\'Quantity' + i + '\' value="' + Qty + '" ' +
+                '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
+                '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + ' "title="' + Item + '"></td > ' +
+                '   <td><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td><input type="text" class=\'inputData\' id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
+                '   <td><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td><input type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td><input style="text-align:center" class=\'inputData\' type="text" id=\'PONumber' + i + '\' ' +
+                '   <td><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
-                '       onkeypress="return gUtil.isNumberKey(event,this.id)"></div></td > ' +
-                /*               '   <td><label for="GLAccount' + i + '"></label>' +
-                               '       <input type="text" id="GLAccount' + i + '" list="GLAccountList" value="' + GLAccount.split("-")[0].trim() + '" ' +
-                               '           class=\'inputData\' style="text-align:left" > ' +
-                               '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
-                               '       </datalist> </td>' +
-               */
-                '   <td><input class=\'inputData\' type="text" id="GLAccount' + i + '" onclick="gUtil.SearchGL(' + i + ')" onkeyup="gUtil.filterGL()"/> ' +
-                '       <div id="GLOption">' +
-                '           <ul id="ulGL">' + gUtil.GLAccountList +
-                '           </ul>' +
-                '       </div>' +
-                '   </td>' +
-
+                '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
+                '   <td><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
+                '       </select></td>' +
                 '</tr>';
-
-            ArrayVal[i] = PONumber + ", " + htmlStr;
+            ArrayVal[i] = (PONumber == "") ? htmlStr : PONumber + ", " + htmlStr;
         }
 
         var SortedList = gUtil.SortLineNo(ArrayVal).join();
@@ -178,27 +193,24 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '   <td style="padding:0px";><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
             '        title="delete item" alt = "del" onclick = "gUtil.removeRow(this)" ></td > ' +
-            '   <td style="text-align:left"><input type="text" class=\'inputData\' id="ItemNumber0" value=""></td >' +
-            '   <td><input type="text" class=\'inputData\' id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '   <td style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value=""></td >' +
+            '   <td><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td>' +
-            '   <td><input type="text" class=\'inputData\' id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '   <td><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
             '   <td><input type="text" id="Extension0" value="" readonly="true"></td>' +
-            '   <td><input type="text" class=\'inputData\' id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
-            /*           '   <td><input type="text" id="GLAccount0" list="GLAccountList" value="" class=\'inputData\' style="text-align:left" > ' +
-                       '       <datalist id="GLAccountList">' + gUtil.GLAccountList +
-                       '       </datalist> </td>' +
-           */
-            '   <td><input type="text" id="GLAccount0" onclick="gUtil.SearchGL(0)" onkeyup="gUtil.filterGL()" /> ' +
-            '       <div id="GLOption">' +
-            '           <ul id="ulGL">' + gUtil.GLAccountList +
-            '           </ul>' +
-            '       </div>' +
+            '   <td><input type="text" class="inputData" id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
+            '       </select> ' +
             '   </td>' +
             '</tr>';
 
         TableBody.append(htmlStr);
     }
+
+    $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
+    $(".SelectGL").select2({ width: '260px', placeholder: { text: '' } });
+    $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
     var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
@@ -456,6 +468,79 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         requiredspan = propertyLine.find('.mf-required-indicator').hide();
 }
 
+function generate_lookup(tableID, Vault, ObjVerProperties, propertyAlias) {
+    var propertyNumber = ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).PropertyDef;
+    var PropertyDef = Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
+    var propertyName = PropertyDef.Name;
+    var propertyType = PropertyDef.DataType;
+    var propertyValue = ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).Value.DisplayValue;
+    var propertyEditable = (PropertyDef.AutomaticValueType == 0 ? 1 : 0);
+    var classID = ObjVerProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
+    var assocPropDefs = Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
+    var propertyRequired = gUtil.isRequired(assocPropDefs, propertyNumber);
+    if (propertyType == 8)
+        propertyValue = ((propertyValue == 'Yes') ? 'Yes' : 'No');
+    if (propertyType == 3)
+        propertyValue = '$' + propertyValue;
+    // Create container element
+    var LookupContatainer = $('<div class="mf-internal-lookups"></div>');
+    var divTag = $('<div class="mf-internal-lookup"></div>');
+    LookupContatainer.append(divTag);
+    LookupContatainer.addClass('mf-editable');
+    //	$(tableID).append(propertyLine);
+    tableID.append(LookupContatainer);
+
+    var items = this.model.GetSelectableValueItemStates();
+
+    // Enable each item if it is found from the array. 
+    for (var index in items) {
+        if (items[index] == this.COMPLETED_OR_APPROVED_ITEM_ID)
+            this.isCompletedItemFound = true;
+        else if (items[index] == this.REJECTED_ITEM_ID)
+            this.isRejectedItemFound = true;
+    }
+
+    // Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
+    LookupContatainer.hover(
+        function () {
+
+            // Set the hover theme. The special theme is set for workflow and workstates properties.
+            $(this).addClass("ui-state-hover");
+            if (propertyNumber == 38 || propertyNumber == 99)
+                $(this).addClass("ui-footer-hover");
+        },
+        function () {
+
+            // Remove the hover theme, as well as the special theme workflow and workstate properties.
+            $(this).removeClass("ui-state-hover");
+            if (propertyNumber == 38 || propertyNumber == 99)
+                $(this).removeClass("ui-footer-hover");
+        }
+    );
+    var sub = (propertyName == "Subtotal") ?
+        '                <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + propertyValue + '" disabled ></div > ' : "";
+
+    LookupContatainer.append(
+        '        <td class="mf-dynamic-namefield">' +
+        '            <div>' +
+        '                <span class="mf-property-' + propertyNumber + '-label">' + propertyName + '</span>' +
+        '                <span class="mf-required-indicator">*</span>' +
+        '            </div>' +
+        '        </td>' +
+        '        <td colspan="4" class="mf-dynamic-controlfield">' +
+        '            <div class="mf-control mf-dynamic-control mf-text">' +
+        '                <div class="mf-internal-container">' +
+        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' + sub +
+        '                </div>' +
+        '            </div>' +
+        '        </td>'
+    );
+
+
+    if (!propertyRequired)
+        requiredspan = LookupContatainer.find('.mf-required-indicator').hide();
+}
+
 function setProperty(Vault, editor, propertyAlias) {
     var ObjectVersionProperties = editor.ObjectVersionProperties
     var PropertyInfo = ObjectVersionProperties.SearchForPropertyByAlias(Vault, propertyAlias, true);
@@ -516,9 +601,10 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     $("#" + tablist).tabs("refresh");
 
     // Create and initialize metadatacard widget.
-    var metadatacard = $('#' + editor.cardname);
-    metadatacard.metadatacard({});
-    metadatacard.metadatacard("initialize", { apUtil: gUtil });
+    //var metadatacard = $('#' + editor.cardname);
+    //metadatacard.lookupcontrolcontainer({});
+    //metadatacard.metadatacard("initialize", { apUtil: gUtil });
+
     var MetaCard = $('div #' + editor.cardname);
     MetaCard.addClass("mf-card-docked");
 
