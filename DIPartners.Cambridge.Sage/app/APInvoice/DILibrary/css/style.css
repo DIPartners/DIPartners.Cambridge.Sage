@@ -169,7 +169,7 @@ input[type="text"]:disabled {
 	padding: 0;
 	margin: 0;
 	overflow: scroll;
-	max-width: 400px;
+	/*max-width: 400px;*/
 	max-height: 200px;
 }
 
@@ -185,3 +185,57 @@ input[type="text"]:disabled {
 		#ulGL li a:hover:not(.header) {
 			background-color: rgb(250, 163, 136);
 		}
+
+/*select2*/
+.SelectGL {
+	height: 20px;
+	font-size: 11px;
+	border: 0px;
+}
+
+.select2-results {
+	font-size: 12px !important;
+	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
+}
+
+.select2-selection__arrow b {
+	display: none !important;
+}
+
+.select2-container--default .select2-selection--single {
+	background-color: transparent !important;
+	border: none !important;
+}
+
+.select2-dropdown {
+	left: -180px !important;
+	top: 8px !important;
+	/*width: 260px;*/
+}
+
+.select2-selection--single {
+	width: 71px !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+	padding-left: 2px !important;
+	padding-right: 2px !important;
+	padding-bottom: 1px !important;
+	text-overflow: clip !important;
+	width: 100% !important;
+}
+
+.select2-search--dropdown .select2-search__field {
+	width: 98% !important;
+}
+
+/*#gl-select {*/
+/* can be any value */
+/*width: 300px;
+}
+
+	#gl-select0 .select2-container--open + .select2-container--open {
+		left: auto;
+		right: 0;
+		width: 100%;
+	}*/
