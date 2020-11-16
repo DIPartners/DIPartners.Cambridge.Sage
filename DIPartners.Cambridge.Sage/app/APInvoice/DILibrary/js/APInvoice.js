@@ -145,15 +145,15 @@ function SetInvoiceDetails(controller) {
                 '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
                 '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
-                '       onclick="openForm(' + i + ', ' + LineNo + ')" ></td > ' +
-                '   <input type="hidden" id=\'ItemDesc' + i + '\' value="' + ItemDesc + '" /> ' +
+                '       onclick="openForm(' + i + ')" ></td > ' +
+                '   <input type="hidden" id=\'ItemDescription' + i + '\' value="' + ItemDesc + '" /> ' +
                 '   <td><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
-                '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
+                '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
-                '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
+                '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td><input type="text" id=\'Extension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
+                '   <td><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
                 '   <td><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
@@ -172,12 +172,13 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '   <td style="padding:0px";><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
             '        title="delete item" alt = "del" onclick = "gUtil.removeRow(this)" ></td > ' +
-            '   <td style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value=""></td >' +
-            '   <td><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '   <td style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value="" onclick="openForm(0)" ></td >' +
+            '   <input type="hidden" id=\'ItemDescription0' + i + '\' value="" /> ' +
+            '   <td><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td>' +
-            '   <td><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'Extension0\')" ' +
+            '   <td><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
-            '   <td><input type="text" id="Extension0" value="" readonly="true"></td>' +
+            '   <td><input type="text" id="InvoiceLineExtension0" value="" readonly="true"></td>' +
             '   <td><input type="text" class="inputData" id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
             '   <td><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
             '       </select> ' +
@@ -730,9 +731,11 @@ function PopupDashboard() {
     RefreshTab();
 }
 
-function openForm(i, line) {
-    var item = document.getElementById("ItemNumber" + i).value;
-    var itemDesc = document.getElementById("ItemDesc" + i).value;
+function openForm(i) {
+    var item = $("#ItemNumber" + i)[0].value;
+    var itemDesc = $("#ItemDescription" + i)[0].value;
+    if (itemDesc == undefined) itemDesc = "";
+
     var modalHtml =
         '<div class="modal-content">' +
         ' <span style="float:right; font-size:20px; cursor:pointer;" onclick="closeForm()">&times;</span><br/>' +
@@ -740,16 +743,14 @@ function openForm(i, line) {
         '   <input type="text" id="item" value="' + item + '" required=required />' +
 
         '   <label for="desc" style="padding-top:10px"><b>Description</b></label>' +
-        '   <input type="text" id="itemDesc" value="' + itemDesc + '"  />' +
+        '   <input type="text" id="itemDescription" value="' + itemDesc + '"  />' +
         '   <br/>' +
-        '       <button type="submit" class="btn" onclick="gUtil.SaveItemNDesc(' + line + ');">save</button>' +
+        '       <button type="submit" class="btn" onclick="gUtil.StoreItemNDesc(' + i + ');">save</button>' +
         '       <button type="button" class="btn cancel" onclick="closeForm()">Close</button>' +
         '</div >';
     $("#popupDesc").append(modalHtml);
 
     var modal = document.getElementById("popupDesc");
-    var modalContent = document.getElementsByClassName("modal-content");
-    var closeX = document.getElementsByClassName("close")[0];
     var tbl = document.getElementById('invoice_details_table');
     var cell = tbl.rows[i + 1].cells[1];
     modal.style.display = "block";

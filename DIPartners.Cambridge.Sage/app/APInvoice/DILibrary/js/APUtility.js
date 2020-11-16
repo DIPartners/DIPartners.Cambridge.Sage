@@ -64,6 +64,7 @@ function APUtil(Vault, controller, editor) {
 		else if (pptName == "InvoiceLineExtension") return 4;
 		else if (pptName == "PONumber") return 5;
 		else if (pptName == "GLAccount") return 6;
+		else if (pptName == "ItemDescription") return 1;
 	}
 
 	this.DestroyOldDetails = function () {
@@ -108,7 +109,7 @@ function APUtil(Vault, controller, editor) {
 		var propertyValue = new MFiles.PropertyValue();
 		var VaultOp = Vault.PropertyDefOperations;
 
-		var value = tbl.rows[no + 1].cells[this.GetColIndex(pptName)].querySelector('input').value;
+		var value = $("#" + pptName + no)[0].value;
 
 		propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + pptName);
 		propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
@@ -260,6 +261,7 @@ function APUtil(Vault, controller, editor) {
 			propertyValues.Add(-1, propertyValue);
 
 			propertyValues.Add(-1, this.GetPropertyValue("ItemNumber", i));            //1150
+			propertyValues.Add(-1, this.GetPropertyValue("ItemDescription", i));            //1150
 			propertyValues.Add(-1, this.GetPropertyValue("Quantity", i));             //1151
 			propertyValues.Add(-1, this.GetPropertyValue("UnitPrice", i));            //1154
 			propertyValues.Add(-1, this.GetPropertyValue("InvoiceLineExtension", i)); //1157
@@ -363,7 +365,7 @@ function APUtil(Vault, controller, editor) {
 			if (startCell == 1) id = "ItemNumber";
 			else if (startCell == 2) id = "Quantity";
 			else if (startCell == 3) id = "UnitPrice";
-			else if (startCell == 4) id = "Extension";
+			else if (startCell == 4) id = "InvoiceLineExtension";
 			else if (startCell == 5) id = "PONumber";
 			else if (startCell == 6) id = "GLAccount";
 
@@ -376,8 +378,15 @@ function APUtil(Vault, controller, editor) {
 				el.setAttribute('id', id + iteration);
 				el.classList.add("inputData");
 
+				if (startCell == 1) {
+					el.setAttribute('onclick', 'openForm(' + iteration + ')');
+					var hiddenItem = document.createElement('hidden');
+					hiddenItem.setAttribute('id', 'ItemDescription' + iteration);
+					el.appendChild(hiddenItem);
+				}
+
 				if (startCell == 2 || startCell == 3) {
-					el.setAttribute('onkeyup', 'gUtil.Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'Extension' + iteration + '\')');
+					el.setAttribute('onkeyup', 'gUtil.Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'InvoiceLineExtension' + iteration + '\')');
 					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
 				}
 				if (startCell == 4) {
@@ -444,8 +453,8 @@ function APUtil(Vault, controller, editor) {
 		var lastRow = tbl.rows.length - 1;	// header
 		var Ext = 0;
 		for (var i = 0; i <= lastRow; i++) {
-			if (document.getElementById('Extension' + i) != undefined) {
-				var currency = document.getElementById('Extension' + i).value;
+			if (document.getElementById('InvoiceLineExtension' + i) != undefined) {
+				var currency = document.getElementById('InvoiceLineExtension' + i).value;
 
 				Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
 			}
@@ -533,9 +542,23 @@ function APUtil(Vault, controller, editor) {
 		return oSCs;
 	};
 
+	this.StoreItemNDesc = function (line) {
+		var item = $("#item")[0].value;
+		var itemDesc = $("#itemDescription")[0].value;
+
+		if (item == "") {
+			alert("Item is required!");
+			return;
+		}
+
+		$("#ItemNumber" + line)[0].value = item;
+		$("#ItemDescription" + line)[0].value = itemDesc;
+		closeForm();
+	}
+
 	this.SaveItemNDesc = function (line) {
 		var item = document.getElementById("item").value;
-		var itemDesc = document.getElementById("itemDesc").value;
+		var itemDesc = document.getElementById("ItemDescription").value;
 
 		if (item == "") {
 			alert("Item is required!");
