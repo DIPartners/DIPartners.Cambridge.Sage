@@ -750,17 +750,19 @@ function openForm(i) {
         '</div >';
     $("#popupDesc").append(modalHtml);
 
-    var modal = document.getElementById("popupDesc");
     var tbl = document.getElementById('invoice_details_table');
     var cell = tbl.rows[i + 1].cells[1];
-    modal.style.display = "block";
-    modal.style.top = "0px";
-    modal.style.left = "0px";
-    modal.style.width = $(".page-container").width() + "px";
-    modal.style.height = $(".panel-left").height() + "px";
+    var modal = $("#popupDesc")[0].style;
+    modal.display = "block";
+    modal.top = "0px";
+    modal.left = "0px";
+    modal.width = $(".page-container").width() + "px";
+    modal.height = $(".panel-left").height() + "px";
 
     $(".modal-content").css("margin-top", (cell.offsetTop + $("#invoice_details_table tr").height() - 10) + "px");
     $(".modal-content").css("margin-left", (cell.offsetLeft + tbl.rows[i + 1].cells[0].offsetWidth + 10) + "px");
+
+    $("#item").focus();
 }
 
 function closeForm(val) {
