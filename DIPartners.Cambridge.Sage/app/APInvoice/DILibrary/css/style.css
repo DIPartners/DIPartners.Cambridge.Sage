@@ -1,11 +1,14 @@
 /* Style for metadata card. */
+body {
+	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
+}
 
 .page-container {
 	margin: 0px;
 }
 
 label {
-	font-family: Segoe UI, Tahoma, Arial, sans-serif;
+	/*font-family:Segoe UI, Tahoma, Arial, sans-serif;*/
 	color: #000000;
 	display: block;
 }
@@ -118,7 +121,7 @@ input[type="text"]:disabled {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-	font-family: Segoe UI, Tahoma, Arial, sans-serif;
+	/*font-family:Segoe UI, Tahoma, Arial, sans-serif;*/
 	color: #000000;
 }
 
@@ -147,44 +150,13 @@ input[type="text"]:disabled {
 	text-align: center !important;
 }
 
-#save-data, #discard-data {
+.btn {
 	color: white;
 	background: #318CCC;
-	font-family: Segoe UI, Tahoma, Arial, sans-serif;
+	/*font-family: Segoe UI, Tahoma, Arial, sans-serif;*/
 	font-weight: normal;
 	text-shadow: 0 0 0;
 }
-
-/*dropdown list*/
-#GLOption {
-	display: none;
-	width: 100%;
-	text-align: left;
-	position: absolute;
-	left: 38%;
-}
-
-#ulGL {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
-	overflow: scroll;
-	/*max-width: 400px;*/
-	max-height: 200px;
-}
-
-	#ulGL li a {
-		border: 1px solid #ddd;
-		margin-top: -1px; /* Prevent double borders */
-		background-color: #eefca2;
-		text-decoration: none;
-		color: black;
-		display: block;
-	}
-
-		#ulGL li a:hover:not(.header) {
-			background-color: rgb(250, 163, 136);
-		}
 
 /*select2*/
 .SelectGL {
@@ -195,7 +167,7 @@ input[type="text"]:disabled {
 
 .select2-results {
 	font-size: 12px !important;
-	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
+	/*font-family: Segoe UI, Tahoma, Arial, sans-serif !important;*/
 }
 
 .select2-selection__arrow b {
@@ -222,20 +194,35 @@ input[type="text"]:disabled {
 	padding-right: 2px !important;
 	padding-bottom: 1px !important;
 	text-overflow: clip !important;
-	width: 100% !important;
+	width: 85% !important;
 }
 
 .select2-search--dropdown .select2-search__field {
 	width: 98% !important;
 }
 
-/*#gl-select {*/
-/* can be any value */
-/*width: 300px;
+/* popup window */
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	padding-top: 200px;
+	overflow: auto;
+	background-color: rgb(255,255,255);
+	background-color: rgba(255,255,255,0.4);
 }
 
-	#gl-select0 .select2-container--open + .select2-container--open {
-		left: auto;
-		right: 0;
-		width: 100%;
-	}*/
+/* Modal Content */
+.modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	margin-top: 0px;
+	padding: 10px;
+	padding-top: 0px;
+	border: 1px solid #888;
+	width: 20%;
+	font-size: 12px !important;
+	/*font-family: Segoe UI, Tahoma, Arial, sans-serif !important;*/
+	/*margin-top: 200px;*/
+	margin-left: 160px;
+}

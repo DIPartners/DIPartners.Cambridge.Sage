@@ -12,8 +12,6 @@ function APUtil(Vault, controller, editor) {
 			case id = "IDS_METADATACARD_COMMAND_SAVE": id = 27593; break;
 			case id = "IDS_METADATACARD_BUTTON_DISCARD": id = 27614; break;
 			case id = "IDS_METADATACARD_BUTTON_TOOLTIP_SAVE": id = 27929; break;
-			case id = "IDS_CONTROLHELPER_DROPDOWN_SEARCHING_INDICATOR": id = 28069; break; //Searching...
-			case id = "IDS_METADATACARD_AUTOMATIC_VALUE": id = 27648; break;
 		}
 
 		// Get localized text from MFShell.
@@ -33,19 +31,17 @@ function APUtil(Vault, controller, editor) {
 	var saveLabel = this.GetText("IDS_METADATACARD_COMMAND_SAVE");
 	var saveTooltip = this.GetText("IDS_METADATACARD_BUTTON_TOOLTIP_SAVE");
 	var discardLabel = this.GetText("IDS_METADATACARD_BUTTON_DISCARD");
-	var search = this.GetText("IDS_CONTROLHELPER_DROPDOWN_SEARCHING_INDICATOR");
-	var auto = this.GetText("IDS_METADATACARD_AUTOMATIC_VALUE");
 
 	$("#save-data").button({ label: saveLabel });
 	$("#save-data").attr("title", saveTooltip);
 	$("#discard-data").button({ label: discardLabel });
 
-	$("#save-data").mouseenter(function () {
+	$(".btn").mouseenter(function () {
 		$(this).css("background", "#7ecaf0");
 	}).mouseleave(function () { $(this).css("background", "#318CCC"); });
-	$("#discard-data").mouseenter(function () {
+	/*$("#discard-data").mouseenter(function () {
 		$(this).css("background", "#7ecaf0");
-	}).mouseleave(function () { $(this).css("background", "#318CCC"); });
+	}).mouseleave(function () { $(this).css("background", "#318CCC"); });*/
 
 	$('li.gl').on('click', function (no) {
 		var content = $(this).text();
@@ -515,42 +511,6 @@ function APUtil(Vault, controller, editor) {
 
 	};
 
-	this.SearchGL = function (no) {
-		gNo = "";
-		document.getElementById("GLAccount" + no).value = "";
-		gNo = no;
-		var x = document.getElementById("GLOption");
-		if (x.style.display === "block") {
-			x.style.display = "none";
-		} else {
-			var div = document.querySelector('#GLOption');
-			var inp = document.querySelector('#GLAccount' + no);
-			var rect = inp.getClientRects();
-			div.style.display = 'block';
-			div.style.left = (rect[0].right - 405) + 'px';
-			div.style.top = (rect[0].top - 40) + 'px';
-		}
-	};
-
-	this.filterGL = function () {
-		var input, filter, ul, li, a, i, txtValue;
-		input = document.getElementById("GLAccount" + gNo);
-		if (input == null) return;
-		input.value = input.value;
-		filter = input.value.toUpperCase();
-		ul = document.getElementById("ulGL");
-		li = ul.getElementsByTagName("li");
-		for (i = 0; i < li.length; i++) {
-			a = li[i].getElementsByTagName("a")[0];
-			txtValue = a.textContent || a.innerText;
-			if (txtValue.toUpperCase().indexOf(filter) > -1) {
-				li[i].style.display = "";
-			} else {
-				li[i].style.display = "none";
-			}
-		}
-	};
-
 	this.FindGLObjects = function (OTAlias) {
 
 		var OT = Vault.ObjectTypeOperations.GetObjectTypeIDByAlias(OTAlias);
@@ -573,4 +533,52 @@ function APUtil(Vault, controller, editor) {
 		return oSCs;
 	};
 
+	this.SaveItemNDesc = function (line) {
+		var item = document.getElementById("item").value;
+		var itemDesc = document.getElementById("itemDesc").value;
+
+		if (item == "") {
+			alert("Item is required!");
+			return;
+		}
+
+		var ci = controller.Invoice;
+
+		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, ci.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+
+		for (var k = 0; k < ObjectSearchResults.count; k++) {
+			var props = ObjectSearchResultsProperties[k];
+			var InvoiceLine = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
+			var objID = new MFiles.ObjID();
+			if (InvoiceLine == line) {
+				objID.SetIDs(ObjectSearchResults[k].ObjVer.Type, ObjectSearchResults[k].ObjVer.ID);
+
+				var InvoiceObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
+				var InvoiceoObjProperties = Vault.ObjectOperations.GetObjectVersionAndProperties(InvoiceObjVer);
+
+				if (!InvoiceoObjProperties.VersionData.ObjectCheckedOut) {
+					var COInvoiceObjVer = Vault.ObjectOperations.CheckOut(objID);
+
+					var InvoiceItem = new MFiles.PropertyValue();
+					InvoiceItem.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
+					InvoiceItem.TypedValue.SetValue(MFDatatypeText, item);
+					Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceItem);
+
+					var InvoiceItemDesc = new MFiles.PropertyValue();
+					InvoiceItemDesc.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemDescription");
+					InvoiceItemDesc.TypedValue.SetValue(MFDatatypeText, itemDesc);
+					Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceItemDesc);
+
+					Vault.ObjectOperations.CheckIn(COInvoiceObjVer.ObjVer);
+				}
+
+				closeForm(true);
+				break;
+			}
+		}
+
+	}
 }

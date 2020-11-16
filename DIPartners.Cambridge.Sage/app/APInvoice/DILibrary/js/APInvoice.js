@@ -105,33 +105,6 @@ function SetInvoiceDetails(controller) {
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Date')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
-    /*
-        //var control = $('<div class="mf-control mf-dynamic-control mf-lookup"></div>');
-        var controlField = $('<td class="mf-dynamic-controlfield"></td>');
-        editor.table.append(controlField);
-        controlField.append($('<div class="mf-autovalue">(automatic)</div>').hide());
-        editor.table.find(".mf-autovalue").after($('<div class="mf-control mf-dynamic-control mf-lookup"></div>'));
-        //controlField.after(control);
-    
-        controlField.lookupcontrolcontainer({
-            editmode: true,
-            readonly: false,
-            metadatacard: editor.metadatacard,
-            arrowkeyhandler: true,
-            itemselected: true
-        });
-    
-        var GLLookup = gUtil.FindGLObjects('vObject.GLAccount');
-        var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-            GLLookup, MFSearchFlagNone, true);
-    
-        var model = {
-            PropertyDef: 1117,
-            ID: "33554303-551e-4e14-810a-cb793fd5a6cd"
-        };
-        
-        controlField.lookupcontrolcontainer("setModel", model, editor.metadatacard);
-     */
 
     // HKo
     SetInvoicePreview();
@@ -143,7 +116,8 @@ function SetInvoiceDetails(controller) {
     editor.table.append(
         '<tr><td colspan="6" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details">' +
-        '       <tr><th width="5%">-</th><th width="20%">Item</th><th width="10%">Qty</th><th width="15%">Unit $</th><th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%">GL<br>Account</th></tr>' +
+        '       <tr><th width="5%">-</th><th width="20%">Item</th><th width="10%">Qty</th><th width="15%">Unit $</th>' +
+        '           <th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%">GL<br>Account</th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
@@ -155,7 +129,9 @@ function SetInvoiceDetails(controller) {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         for (var i = 0; i < ObjectSearchResults.Count; i++) {
             var props = ObjectSearchResultsProperties[i];
+            var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
+            var ItemDesc = props.SearchForPropertyByAlias(Vault, "vProperty.ItemDescription", true).Value.DisplayValue;
             var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
@@ -168,7 +144,9 @@ function SetInvoiceDetails(controller) {
                 '<tr>' +
                 '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
-                '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + ' "title="' + Item + '"></td > ' +
+                '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
+                '       onclick="openForm(' + i + ', ' + LineNo + ')" ></td > ' +
+                '   <input type="hidden" id=\'ItemDesc' + i + '\' value="' + ItemDesc + '" /> ' +
                 '   <td><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'Extension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
@@ -182,11 +160,12 @@ function SetInvoiceDetails(controller) {
                 '   <td><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
                 '       </select></td>' +
                 '</tr>';
+            TableBody.append(htmlStr);
             ArrayVal[i] = (PONumber == "") ? htmlStr : PONumber + ", " + htmlStr;
         }
 
         var SortedList = gUtil.SortLineNo(ArrayVal).join();
-        TableBody.append(SortedList);
+        //TableBody.append(SortedList);
     }
     else {
         var htmlStr =
@@ -208,9 +187,18 @@ function SetInvoiceDetails(controller) {
         TableBody.append(htmlStr);
     }
 
-    $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
-    $(".SelectGL").select2({ width: '260px', placeholder: { text: '' } });
+    $(".SelectGL").on('select2:open', function (e) {
+        $(".SelectGL option[value='']").remove();
+        gUtil.toggleButton(false);
+    });
+    $(".SelectGL").select2(
+        {
+            width: '260px',
+            top: '20px',
+            placeholder: { text: '' }
+        });
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
+
 
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
     var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
@@ -310,9 +298,9 @@ function SetPSDetails(controller) {
 
 function ResetTabs() {
     $(".panel-left").empty();
-    $(".panel-left").append('<div id="ltabs"><ul></ul></div>');
+    $(".panel-left").append('<div id="ltabs"><ul class="nav nav-tabs"></ul></div>');
     $(".panel-right").empty();
-    $(".panel-right").append('<div id="rtabs"><ul></ul></div>');
+    $(".panel-right").append('<div id="rtabs"><ul class="nav nav-tabs role="tablist"></ul></div>');
     $('#ltabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
@@ -391,16 +379,39 @@ function FindObjects(Vault, OTAlias, PDAlias, PDType, Value) {
     return oSCs;
 }
 
-function SetInvoicePreview() {
+function SetInvoicePreview1() {
 
     var tablist = 'rtabs';
     var tabname = 'InvPre';
     var tabdisplayname = 'Invoice Preview';
 
     // Add the tab to the tab list
-    $('<li><a href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div id="' + tabname + '"><div id="' + tabname + '0"></div></div>').appendTo("#" + tablist);
+    $('<li class="nav-item"><a class="nav-link active" aria-selected="true" role="tab" href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div class="tab-content" id="' + tabname + '"><div class="tab-pane fade" id="' + tabname + '" role="tabpanel"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
+}
+
+function SetInvoicePreview() {
+
+    var tablist = 'rtabs';
+    var tabname = 'InvPre';
+    var tabdisplayname = 'Invoice Preview';
+    var tabUL =
+        '<li class="nav-item" role = "presentation"> ' +
+        '    <a class="nav-link active" id="invoice-tab" data-toggle="tab" href="#' + tabname + '" ' +
+        '       role="tab" aria-controls="' + tabdisplayname + '" aria-selected="true" > ' + tabdisplayname + '</a > ' +
+        '</li>';
+    var tabDiv =
+        '<div class="tab-content" id="' + tabname + '">' +
+        '   <div class="tab-pane fade show active" id = "' + tabname + '" role = "tabpanel" aria-labelledby="' + tabname + '-tab"></div>' +
+        '</div>';
+    $(tabUL).appendTo("#" + tablist + " ul");
+    $(tabDiv).appendTo("#" + tablist);
+
+    // Add the tab to the tab list
+    /*$('<li class="nav-item"><a class="nav-link active" aria-selected="true" role="tab" href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div class="tab-content" id="' + tabname + '"><div class="tab-pane fade" id="' + tabname + '" role="tabpanel"></div></div>').appendTo("#" + tablist);
+    $("#" + tablist).tabs("refresh");*/
 }
 
 function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
@@ -585,19 +596,38 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var self = this;
     var Vault = controller.Vault;
     controller.editor = editor;
-    if (typeof controller.cards === 'undefined')
-        cardid = 0;
-    else
-        cardid = controller.cards + 1;
+    var cardid = (typeof controller.cards === 'undefined') ? 0 : controller.cards + 1;
+    var toggleTab, active;
     controller.cards = cardid;
-
     editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = tabid;
     editor.tabdisplayname = tabtitle;
+    if (tablist == "rtabs") {
+        toggleTab = ""
+        active = "";
+    }
+    else {
+        active = "active";
+        toggleTab = "aria-selected=\"true\"";
+    }
+
+
+    var tabUL =
+        '<li class="nav-item" role="presentation"> ' +
+        '    <a class="nav-link ' + active + '" id="invoice-tab" data-toggle="tab" href="#' + editor.cardname + '" ' +
+        '       role="tab" aria-controls="' + editor.tabdisplayname + '" ' + toggleTab + '> ' + editor.tabdisplayname + '</a> ' +
+        '</li>';
+    var tabDiv =
+        '<div class="tab-content" id="' + editor.tabname + '">' +
+        '   <div class="tab-pane fade show mf-metadatacard mf-mode-properties" id="' + editor.cardname + '" role="tabpanel" aria-labelledby="' + editor.tabname + '-tab"></div>' +
+        '</div>';
+    $(tabUL).appendTo("#" + tablist + " ul");
+    $(tabDiv).appendTo("#" + tablist);
+
 
     // Add the tab to the tab list
-    $('<li><a href="#' + editor.tabname + '">' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div id="' + editor.tabname + '"><div id="' + editor.cardname + '" class="mf-metadatacard mf-mode-properties"></div></div>').appendTo("#" + tablist);
+    //$('<li class="nav-item"><a class="nav-link ' + active +'\" role="tab" href="#' + editor.tabname +'"' + toggleTab + '>'+editor.tabdisplayname+'</a></li>').appendTo("#" + tablist + " ul");
+    //$('<div class="tab-content" id="' + editor.tabname + '"><div class="tab-pane fade show active mf-metadatacard mf-mode-properties" id="' + editor.cardname + '"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
     // Create and initialize metadatacard widget.
@@ -698,4 +728,42 @@ function CreatePopupIcon() {
 function PopupDashboard() {
     gDashboard.Parent.shellFrame.ShowPopupDashboard("APInvoice", true, gDashboard.CustomData);
     RefreshTab();
+}
+
+function openForm(i, line) {
+    var item = document.getElementById("ItemNumber" + i).value;
+    var itemDesc = document.getElementById("ItemDesc" + i).value;
+    var modalHtml =
+        '<div class="modal-content">' +
+        ' <span style="float:right; font-size:20px; cursor:pointer;" onclick="closeForm()">&times;</span><br/>' +
+        '   <label for="item"><b>Item</b></label>' +
+        '   <input type="text" id="item" value="' + item + '" required=required />' +
+
+        '   <label for="desc" style="padding-top:10px"><b>Description</b></label>' +
+        '   <input type="text" id="itemDesc" value="' + itemDesc + '"  />' +
+        '   <br/>' +
+        '       <button type="submit" class="btn" onclick="gUtil.SaveItemNDesc(' + line + ');">save</button>' +
+        '       <button type="button" class="btn cancel" onclick="closeForm()">Close</button>' +
+        '</div >';
+    $("#popupDesc").append(modalHtml);
+
+    var modal = document.getElementById("popupDesc");
+    var modalContent = document.getElementsByClassName("modal-content");
+    var closeX = document.getElementsByClassName("close")[0];
+    var tbl = document.getElementById('invoice_details_table');
+    var cell = tbl.rows[i + 1].cells[1];
+    modal.style.display = "block";
+    modal.style.top = "0px";
+    modal.style.left = "0px";
+    modal.style.width = $(".page-container").width() + "px";
+    modal.style.height = $(".panel-left").height() + "px";
+
+    $(".modal-content").css("margin-top", (cell.offsetTop + $("#invoice_details_table tr").height() - 10) + "px");
+    $(".modal-content").css("margin-left", (cell.offsetLeft + tbl.rows[i + 1].cells[0].offsetWidth + 10) + "px");
+}
+
+function closeForm(val) {
+    document.getElementById("popupDesc").style.display = "none";
+    $("#popupDesc").empty();
+    if (val) RefreshTab();
 }
