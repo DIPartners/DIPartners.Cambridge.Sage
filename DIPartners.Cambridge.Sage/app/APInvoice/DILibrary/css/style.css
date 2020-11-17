@@ -99,8 +99,16 @@ label {
 	cursor: pointer !important;
 }
 
+#invoice_details_table tr td:nth-child(5) input {
+	cursor: default !important;
+}
+
 #invoice_details_table tr td:nth-child(n+3) input {
 	text-align: right !important;
+}
+
+.ui-widget-content {
+	color: rgb(153, 152, 152) !important;
 }
 
 #po_details_table td {
@@ -121,7 +129,7 @@ input[type="text"]:disabled {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-	/*font-family:Segoe UI, Tahoma, Arial, sans-serif;*/
+	font-family: Segoe UI, Tahoma, Arial, sans-serif;
 	color: #000000;
 }
 
@@ -153,7 +161,7 @@ input[type="text"]:disabled {
 .btn {
 	color: white;
 	background: #318CCC;
-	/*font-family: Segoe UI, Tahoma, Arial, sans-serif;*/
+	font-family: Segoe UI, Tahoma, Arial, sans-serif;
 	font-weight: normal;
 	text-shadow: 0 0 0;
 }
@@ -167,7 +175,6 @@ input[type="text"]:disabled {
 
 .select2-results {
 	font-size: 12px !important;
-	/*font-family: Segoe UI, Tahoma, Arial, sans-serif !important;*/
 }
 
 .select2-selection__arrow b {
@@ -182,23 +189,25 @@ input[type="text"]:disabled {
 .select2-dropdown {
 	left: -180px !important;
 	top: 8px !important;
-	/*width: 260px;*/
+	width: 260px !important;
 }
 
-.select2-selection--single {
-	width: 71px !important;
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	width: 0px !important;
 }
 
 .select2-container .select2-selection--single .select2-selection__rendered {
-	padding-left: 2px !important;
 	padding-right: 2px !important;
-	padding-bottom: 1px !important;
-	text-overflow: clip !important;
-	width: 85% !important;
+	padding-left: 2px !important;
 }
 
-.select2-search--dropdown .select2-search__field {
-	width: 98% !important;
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+	color: #000000 !important;
+	font-family: Segoe UI, Tahoma, Arial, sans-serif;
+}
+
+.select2-container {
+	width: 100% !important
 }
 
 /* popup window */
@@ -222,7 +231,9 @@ input[type="text"]:disabled {
 	border: 1px solid #888;
 	width: 20%;
 	font-size: 12px !important;
-	/*font-family: Segoe UI, Tahoma, Arial, sans-serif !important;*/
-	/*margin-top: 200px;*/
 	margin-left: 160px;
+}
+
+.importantRule {
+	color: transparent !important;
 }

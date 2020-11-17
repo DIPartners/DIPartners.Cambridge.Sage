@@ -293,31 +293,20 @@ function APUtil(Vault, controller, editor) {
 		document.getElementById("GLOption").style.display = "none";
 	}
 
-	this.GetGLAccount = function (id) {
+	this.GetGLAccount = function () {
 
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
 			gUtil.FindGLObjects('vObject.GLAccount'), MFSearchFlagNone, true);
 		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
 		var dropValue;
 		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-		if (id == "")
-			this.GLAccountList = "<option value=''></option>";
-		for (var i = 0; i < ObjectSearchResults.Count; i++) {
+		this.GLAccountList = "<option value=' '></option>";
+		this.GLAccountArr[0] = "";
+		for (var i = 1; i < ObjectSearchResults.Count; i++) {
 			var props = ObjectSearchResultsProperties[i];
 			dropValue = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccountName", true).Value.DisplayValue;
 			var val = dropValue.split("-");
-
-			if (dropValue == id)
-				this.GLAccountList += '<option value=\"' + dropValue + '\" selected>' + dropValue + '</option>';
-			else
-				this.GLAccountList += '<option value=\"' + dropValue + '\">' + dropValue + '</option>';
-			//this.GLAccountList += '<option value=\"' + val[0].trim() + '\">' + dropValue + '</option>';
-
-			/*var glList = '<input type="text" id="GLAccount' + i + '" onclick="gUtil.SearchGL()" onkeyup="gUtil.filterGL()" />' +
-				'			<div id="GLOption">' +
-				'				<ul id="ulGL"><li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li></ul>';*/
-			//this.GLAccountList += '<li onclick="gUtil.setGL(\'' + dropValue + '\')"><a href="#">\'' + dropValue + '\'</a></li>';
-
+			this.GLAccountList += '<option value=\"' + dropValue + '\">' + dropValue + '</option>';
 			this.GLAccountArr[i] = dropValue;
 		}
 	}
@@ -406,7 +395,8 @@ function APUtil(Vault, controller, editor) {
 					glSel.appendChild(glOpt);
 				}
 				cellRight.appendChild(glSel);
-				$("#GLAccount" + iteration).select2({ width: '260px', placeholder: { text: '' } });
+				$("#GLAccount" + iteration).select2({ allowClear: true, placeholder: { text: '' } });
+				$("#GLAccount" + iteration).val(null).trigger("change");
 			}
 			startCell++;
 		}
@@ -552,56 +542,8 @@ function APUtil(Vault, controller, editor) {
 		}
 
 		$("#ItemNumber" + line)[0].value = item;
+		$("#ItemNumber" + line)[0].title = itemDesc;
 		$("#ItemDescription" + line)[0].value = itemDesc;
 		closeForm();
-	}
-
-	this.SaveItemNDesc = function (line) {
-		var item = document.getElementById("item").value;
-		var itemDesc = document.getElementById("ItemDescription").value;
-
-		if (item == "") {
-			alert("Item is required!");
-			return;
-		}
-
-		var ci = controller.Invoice;
-
-		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, ci.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
-		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
-		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-
-		for (var k = 0; k < ObjectSearchResults.count; k++) {
-			var props = ObjectSearchResultsProperties[k];
-			var InvoiceLine = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
-			var objID = new MFiles.ObjID();
-			if (InvoiceLine == line) {
-				objID.SetIDs(ObjectSearchResults[k].ObjVer.Type, ObjectSearchResults[k].ObjVer.ID);
-
-				var InvoiceObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
-				var InvoiceoObjProperties = Vault.ObjectOperations.GetObjectVersionAndProperties(InvoiceObjVer);
-
-				if (!InvoiceoObjProperties.VersionData.ObjectCheckedOut) {
-					var COInvoiceObjVer = Vault.ObjectOperations.CheckOut(objID);
-
-					var InvoiceItem = new MFiles.PropertyValue();
-					InvoiceItem.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemNumber");
-					InvoiceItem.TypedValue.SetValue(MFDatatypeText, item);
-					Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceItem);
-
-					var InvoiceItemDesc = new MFiles.PropertyValue();
-					InvoiceItemDesc.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.ItemDescription");
-					InvoiceItemDesc.TypedValue.SetValue(MFDatatypeText, itemDesc);
-					Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceItemDesc);
-
-					Vault.ObjectOperations.CheckIn(COInvoiceObjVer.ObjVer);
-				}
-
-				closeForm(true);
-				break;
-			}
-		}
-
 	}
 }

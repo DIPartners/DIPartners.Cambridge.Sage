@@ -84,13 +84,37 @@ function SetDetails(dashboard) {
     };
 
     gUtil.ResizeContentArea();
-    //    gUtil.GetGLAccount();
+    gUtil.GetGLAccount();
     SetInvoiceDetails(controller);
     SetPODetails(controller);
     SetPSDetails(controller);
     $("#ltabs").tabs("option", "active", 0);
     $("#rtabs").tabs("option", "active", 0);
     if (!isPopup) CreatePopupIcon();
+
+    let dropDownEl = $("#invoice_details_table");
+    let dropDownToggleEl = $("#ItemNumber0");
+
+
+    //var x = document.activeElement.tagName;
+    var browser = document.querySelector('#invoice_details_table');
+    browser.setActive();
+
+    dropDownEl.on("mouseover", function () {
+        dropDownEl.focus();
+        dropDownToggleEl.css({
+            "background": "#00aaff",
+            "border": "#00aaff 1px solid"
+        });
+    });
+    /*x = document.activeElement.tagName;
+    dropDownEl.on("mouseout", function () {
+        dropDownToggleEl.css({
+            "background": "transparent",
+            "border": "none"
+        });
+    });*/
+
 }
 
 function SetInvoiceDetails(controller) {
@@ -115,7 +139,7 @@ function SetInvoiceDetails(controller) {
 
     editor.table.append(
         '<tr><td colspan="6" align="center">' +
-        '    <table width="90%" id="invoice_details_table" class="details">' +
+        '    <table width="90%" id="invoice_details_table" class="details" autofocus="autofocus">' +
         '       <tr><th width="5%">-</th><th width="20%">Item</th><th width="10%">Qty</th><th width="15%">Unit $</th>' +
         '           <th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%">GL<br>Account</th></tr>' +
         '    </table>' +
@@ -137,15 +161,14 @@ function SetInvoiceDetails(controller) {
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
             var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
-            Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value
-            gUtil.GetGLAccount(GLAccount);
+            Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
 
             var htmlStr =
-                '<tr>' +
+                '<tr tabindex="0">' +
                 '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
                 '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
-                '       onclick="openForm(' + i + ')" ></td > ' +
+                '       onclick="openForm(' + i + ')"></td > ' +
                 '   <input type="hidden" id=\'ItemDescription' + i + '\' value="' + ItemDesc + '" /> ' +
                 '   <td><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
@@ -161,11 +184,13 @@ function SetInvoiceDetails(controller) {
                 '       </select></td>' +
                 '</tr>';
             TableBody.append(htmlStr);
-            ArrayVal[i] = (PONumber == "") ? htmlStr : PONumber + ", " + htmlStr;
-        }
+            $("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
+            $(".SelectGL").select2({ allowClear: true, width: '260px', placeholder: { text: '' } });
 
-        var SortedList = gUtil.SortLineNo(ArrayVal).join();
-        //TableBody.append(SortedList);
+            if (GLAccount == "") {
+                $("#GLAccount" + i).val(null).trigger("change");
+            }
+        }
     }
     else {
         var htmlStr =
@@ -188,17 +213,9 @@ function SetInvoiceDetails(controller) {
         TableBody.append(htmlStr);
     }
 
-    $(".SelectGL").on('select2:open', function (e) {
-        $(".SelectGL option[value='']").remove();
-        gUtil.toggleButton(false);
-    });
-    $(".SelectGL").select2(
-        {
-            width: '260px',
-            top: '20px',
-            placeholder: { text: '' }
-        });
+    $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
+
 
 
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
@@ -211,8 +228,8 @@ function SetInvoiceDetails(controller) {
         '<td colspan="2"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
         '</tr>'
     );
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal')
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified')
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal');
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified');
 }
 
 function SetPODetails(controller) {
@@ -641,7 +658,7 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
 
     var mfcontentDiv = $('<div>');
     mfcontentDiv.addClass('mf-content');
-    mfcontentDiv.css('height', '700px');
+    mfcontentDiv.css('height', '100%');
     MetaCard.append(mfcontentDiv);
 
     var mfpropertiesviewDiv = $('<div>');
@@ -656,13 +673,14 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     mfinternaldynamiccontrolsDiv.addClass('mf-internal-dynamic-controls');
     mfdynamiccontrolsDiv.append(mfinternaldynamiccontrolsDiv);
 
+    var scroll = $(window).outerHeight() - $("#mf-footer").outerHeight() - $("#titleLabel").height() - 20;
     var mfsectionDiv = $('<div>');
     mfsectionDiv.addClass('mf-section mf-section-properties');
     mfinternaldynamiccontrolsDiv.append(mfsectionDiv);
 
     var mfscrollableDiv = $('<div>');
     mfscrollableDiv.addClass('ui-scrollable');
-    mfscrollableDiv.css('height', '700px');
+    mfscrollableDiv.css('height', scroll + 'px');
     mfsectionDiv.append(mfscrollableDiv);
 
     var mfsectioncontentDiv = $('<div>');
@@ -768,5 +786,6 @@ function openForm(i) {
 function closeForm(val) {
     document.getElementById("popupDesc").style.display = "none";
     $("#popupDesc").empty();
+    $("#invoice_details_table").focus();
     if (val) RefreshTab();
 }
