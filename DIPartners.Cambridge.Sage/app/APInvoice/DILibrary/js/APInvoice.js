@@ -88,34 +88,37 @@ function SetDetails(dashboard) {
     SetInvoiceDetails(controller);
     SetPODetails(controller);
     SetPSDetails(controller);
-    $("#ltabs").tabs("option", "active", 0);
-    $("#rtabs").tabs("option", "active", 0);
     if (!isPopup) CreatePopupIcon();
+    $("#rtabs").tabs("option", "active", 0);
+    $("#ltabs").tabs("option", "active", 0);
 
-    let dropDownEl = $("#invoice_details_table");
-    let dropDownToggleEl = $("#ItemNumber0");
-
-
-    //var x = document.activeElement.tagName;
-    var browser = document.querySelector('#invoice_details_table');
-    browser.setActive();
-
-    dropDownEl.on("mouseover", function () {
-        dropDownEl.focus();
-        dropDownToggleEl.css({
-            "background": "#00aaff",
-            "border": "#00aaff 1px solid"
-        });
-    });
-    /*x = document.activeElement.tagName;
-    dropDownEl.on("mouseout", function () {
-        dropDownToggleEl.css({
-            "background": "transparent",
-            "border": "none"
-        });
-    });*/
+    /* //  $('a[href="#invoice_details_table"]').click();
+       let dropDownEl = $("#invoice_details_table");
+       let dropDownToggleEl = $("#ItemNumber0");
+   
+   
+       //var x = document.activeElement.tagName;
+       var browser = document.querySelector('#invoice_details_table');
+       browser.setActive();
+   
+       dropDownEl.on("mouseover", function () {
+           //alert(0);
+           dropDownToggleEl.attr("title", "test00");
+           dropDownToggleEl.focus();
+       });
+   
+       var el = document.querySelector('input[type="text"]');
+   */
+    /*//*x = document.activeElement.tagName;
+     dropDownEl.on("mouseout", function () {
+         dropDownToggleEl.css({
+             "background": "transparent",
+             "border": "none"
+         });
+     });*/
 
 }
+
 
 function SetInvoiceDetails(controller) {
     var editor = controller.Invoice;
@@ -139,9 +142,9 @@ function SetInvoiceDetails(controller) {
 
     editor.table.append(
         '<tr><td colspan="6" align="center">' +
-        '    <table width="90%" id="invoice_details_table" class="details" autofocus="autofocus">' +
+        '    <table width="90%" id="invoice_details_table" class="details">' +
         '       <tr><th width="5%">-</th><th width="20%">Item</th><th width="10%">Qty</th><th width="15%">Unit $</th>' +
-        '           <th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%">GL<br>Account</th></tr>' +
+        '           <th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%"><span>GL<br>Account</span></th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
@@ -164,11 +167,11 @@ function SetInvoiceDetails(controller) {
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
 
             var htmlStr =
-                '<tr tabindex="0">' +
+                '<tr>' +
                 '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
                 '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
-                '       onclick="openForm(' + i + ')"></td > ' +
+                '       onclick="openForm(' + i + ')" ></td > ' +
                 '   <input type="hidden" id=\'ItemDescription' + i + '\' value="' + ItemDesc + '" /> ' +
                 '   <td><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
@@ -184,12 +187,10 @@ function SetInvoiceDetails(controller) {
                 '       </select></td>' +
                 '</tr>';
             TableBody.append(htmlStr);
+
             $("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
             $(".SelectGL").select2({ allowClear: true, width: '260px', placeholder: { text: '' } });
-
-            if (GLAccount == "") {
-                $("#GLAccount" + i).val(null).trigger("change");
-            }
+            if (GLAccount == "") { $("#GLAccount" + i).val(null).trigger("change"); }
         }
     }
     else {
@@ -216,6 +217,37 @@ function SetInvoiceDetails(controller) {
     $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 
+    /*$('.SelectGL').on('select2:open', function (e) {
+        var container = $(this).select('select2-container');
+        var position = container.offset().top;
+        var availableHeight = $(window).height() - position - container.outerHeight();
+        var bottomPadding = 50; // Set as needed
+        $('ul.select2-results__options').css('max-height', (availableHeight - bottomPadding) + 'px');
+        $('.select2-dropdown').css('left', -200 + 'px');
+    });*/
+
+    $('.SelectGL').on('select2:open', function (e) {
+
+        var Element = $('#invoice_details_table')[0];
+        var Left = Element.getBoundingClientRect().left,
+            Top = Element.getBoundingClientRect().top,
+            Right = Element.getBoundingClientRect().right,
+            Bottom = Element.getBoundingClientRect().bottom;
+
+
+        var container = $(this).select('select2-container');
+
+        var tabW = $('#invoice_details_table')[0].clientWidth;
+        var position = container.offset().left;
+        var pos = $(this).select('select2-container').position().left;
+        var pos1 = $(this).select('span.select2-container.select2-container--default.select2-container--open').position().left;
+        $('.select2-dropdown').css('left', (tabW - 230 - pos) + 'px');
+        //$('.select2-dropdown').css('left', (tabW - (Right - $('.select2-dropdown')[0].clientWidth) - pos - container.outerHeight()) + 'px');
+        // var s = Right - (Right - $('.select2-dropdown')[0].clientWidth);
+        // $('.select2-dropdown').css('left', -(s) + 'px');
+        $('span.select2-container.select2-container--default.select2-container--open').style;
+        //$('.select2-dropdown').css('left', -(Right - $('.select2-dropdown')[0].clientWidth) + 'px');
+    });
 
 
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
@@ -316,9 +348,9 @@ function SetPSDetails(controller) {
 
 function ResetTabs() {
     $(".panel-left").empty();
-    $(".panel-left").append('<div id="ltabs"><ul class="nav nav-tabs"></ul></div>');
+    $(".panel-left").append('<div id="ltabs"><ul></ul></div>');
     $(".panel-right").empty();
-    $(".panel-right").append('<div id="rtabs"><ul class="nav nav-tabs role="tablist"></ul></div>');
+    $(".panel-right").append('<div id="rtabs"><ul></ul></div>');
     $('#ltabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
@@ -397,39 +429,16 @@ function FindObjects(Vault, OTAlias, PDAlias, PDType, Value) {
     return oSCs;
 }
 
-function SetInvoicePreview1() {
-
-    var tablist = 'rtabs';
-    var tabname = 'InvPre';
-    var tabdisplayname = 'Invoice Preview';
-
-    // Add the tab to the tab list
-    $('<li class="nav-item"><a class="nav-link active" aria-selected="true" role="tab" href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div class="tab-content" id="' + tabname + '"><div class="tab-pane fade" id="' + tabname + '" role="tabpanel"></div></div>').appendTo("#" + tablist);
-    $("#" + tablist).tabs("refresh");
-}
-
 function SetInvoicePreview() {
 
     var tablist = 'rtabs';
     var tabname = 'InvPre';
     var tabdisplayname = 'Invoice Preview';
-    var tabUL =
-        '<li class="nav-item" role = "presentation"> ' +
-        '    <a class="nav-link active" id="invoice-tab" data-toggle="tab" href="#' + tabname + '" ' +
-        '       role="tab" aria-controls="' + tabdisplayname + '" aria-selected="true" > ' + tabdisplayname + '</a > ' +
-        '</li>';
-    var tabDiv =
-        '<div class="tab-content" id="' + tabname + '">' +
-        '   <div class="tab-pane fade show active" id = "' + tabname + '" role = "tabpanel" aria-labelledby="' + tabname + '-tab"></div>' +
-        '</div>';
-    $(tabUL).appendTo("#" + tablist + " ul");
-    $(tabDiv).appendTo("#" + tablist);
 
     // Add the tab to the tab list
-    /*$('<li class="nav-item"><a class="nav-link active" aria-selected="true" role="tab" href="#' + tabname + '" onclick="javascript:LoadPreview()">' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<li class="nav-item"><a class="nav-link active" aria-selected="true" role="tab" href="#' + tabname + '" >' + tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
     $('<div class="tab-content" id="' + tabname + '"><div class="tab-pane fade" id="' + tabname + '" role="tabpanel"></div></div>').appendTo("#" + tablist);
-    $("#" + tablist).tabs("refresh");*/
+    $("#" + tablist).tabs("refresh");
 }
 
 function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
@@ -620,38 +629,11 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = tabid;
     editor.tabdisplayname = tabtitle;
-    if (tablist == "rtabs") {
-        toggleTab = ""
-        active = "";
-    }
-    else {
-        active = "active";
-        toggleTab = "aria-selected=\"true\"";
-    }
-
-
-    var tabUL =
-        '<li class="nav-item" role="presentation"> ' +
-        '    <a class="nav-link ' + active + '" id="invoice-tab" data-toggle="tab" href="#' + editor.cardname + '" ' +
-        '       role="tab" aria-controls="' + editor.tabdisplayname + '" ' + toggleTab + '> ' + editor.tabdisplayname + '</a> ' +
-        '</li>';
-    var tabDiv =
-        '<div class="tab-content" id="' + editor.tabname + '">' +
-        '   <div class="tab-pane fade show mf-metadatacard mf-mode-properties" id="' + editor.cardname + '" role="tabpanel" aria-labelledby="' + editor.tabname + '-tab"></div>' +
-        '</div>';
-    $(tabUL).appendTo("#" + tablist + " ul");
-    $(tabDiv).appendTo("#" + tablist);
-
 
     // Add the tab to the tab list
-    //$('<li class="nav-item"><a class="nav-link ' + active +'\" role="tab" href="#' + editor.tabname +'"' + toggleTab + '>'+editor.tabdisplayname+'</a></li>').appendTo("#" + tablist + " ul");
-    //$('<div class="tab-content" id="' + editor.tabname + '"><div class="tab-pane fade show active mf-metadatacard mf-mode-properties" id="' + editor.cardname + '"></div></div>').appendTo("#" + tablist);
+    $('<li class="nav-item"><a class="nav-link ' + active + '\" role="tab" href="#' + editor.tabname + '"' + toggleTab + '>' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div class="tab-content" id="' + editor.tabname + '"><div class="tab-pane fade show active mf-metadatacard mf-mode-properties" id="' + editor.cardname + '"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
-
-    // Create and initialize metadatacard widget.
-    //var metadatacard = $('#' + editor.cardname);
-    //metadatacard.lookupcontrolcontainer({});
-    //metadatacard.metadatacard("initialize", { apUtil: gUtil });
 
     var MetaCard = $('div #' + editor.cardname);
     MetaCard.addClass("mf-card-docked");

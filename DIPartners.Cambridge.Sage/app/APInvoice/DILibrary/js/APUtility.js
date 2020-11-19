@@ -39,9 +39,6 @@ function APUtil(Vault, controller, editor) {
 	$(".btn").mouseenter(function () {
 		$(this).css("background", "#7ecaf0");
 	}).mouseleave(function () { $(this).css("background", "#318CCC"); });
-	/*$("#discard-data").mouseenter(function () {
-		$(this).css("background", "#7ecaf0");
-	}).mouseleave(function () { $(this).css("background", "#318CCC"); });*/
 
 	$('li.gl').on('click', function (no) {
 		var content = $(this).text();
@@ -58,13 +55,12 @@ function APUtil(Vault, controller, editor) {
 
 	this.GetColIndex = function (pptName) {
 
-		if (pptName == "ItemNumber") return 1;
+		if (pptName == "ItemNumber" || pptName == "ItemDescription") return 1;
 		else if (pptName == "Quantity") return 2;
 		else if (pptName == "UnitPrice") return 3;
 		else if (pptName == "InvoiceLineExtension") return 4;
 		else if (pptName == "PONumber") return 5;
 		else if (pptName == "GLAccount") return 6;
-		else if (pptName == "ItemDescription") return 1;
 	}
 
 	this.DestroyOldDetails = function () {
@@ -546,4 +542,5 @@ function APUtil(Vault, controller, editor) {
 		$("#ItemDescription" + line)[0].value = itemDesc;
 		closeForm();
 	}
+
 }
