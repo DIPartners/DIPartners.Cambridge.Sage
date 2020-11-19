@@ -91,32 +91,6 @@ function SetDetails(dashboard) {
     if (!isPopup) CreatePopupIcon();
     $("#rtabs").tabs("option", "active", 0);
     $("#ltabs").tabs("option", "active", 0);
-
-    /* //  $('a[href="#invoice_details_table"]').click();
-       let dropDownEl = $("#invoice_details_table");
-       let dropDownToggleEl = $("#ItemNumber0");
-   
-   
-       //var x = document.activeElement.tagName;
-       var browser = document.querySelector('#invoice_details_table');
-       browser.setActive();
-   
-       dropDownEl.on("mouseover", function () {
-           //alert(0);
-           dropDownToggleEl.attr("title", "test00");
-           dropDownToggleEl.focus();
-       });
-   
-       var el = document.querySelector('input[type="text"]');
-   */
-    /*//*x = document.activeElement.tagName;
-     dropDownEl.on("mouseout", function () {
-         dropDownToggleEl.css({
-             "background": "transparent",
-             "border": "none"
-         });
-     });*/
-
 }
 
 
@@ -217,15 +191,6 @@ function SetInvoiceDetails(controller) {
     $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 
-    /*$('.SelectGL').on('select2:open', function (e) {
-        var container = $(this).select('select2-container');
-        var position = container.offset().top;
-        var availableHeight = $(window).height() - position - container.outerHeight();
-        var bottomPadding = 50; // Set as needed
-        $('ul.select2-results__options').css('max-height', (availableHeight - bottomPadding) + 'px');
-        $('.select2-dropdown').css('left', -200 + 'px');
-    });*/
-
     $('.SelectGL').on('select2:open', function (e) {
 
         var Element = $('#invoice_details_table')[0];
@@ -238,15 +203,8 @@ function SetInvoiceDetails(controller) {
         var container = $(this).select('select2-container');
 
         var tabW = $('#invoice_details_table')[0].clientWidth;
-        var position = container.offset().left;
         var pos = $(this).select('select2-container').position().left;
-        var pos1 = $(this).select('span.select2-container.select2-container--default.select2-container--open').position().left;
         $('.select2-dropdown').css('left', (tabW - 230 - pos) + 'px');
-        //$('.select2-dropdown').css('left', (tabW - (Right - $('.select2-dropdown')[0].clientWidth) - pos - container.outerHeight()) + 'px');
-        // var s = Right - (Right - $('.select2-dropdown')[0].clientWidth);
-        // $('.select2-dropdown').css('left', -(s) + 'px');
-        $('span.select2-container.select2-container--default.select2-container--open').style;
-        //$('.select2-dropdown').css('left', -(Right - $('.select2-dropdown')[0].clientWidth) + 'px');
     });
 
 
@@ -504,79 +462,6 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
 
     if (!propertyRequired)
         requiredspan = propertyLine.find('.mf-required-indicator').hide();
-}
-
-function generate_lookup(tableID, Vault, ObjVerProperties, propertyAlias) {
-    var propertyNumber = ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).PropertyDef;
-    var PropertyDef = Vault.PropertyDefOperations.GetPropertyDef(propertyNumber);
-    var propertyName = PropertyDef.Name;
-    var propertyType = PropertyDef.DataType;
-    var propertyValue = ObjVerProperties.SearchForPropertyByAlias(Vault, propertyAlias, true).Value.DisplayValue;
-    var propertyEditable = (PropertyDef.AutomaticValueType == 0 ? 1 : 0);
-    var classID = ObjVerProperties.SearchForProperty(MFBuiltInPropertyDefClass).TypedValue.getvalueaslookup().Item;
-    var assocPropDefs = Vault.ClassOperations.GetObjectClass(classID).AssociatedPropertyDefs;
-    var propertyRequired = gUtil.isRequired(assocPropDefs, propertyNumber);
-    if (propertyType == 8)
-        propertyValue = ((propertyValue == 'Yes') ? 'Yes' : 'No');
-    if (propertyType == 3)
-        propertyValue = '$' + propertyValue;
-    // Create container element
-    var LookupContatainer = $('<div class="mf-internal-lookups"></div>');
-    var divTag = $('<div class="mf-internal-lookup"></div>');
-    LookupContatainer.append(divTag);
-    LookupContatainer.addClass('mf-editable');
-    //	$(tableID).append(propertyLine);
-    tableID.append(LookupContatainer);
-
-    var items = this.model.GetSelectableValueItemStates();
-
-    // Enable each item if it is found from the array. 
-    for (var index in items) {
-        if (items[index] == this.COMPLETED_OR_APPROVED_ITEM_ID)
-            this.isCompletedItemFound = true;
-        else if (items[index] == this.REJECTED_ITEM_ID)
-            this.isRejectedItemFound = true;
-    }
-
-    // Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
-    LookupContatainer.hover(
-        function () {
-
-            // Set the hover theme. The special theme is set for workflow and workstates properties.
-            $(this).addClass("ui-state-hover");
-            if (propertyNumber == 38 || propertyNumber == 99)
-                $(this).addClass("ui-footer-hover");
-        },
-        function () {
-
-            // Remove the hover theme, as well as the special theme workflow and workstate properties.
-            $(this).removeClass("ui-state-hover");
-            if (propertyNumber == 38 || propertyNumber == 99)
-                $(this).removeClass("ui-footer-hover");
-        }
-    );
-    var sub = (propertyName == "Subtotal") ?
-        '                <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + propertyValue + '" disabled ></div > ' : "";
-
-    LookupContatainer.append(
-        '        <td class="mf-dynamic-namefield">' +
-        '            <div>' +
-        '                <span class="mf-property-' + propertyNumber + '-label">' + propertyName + '</span>' +
-        '                <span class="mf-required-indicator">*</span>' +
-        '            </div>' +
-        '        </td>' +
-        '        <td colspan="4" class="mf-dynamic-controlfield">' +
-        '            <div class="mf-control mf-dynamic-control mf-text">' +
-        '                <div class="mf-internal-container">' +
-        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' + sub +
-        '                </div>' +
-        '            </div>' +
-        '        </td>'
-    );
-
-
-    if (!propertyRequired)
-        requiredspan = LookupContatainer.find('.mf-required-indicator').hide();
 }
 
 function setProperty(Vault, editor, propertyAlias) {
