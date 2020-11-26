@@ -105,7 +105,7 @@ function APUtil(Vault, controller, editor) {
 		var propertyValue = new MFiles.PropertyValue();
 		var VaultOp = Vault.PropertyDefOperations;
 
-		var value = $("#" + pptName + no)[0].value;
+		var value = tbl.rows[no + 1].cells[this.GetColIndex(pptName)].querySelector('input').value;
 
 		propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + pptName);
 		propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
@@ -176,31 +176,6 @@ function APUtil(Vault, controller, editor) {
 			alert("GL Account is not found");
 			return null;
 		}
-
-		/*var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
-		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
-
-		if (PONO == "") return null;
-		var GLResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
-
-		var GLResultsObjVers = GLResults.GetAsObjectVersions().GetAsObjVers()
-		var GLSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(GLResultsObjVers);
-		var bFound = false;
-
-		for (var i = 0; i < GLSearchResultsProperties.Count; i++) {
-			var props = GLSearchResultsProperties[i];
-			var GLfromPO = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
-			if (GLfromPO == ObjectSearchResults[0].Title) {
-				bFound = true;
-				break;
-			}
-		}
-
-		if (!bFound) {
-			alert("Entered GL Account does not belong to PO");
-			return null;
-		}*/
 
 		var newGL = new MFiles.Lookup();
 		newGL.ObjectType = ObjectSearchResults[0].ObjVer.Type;
@@ -426,6 +401,27 @@ function APUtil(Vault, controller, editor) {
 			}
 			if (charCode > 31 && (charCode < 48 || charCode > 57))
 				return false;
+
+			return true;
+		} catch (w) {
+			alert(w);
+		}
+	};
+
+	this.isNumberKeyWithCurrency = function (evt, id) {
+		var val = $("#" + id)[0].value;
+		if (val.substring(0, 1) == "$") val = val.substring(1);
+		try {
+			var charCode = (evt.which) ? evt.which : event.keyCode;
+
+			if (charCode == 46) {	// del key
+				if (!(val.indexOf(".") > -1)) {
+					return true;
+				}
+			}
+			if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+
+			$("#" + id)[0].value = "$" + val;
 
 			return true;
 		} catch (w) {

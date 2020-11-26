@@ -220,6 +220,9 @@ function SetInvoiceDetails(controller) {
     );
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal');
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified');
+
+    generate_addedRow(editor.table, 'Freight');
+    generate_addedRow(editor.table, 'Taxable');
 }
 
 function SetPODetails(controller) {
@@ -306,9 +309,9 @@ function SetPSDetails(controller) {
 
 function ResetTabs() {
     $(".panel-left").empty();
-    $(".panel-left").append('<div id="ltabs"><ul></ul></div>');
+    $(".panel-left").append('<div id="ltabs"><ul class="nav nav-tabs" role="tablist"></ul></div>');
     $(".panel-right").empty();
-    $(".panel-right").append('<div id="rtabs"><ul></ul></div>');
+    $(".panel-right").append('<div id="rtabs"><ul class="nav nav-tabs" role="tablist"></ul></div>');
     $('#ltabs').tabs({
         activate: function (event, ui) {
             var tabID = ui.newPanel[0].id;
@@ -418,15 +421,14 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
     propertyLine.addClass('mf-dynamic-row mf-property-' + propertyNumber);
     propertyLine.attr('id', propertyNumber)
     // Check if field is editable. If it is, add class 'mf-editable'
-    if (propertyEditable)
-        propertyLine.addClass('mf-editable');
+    //if (propertyEditable)
+    propertyLine.addClass('mf-editable');
     //	$(tableID).append(propertyLine);
     tableID.append(propertyLine);
 
     // Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
     propertyLine.hover(
         function () {
-
             // Set the hover theme. The special theme is set for workflow and workstates properties.
             $(this).addClass("ui-state-hover");
             if (propertyNumber == 38 || propertyNumber == 99)
@@ -440,28 +442,77 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
                 $(this).removeClass("ui-footer-hover");
         }
     );
+
+    var line;
+    if (propertyName == "Verified") {
+        var verifiedChk = (propertyValue == "No") ? "" : "checked";
+        line = '<input type="checkbox" id="Verified" ' + verifiedChk + '>';
+    }
+    else {
+        line = '<div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>';
+    }
+
     var sub = (propertyName == "Subtotal") ?
-        '                <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + propertyValue + '" disabled ></div > ' : "";
+        '<div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + propertyValue + '" disabled ></div> ' : "";
 
     propertyLine.append(
-        '        <td class="mf-dynamic-namefield">' +
-        '            <div>' +
-        '                <span class="mf-property-' + propertyNumber + '-label">' + propertyName + '</span>' +
-        '                <span class="mf-required-indicator">*</span>' +
-        '            </div>' +
-        '        </td>' +
-        '        <td colspan="4" class="mf-dynamic-controlfield">' +
-        '            <div class="mf-control mf-dynamic-control mf-text">' +
-        '                <div class="mf-internal-container">' +
-        '                    <div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>' + sub +
-        '                </div>' +
-        '            </div>' +
-        '        </td>'
+        '<td class="mf-dynamic-namefield">' +
+        '    <div>' +
+        '        <span class="mf-property-' + propertyNumber + '-label">' + propertyName + '</span>' +
+        '        <span class="mf-required-indicator">*</span>' +
+        '    </div>' +
+        '</td>' +
+        '<td colspan="4" class="mf-dynamic-controlfield">' +
+        '    <div class="mf-control mf-dynamic-control mf-text">' +
+        '        <div class="mf-internal-container">' + line + sub +
+        '        </div>' +
+        '    </div>' +
+        '</td>'
     );
 
 
     if (!propertyRequired)
         requiredspan = propertyLine.find('.mf-required-indicator').hide();
+}
+
+function generate_addedRow(tableID, propertyName) {
+
+    // Create container elemehhnt
+    var propertyLine = $('<tr>');
+    var propertyNumber = 0;
+    propertyLine.addClass('mf-dynamic-row');
+    propertyLine.attr('id', propertyName)
+    // Check if field is editable. If it is, add class 'mf-editable'
+    propertyLine.addClass('mf-editable');
+    //	$(tableID).append(propertyLine);
+    tableID.append(propertyLine);
+
+    // Add hover handler (IE 10 css pseudo selector :hover is not detecting mouse leave events)
+    propertyLine.hover(
+        function () {
+            $(this).addClass("ui-state-hover");
+        },
+        function () {
+            $(this).removeClass("ui-state-hover");
+        }
+    );
+
+    var bottomLine = (propertyName == "Freight") ?
+        '<div class="mf-internal-text"><input type="text" id="txt' + propertyName + '" value="$" onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)" style="width:50%"></div>' :
+        '<input type="checkbox" id="chk' + propertyName + '" value="" >';
+
+    propertyLine.append(
+        '<td class="mf-dynamic-namefield">' +
+        '    <div>' +
+        '        <span>' + propertyName + '</span>' +
+        '    </div>' +
+        '</td>' +
+        '<td colspan="4" class="mf-dynamic-controlfield">' +
+        '    <div class="mf-control mf-dynamic-control mf-text">' +
+        '        <div class="mf-internal-container">' + bottomLine + '</div>' +
+        '    </div>' +
+        '</td>'
+    );
 }
 
 function setProperty(Vault, editor, propertyAlias) {
@@ -509,14 +560,14 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var Vault = controller.Vault;
     controller.editor = editor;
     var cardid = (typeof controller.cards === 'undefined') ? 0 : controller.cards + 1;
-    var toggleTab, active;
     controller.cards = cardid;
     editor.cardname = 'metadatacard-' + cardid;
     editor.tabname = tabid;
     editor.tabdisplayname = tabtitle;
+    var active = (tablist == "ltabs") ? "active" : "";
 
     // Add the tab to the tab list
-    $('<li class="nav-item"><a class="nav-link ' + active + '\" role="tab" href="#' + editor.tabname + '"' + toggleTab + '>' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<li class="nav-item"><a class="nav-link ' + active + '\" href="#' + editor.tabname + '" role="tab" data-toggle="tab" >' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
     $('<div class="tab-content" id="' + editor.tabname + '"><div class="tab-pane fade show active mf-metadatacard mf-mode-properties" id="' + editor.cardname + '"></div></div>').appendTo("#" + tablist);
     $("#" + tablist).tabs("refresh");
 
@@ -558,6 +609,7 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var mfdynamicTab = $('<table>');
     mfdynamicTab.addClass('mf-dynamic-table');
     mfdynamicTab.attr('id', 'mf-property-table');
+    mfdynamicTab.css("margin-bottom", "30px");
     mfsectioncontentDiv.append(mfdynamicTab);
 
     // Bind click event to this element with 'metadatacard' namespace.
