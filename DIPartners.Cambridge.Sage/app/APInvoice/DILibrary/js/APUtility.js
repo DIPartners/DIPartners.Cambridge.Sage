@@ -498,8 +498,8 @@ function APUtil(Vault, controller, editor) {
 		var tabh = $(".ui-tabs-nav").height();
 		$(".mf-layout-vertical").height(win);
 		$(".ui-tabs-panel").height(pch - tabh);
-		$(".mf-section-properties").outerHeight($(".ui-tabs-panel").height());
-
+		$("mf-section, .mf-section-properties").height($(".panel-left").height() - 30);
+		$(".ui-scrollable").css('height', $(".panel-left").height() - 30);
 	};
 
 	this.FindGLObjects = function (OTAlias) {

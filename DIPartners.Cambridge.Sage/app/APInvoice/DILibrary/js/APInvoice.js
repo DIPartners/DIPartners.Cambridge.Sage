@@ -574,50 +574,46 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var MetaCard = $('div #' + editor.cardname);
     MetaCard.addClass("mf-card-docked");
 
-    var mfcontentDiv = $('<div>');
-    mfcontentDiv.addClass('mf-content');
-    mfcontentDiv.css('height', '100%');
-    MetaCard.append(mfcontentDiv);
+    //var mfcontentDiv = $('<div>');
+    //mfcontentDiv.addClass('mf-content');
+    //mfcontentDiv.css('height', '100%');
+    //MetaCard.append(mfcontentDiv);
 
-    var mfpropertiesviewDiv = $('<div>');
-    mfpropertiesviewDiv.attr('id', 'mf-properties-view')
-    mfcontentDiv.append(mfpropertiesviewDiv);
+    //var mfpropertiesviewDiv = $('<div>');
+    //mfpropertiesviewDiv.attr('id', 'mf-properties-view')
+    //mfcontentDiv.append(mfpropertiesviewDiv);
 
-    var mfdynamiccontrolsDiv = $('<div>');
-    mfdynamiccontrolsDiv.addClass('mf-dynamic-controls');
-    mfpropertiesviewDiv.append(mfdynamiccontrolsDiv);
+    //var mfdynamiccontrolsDiv = $('<div>');
+    //mfdynamiccontrolsDiv.addClass('mf-dynamic-controls');
+    //mfpropertiesviewDiv.append(mfdynamiccontrolsDiv);
 
-    var mfinternaldynamiccontrolsDiv = $('<div>');
-    mfinternaldynamiccontrolsDiv.addClass('mf-internal-dynamic-controls');
-    mfdynamiccontrolsDiv.append(mfinternaldynamiccontrolsDiv);
+    //var mfinternaldynamiccontrolsDiv = $('<div>');
+    //mfinternaldynamiccontrolsDiv.addClass('mf-internal-dynamic-controls');
+    //mfdynamiccontrolsDiv.append(mfinternaldynamiccontrolsDiv);
+    var scroll = $(".panel-left").height() - 30;
 
-    var scroll = $(window).outerHeight() - $("#mf-footer").outerHeight() - $("#titleLabel").height() - 20;
     var mfsectionDiv = $('<div>');
     mfsectionDiv.addClass('mf-section mf-section-properties');
-    mfinternaldynamiccontrolsDiv.append(mfsectionDiv);
+    mfsectionDiv.css('height', scroll);
+    MetaCard.append(mfsectionDiv);
+
 
     var mfscrollableDiv = $('<div>');
     mfscrollableDiv.addClass('ui-scrollable');
-    mfscrollableDiv.css('height', scroll + 'px');
+    mfscrollableDiv.css('height', scroll);
     mfsectionDiv.append(mfscrollableDiv);
 
-    var mfsectioncontentDiv = $('<div>');
-    mfsectioncontentDiv.addClass('mf-section-content mf-dynamic-properties');
-    mfsectioncontentDiv.attr('id', 'a' + cardid);
-    mfscrollableDiv.append(mfsectioncontentDiv);
+
+    //var mfsectioncontentDiv = $('<div>');
+    //mfsectioncontentDiv.addClass('mf-section-content mf-dynamic-properties');
+    //mfsectioncontentDiv.attr('id', 'a' + cardid);
+    //mfscrollableDiv.append(mfsectioncontentDiv);
 
     var mfdynamicTab = $('<table>');
     mfdynamicTab.addClass('mf-dynamic-table');
     mfdynamicTab.attr('id', 'mf-property-table');
     mfdynamicTab.css("margin-bottom", "30px");
-    mfsectioncontentDiv.append(mfdynamicTab);
-
-    // Bind click event to this element with 'metadatacard' namespace.
-    MetaCard.bind("click.metadatacard", function (event) {
-        //alert("Card Clicked!!!");
-        // metadatacard.requestEditMode(null);
-        //self.editManager.requestEditMode(null);
-    });
+    mfscrollableDiv.append(mfdynamicTab);
 
     editor.metadatacard = MetaCard;
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
