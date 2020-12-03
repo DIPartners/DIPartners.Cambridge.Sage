@@ -117,8 +117,8 @@ function SetInvoiceDetails(controller) {
     editor.table.append(
         '<tr><td colspan="6" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details">' +
-        '       <tr><th width="5%">-</th><th width="20%">Item</th><th width="10%">Qty</th><th width="15%">Unit $</th>' +
-        '           <th width="10%">Ext $</th><th width="10%">PO#</th><th width="15%"><span>GL<br>Account</span></th></tr>' +
+        '       <tr><th scope="col" width="5%">-</th><th scope="col" width="20%">Item</th><th scope="col" width="10%">Qty</th><th scope="col" width="15%">Unit $</th>' +
+        '           <th scope="col" width="10%">Ext $</th><th scope="col" width="10%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
@@ -142,69 +142,59 @@ function SetInvoiceDetails(controller) {
 
             var htmlStr =
                 '<tr>' +
-                '   <td style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
+                '   <td scope="row" style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
                 '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
-                '   <td><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
+                '   <td data-label="Item" ><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
                 '       onclick="openForm(' + i + ')" ></td > ' +
                 '   <input type="hidden" id=\'ItemDescription' + i + '\' value="' + ItemDesc + '" /> ' +
-                '   <td><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
+                '   <td data-label="Qty" ><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
+                '   <td data-label="Unit $"><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
+                '   <td data-label="Ext $" ><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
+                '   <td data-label="PO#" ><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
+                '   <td data-label="GL Account" ><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
                 '       </select></td>' +
                 '</tr>';
             TableBody.append(htmlStr);
 
             $("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
-            $(".SelectGL").select2({ allowClear: true, width: '260px', placeholder: { text: '' } });
             if (GLAccount == "") { $("#GLAccount" + i).val(null).trigger("change"); }
         }
     }
     else {
         var htmlStr =
             '<tr>' +
-            '   <td style="padding:0px";><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
+            '   <td scope="row" style="padding:0px";><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
             '        title="delete item" alt = "del" onclick = "gUtil.removeRow(this)" ></td > ' +
-            '   <td style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value="" onclick="openForm(0)" ></td >' +
-            '   <input type="hidden" id=\'ItemDescription0' + i + '\' value="" /> ' +
-            '   <td><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
+            '   <td  data-label="Item" style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value="" onclick="openForm(0)" ></td >' +
+            '   <input type="hidden" id=\'ItemDescription0\' value="" /> ' +
+            '   <td data-label="Item" ><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td>' +
-            '   <td><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
+            '   <td data-label="Qty" ><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
-            '   <td><input type="text" id="InvoiceLineExtension0" value="" readonly="true"></td>' +
-            '   <td><input type="text" class="inputData" id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
-            '   <td><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
+            '   <td data-label="Unit $" ><input type="text" id="InvoiceLineExtension0" value="" readonly="true"></td>' +
+            '   <td data-label="Ext $" ><input type="text" class="inputData" id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td data-label="GL Account" ><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
             '       </select> ' +
             '   </td>' +
             '</tr>';
 
         TableBody.append(htmlStr);
+
+        $("#GLAccount0 option[value=\"" + GLAccount + "\"]").prop("selected", true);
+        if (GLAccount == "") { $("#GLAccount0").val(null).trigger("change"); }
     }
-
+    $(".SelectGL").select2({ allowClear: true, width: '260px', placeholder: { text: '' } });
     $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
-    $(".inputData").click(function (event) { gUtil.toggleButton(false); });
-
     $('.SelectGL').on('select2:open', function (e) {
-
-        var Element = $('#invoice_details_table')[0];
-        var Left = Element.getBoundingClientRect().left,
-            Top = Element.getBoundingClientRect().top,
-            Right = Element.getBoundingClientRect().right,
-            Bottom = Element.getBoundingClientRect().bottom;
-
-
-        var container = $(this).select('select2-container');
-
         var tabW = $('#invoice_details_table')[0].clientWidth;
         var pos = $(this).select('select2-container').position().left;
-        $('.select2-dropdown').css('left', (tabW - 230 - pos) + 'px');
+        $('.select2-dropdown').css('left', (tabW - 255 - pos) + 'px');
     });
 
 
@@ -223,6 +213,7 @@ function SetInvoiceDetails(controller) {
 
     generate_addedRow(editor.table, 'Freight');
     generate_addedRow(editor.table, 'Taxable');
+    $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 }
 
 function SetPODetails(controller) {
@@ -446,7 +437,7 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
     var line;
     if (propertyName == "Verified") {
         var verifiedChk = (propertyValue == "No") ? "" : "checked";
-        line = '<input type="checkbox" id="Verified" ' + verifiedChk + '>';
+        line = '<input type="checkbox" id="Verified" class="inputData"' + verifiedChk + '>';
     }
     else {
         line = '<div class="mf-internal-text mf-property-' + propertyNumber + '-text-0">' + propertyValue + '</div>';
@@ -498,8 +489,8 @@ function generate_addedRow(tableID, propertyName) {
     );
 
     var bottomLine = (propertyName == "Freight") ?
-        '<div class="mf-internal-text"><input type="text" id="txt' + propertyName + '" value="$" onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)" style="width:50%"></div>' :
-        '<input type="checkbox" id="chk' + propertyName + '" value="" >';
+        '<div class="mf-internal-text"><input type="text" id="txt' + propertyName + '" value="$" class="inputData" onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)" style="width:50%"></div>' :
+        '<input type="checkbox" id="chk' + propertyName + '" class="inputData" onclick="gUtil.UpdateInvoice()"; >';
 
     propertyLine.append(
         '<td class="mf-dynamic-namefield">' +
@@ -556,6 +547,44 @@ function setProperty(Vault, editor, propertyAlias) {
 }
 
 function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
+    controller.editor = editor;
+    var cardid = (typeof controller.cards === 'undefined') ? 0 : controller.cards + 1;
+    controller.cards = cardid;
+    editor.cardname = 'metadatacard-' + cardid;
+    editor.tabname = tabid;
+    editor.tabdisplayname = tabtitle;
+    var active = (tablist == "ltabs") ? "active" : "";
+
+    // Add the tab to the tab list
+    $('<li class="nav-item"><a class="nav-link ' + active + '\" href="#' + editor.tabname + '" role="tab" data-toggle="tab" >' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
+    $('<div class="tab-content" id="' + editor.tabname + '"><div class="tab-pane fade show active mf-metadatacard mf-mode-properties" id="' + editor.cardname + '"></div></div>').appendTo("#" + tablist);
+    $("#" + tablist).tabs("refresh");
+
+    var MetaCard = $('div #' + editor.cardname);
+    MetaCard.addClass("mf-card-docked");
+
+    var scroll = $(".panel-left").height() - 30;
+    var mfsectionDiv = $('<div>');
+    mfsectionDiv.addClass('mf-section mf-section-properties');
+    mfsectionDiv.css('height', scroll);
+    MetaCard.append(mfsectionDiv);
+
+    var mfscrollableDiv = $('<div>');
+    mfscrollableDiv.addClass('ui-scrollable');
+    mfscrollableDiv.css('height', scroll);
+    mfsectionDiv.append(mfscrollableDiv);
+
+    var mfdynamicTab = $('<table>');
+    mfdynamicTab.addClass('mf-dynamic-table');
+    mfdynamicTab.attr('id', 'mf-property-table');
+    mfdynamicTab.css("margin-bottom", "30px");
+    mfscrollableDiv.append(mfdynamicTab);
+
+    editor.metadatacard = MetaCard;
+    editor.table = $('div #' + editor.cardname + ' #mf-property-table');
+}
+
+function CreateMetadataCard1(controller, editor, tablist, tabid, tabtitle) {
     var self = this;
     var Vault = controller.Vault;
     controller.editor = editor;
@@ -574,46 +603,44 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     var MetaCard = $('div #' + editor.cardname);
     MetaCard.addClass("mf-card-docked");
 
-    //var mfcontentDiv = $('<div>');
-    //mfcontentDiv.addClass('mf-content');
-    //mfcontentDiv.css('height', '100%');
-    //MetaCard.append(mfcontentDiv);
+    var mfcontentDiv = $('<div>');
+    mfcontentDiv.addClass('mf-content');
+    mfcontentDiv.css('height', '100%');
+    MetaCard.append(mfcontentDiv);
 
-    //var mfpropertiesviewDiv = $('<div>');
-    //mfpropertiesviewDiv.attr('id', 'mf-properties-view')
-    //mfcontentDiv.append(mfpropertiesviewDiv);
+    var mfpropertiesviewDiv = $('<div>');
+    mfpropertiesviewDiv.attr('id', 'mf-properties-view')
+    mfcontentDiv.append(mfpropertiesviewDiv);
 
-    //var mfdynamiccontrolsDiv = $('<div>');
-    //mfdynamiccontrolsDiv.addClass('mf-dynamic-controls');
-    //mfpropertiesviewDiv.append(mfdynamiccontrolsDiv);
+    var mfdynamiccontrolsDiv = $('<div>');
+    mfdynamiccontrolsDiv.addClass('mf-dynamic-controls');
+    mfpropertiesviewDiv.append(mfdynamiccontrolsDiv);
 
-    //var mfinternaldynamiccontrolsDiv = $('<div>');
-    //mfinternaldynamiccontrolsDiv.addClass('mf-internal-dynamic-controls');
-    //mfdynamiccontrolsDiv.append(mfinternaldynamiccontrolsDiv);
-    var scroll = $(".panel-left").height() - 30;
+    var mfinternaldynamiccontrolsDiv = $('<div>');
+    mfinternaldynamiccontrolsDiv.addClass('mf-internal-dynamic-controls');
+    mfdynamiccontrolsDiv.append(mfinternaldynamiccontrolsDiv);
 
+    var scroll = $(window).outerHeight() - $("#mf-footer").outerHeight() - $("#titleLabel").height() - 20;
     var mfsectionDiv = $('<div>');
     mfsectionDiv.addClass('mf-section mf-section-properties');
-    mfsectionDiv.css('height', scroll);
-    MetaCard.append(mfsectionDiv);
-
+    mfinternaldynamiccontrolsDiv.append(mfsectionDiv);
 
     var mfscrollableDiv = $('<div>');
     mfscrollableDiv.addClass('ui-scrollable');
-    mfscrollableDiv.css('height', scroll);
+    //mfscrollableDiv.css('height', scroll + 'px');
+    mfscrollableDiv.css('height', '700px');
     mfsectionDiv.append(mfscrollableDiv);
 
-
-    //var mfsectioncontentDiv = $('<div>');
-    //mfsectioncontentDiv.addClass('mf-section-content mf-dynamic-properties');
-    //mfsectioncontentDiv.attr('id', 'a' + cardid);
-    //mfscrollableDiv.append(mfsectioncontentDiv);
+    var mfsectioncontentDiv = $('<div>');
+    mfsectioncontentDiv.addClass('mf-section-content mf-dynamic-properties');
+    mfsectioncontentDiv.attr('id', 'a' + cardid);
+    mfscrollableDiv.append(mfsectioncontentDiv);
 
     var mfdynamicTab = $('<table>');
     mfdynamicTab.addClass('mf-dynamic-table');
     mfdynamicTab.attr('id', 'mf-property-table');
     mfdynamicTab.css("margin-bottom", "30px");
-    mfscrollableDiv.append(mfdynamicTab);
+    mfsectioncontentDiv.append(mfdynamicTab);
 
     editor.metadatacard = MetaCard;
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
@@ -635,7 +662,6 @@ function LoadPreview() {
     DisplaySearchCondition.Expression.DataPropertyValuePropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.InvoiceName")
     DisplaySearchCondition.TypedValue.SetValue(MFDatatypeText, editor.ObjectVersionProperties[0].Value.DisplayValue);
     DisplaySearchConditions.Add(-1, DisplaySearchCondition);
-
 
     var DisplayResult = Vault.ObjectSearchOperations.SearchForObjectsByConditions(DisplaySearchConditions, MFSearchFlagNone, false);
     var doc = Vault.ObjectOperations.GetLatestObjectVersionAndProperties(DisplayResult[0].ObjVer.ObjID, false);
@@ -692,8 +718,11 @@ function openForm(i) {
     modal.width = $(".page-container").width() + "px";
     modal.height = $(".panel-left").height() + "px";
 
-    $(".modal-content").css("margin-top", (cell.offsetTop + $("#invoice_details_table tr").height() - 10) + "px");
-    $(".modal-content").css("margin-left", (cell.offsetLeft + tbl.rows[i + 1].cells[0].offsetWidth + 10) + "px");
+    if (cell.offsetTop + cell.offsetHeight + $(".modal-content").height() > $("#invoice_details_table").height())
+        $(".modal-content").css("margin-top", (cell.offsetTop - $(".modal-content").height() - 25) + "px");
+    else
+        $(".modal-content").css("margin-top", (cell.offsetTop + $("#invoice_details_table tr").height() - 22) + "px");
+    $(".modal-content").css("margin-left", (cell.offsetLeft + tbl.rows[i + 1].cells[0].offsetWidth) - 15 + "px");
 
     $("#item").focus();
 }
