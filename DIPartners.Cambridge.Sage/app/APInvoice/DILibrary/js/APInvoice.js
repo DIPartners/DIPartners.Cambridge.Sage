@@ -94,6 +94,149 @@ function SetDetails(dashboard) {
 }
 
 
+function SetInvoiceDetails1(controller) {
+    var editor = controller.Invoice;
+    var Vault = controller.Vault;
+    var tabname = 'Invoice';
+    var tabdisplayname = tabname;
+    var ArrayVal = [];
+
+    CreateMetadataCard(controller, editor, "ltabs", tabname, tabdisplayname);
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.InvoiceNumber')
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Date')
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Vendor')
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.POReference')
+
+    // HKo
+    SetInvoicePreview();
+    LoadPreview();
+
+    var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+        FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
+
+    editor.table.append(
+        '<tr><td colspan="6" align="center">' +
+        '    <table width="90%" id="invoice_details_table" class="details mf-dynamic-table">' +
+        '       <tr><th scope="col" width="5%">-</th><th scope="col" width="20%">Item</th><th scope="col" width="10%">Qty</th><th scope="col" width="15%">Unit $</th>' +
+        '           <th scope="col" width="15%">Ext $</th><th scope="col" width="8%">TAX</th><th scope="col" width="8%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
+        '    </table>' +
+        '</td></tr>' +
+        '');
+    var TableBody = editor.table.find('#invoice_details_table');
+    var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
+    var Total = 0, Count = ObjectSearchResults.Count
+
+    if (ObjectSearchResults.Count > 0) {
+        var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
+        for (var i = 0; i < Count; i++) {
+            var props = ObjectSearchResultsProperties[i];
+            var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
+            var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
+            var ItemDesc = props.SearchForPropertyByAlias(Vault, "vProperty.ItemDescription", true).Value.DisplayValue;
+            var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
+            var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            var Tax = "HI";
+            var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
+            var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
+            Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
+            var curNo = Number(PONumber.split(" - ").pop().trim()) - 1;
+            var removeState = (PONumber != "" || Qty == "0") ?
+                '   <td scope="row" style="cursor:default;"></td>' :
+                '   <td scope="row" style="padding:0px; text-align:center;"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
+                '       alt="del" onclick = "gUtil.removeRow(this)"></td> ';
+
+            var htmlStr =
+                '<tr>' + removeState +
+                '   <td data-label="Item" ><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
+                '       onclick="openForm(' + curNo + ')" ></td > ' +
+                '   <input type="hidden" id=\'ItemDescription' + i + '\' value="' + ItemDesc + '" /> ' +
+                '   <td data-label="Qty"><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
+                '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
+                '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
+                '   <td data-label="Unit $"><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
+                '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
+                '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
+                '   <td data-label="Ext $"><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
+                '   <td data-label="TAX"><input type="text" id=\'Tax' + i + '\' value="' + Tax + '" readonly="true"></td>' +
+                '   <td data-label="PO#"><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
+                '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
+                '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
+                '   <td data-label="GL Account" ><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
+                '       </select></td>' +
+                '</tr>';
+
+            //TableBody.append(htmlStr);
+            //$("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
+            //if (GLAccount == "") { $("#GLAccount" + i).val(null).trigger("change"); }
+
+            ArrayVal[i] = PONumber + ", " + htmlStr;
+        }
+        var SortedList = gUtil.SortLineNo(ArrayVal).join();
+
+        TableBody.append(SortedList);
+
+        for (var j = 0; j < ObjectSearchResults.Count; j++) {
+            var t = Number($("#PONumber" + j)[0].title.split(" - ").pop().trim()) - 1;
+            $("#GLAccount" + t + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
+            if (GLAccount == "") { $("#GLAccount" + t).val(null).trigger("change"); }
+        }
+    }
+    else {
+        var htmlStr =
+            '<tr>' +
+            '   <td scope="row" style="padding:0px; text-align:center;"><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
+            '        title="delete item" alt = "del" onclick = "gUtil.removeRow(this)" ></td > ' +
+            '   <td  data-label="Item" style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value="" onclick="openForm(0)" ></td >' +
+            '       <input type="hidden" id=\'ItemDescription0\' value="" /> ' +
+            '   <td data-label="Qty" ><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
+            '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td>' +
+            '   <td data-label="Unit $" ><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
+            '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
+            '   <td data-label="Ext $" ><input type="text" class="inputData" id="InvoiceLineExtension0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td data-label="TAX" ><input type="text" id="Tax0" value="" readonly="true"></td>' +
+            '   <td data-label="PO#" ><input type="text" id="PONumber0" value="" readonly="true"></td>' +
+            '   <td data-label="GL Account" ><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
+            '       </select> ' +
+            '   </td>' +
+            '</tr>';
+
+        TableBody.append(htmlStr);
+
+        $("#GLAccount0 option[value=\"" + GLAccount + "\"]").prop("selected", true);
+        if (GLAccount == "") { $("#GLAccount0").val(null).trigger("change"); }
+    }
+    $(".SelectGL").select2({ allowClear: true, width: '260px', placeholder: { text: '' } });
+    $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
+    $('.SelectGL').on('select2:open', function (e) {
+        var tabW = $('#invoice_details_table')[0].clientWidth;
+        var pos = $(this).select('select2-container').position().left;
+        $('.select2-dropdown').css('left', (tabW - 255 - pos) + 'px');
+    });
+
+    var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
+    var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
+    TableBody.append(
+        '<tr>' +
+        '<td style="text-align:center"><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
+        '       onclick="gUtil.addRowToTable(\'invoice_details_table\');"><strong>+</strong></a ></td > ' +
+        '<td colspan="4"><div class="gp-balance">' +
+        '   <label for="Total" id="Balanced" class="Balance ' + balance.split(" ").join("") + '" > ' + balance + '</label> ' +
+        '   <span id="totalSpan"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></span></div></td>' +
+        '<td data-label="TAX" ><input type="text" id="Tax0" value="" readonly="true"></td>' +
+        '<td colspan="2"></td>' +
+        '</tr>'
+    );
+
+    generate_addedRow(editor.table, 'Tax');
+    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal');
+    //generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified');
+
+    generate_addedRow(editor.table, 'Freight');
+    generate_addedRow(editor.table, 'TaxCode');
+    $(".inputData").click(function (event) { gUtil.toggleButton(false); });
+}
+
 function SetInvoiceDetails(controller) {
     var editor = controller.Invoice;
     var Vault = controller.Vault;
@@ -116,19 +259,19 @@ function SetInvoiceDetails(controller) {
 
     editor.table.append(
         '<tr><td colspan="6" align="center">' +
-        '    <table width="90%" id="invoice_details_table" class="details">' +
+        '    <table width="90%" id="invoice_details_table" class="details mf-dynamic-table">' +
         '       <tr><th scope="col" width="5%">-</th><th scope="col" width="20%">Item</th><th scope="col" width="10%">Qty</th><th scope="col" width="15%">Unit $</th>' +
-        '           <th scope="col" width="10%">Ext $</th><th scope="col" width="10%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
+        '           <th scope="col" width="15%">Ext $</th><th scope="col" width="8%">TAX</th><th scope="col" width="8%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
     var TableBody = editor.table.find('#invoice_details_table');
     var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
-    var Total = 0
+    var Total = 0, Count = ObjectSearchResults.Count
 
     if (ObjectSearchResults.Count > 0) {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-        for (var i = 0; i < ObjectSearchResults.Count; i++) {
+        for (var i = 0; i < Count; i++) {
             var props = ObjectSearchResultsProperties[i];
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
@@ -136,49 +279,66 @@ function SetInvoiceDetails(controller) {
             var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            var Tax = "HI";
             var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
             var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
+            var curNo = Number(PONumber.split(" - ").pop().trim()) - 1;
+            var removeState = (PONumber != "" || Qty == "0") ?
+                '   <td scope="row" style="cursor:default;"></td>' :
+                '   <td scope="row" style="padding:0px; text-align:center;"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
+                '       alt="del" onclick = "gUtil.removeRow(this)"></td> ';
 
             var htmlStr =
-                '<tr>' +
-                '   <td scope="row" style="padding:0px; text-align:center"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
-                '       alt="del" onclick = "gUtil.removeRow(this)" ></td> ' +
+                '<tr>' + removeState +
                 '   <td data-label="Item" ><input type="text" class="inputData" id=\'ItemNumber' + i + '\' value="' + Item + '" title="' + ItemDesc + '" ' +
-                '       onclick="openForm(' + i + ')" ></td > ' +
+                '       onclick="openForm(' + curNo + ')" ></td > ' +
                 '   <input type="hidden" id=\'ItemDescription' + i + '\' value="' + ItemDesc + '" /> ' +
-                '   <td data-label="Qty" ><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
+                '   <td data-label="Qty"><input type="text" class="inputData" id=\'Quantity' + i + '\' value="' + Qty + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td data-label="Unit $"><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td data-label="Ext $" ><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td data-label="PO#" ><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
+                '   <td data-label="Ext $"><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
+                '   <td data-label="TAX"><input type="text" id=\'Tax' + i + '\' value="' + Tax + '" readonly="true"></td>' +
+                '   <td data-label="PO#"><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td data-label="GL Account" ><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
                 '       </select></td>' +
                 '</tr>';
-            TableBody.append(htmlStr);
 
-            $("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
-            if (GLAccount == "") { $("#GLAccount" + i).val(null).trigger("change"); }
+            //TableBody.append(htmlStr);
+            //$("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
+            //if (GLAccount == "") { $("#GLAccount" + i).val(null).trigger("change"); }
+
+            ArrayVal[i] = PONumber + ", " + htmlStr;
+        }
+        var SortedList = gUtil.SortLineNo(ArrayVal).join();
+
+        TableBody.append(SortedList);
+
+        for (var j = 0; j < ObjectSearchResults.Count; j++) {
+            var t = Number($("#PONumber" + j)[0].title.split(" - ").pop().trim()) - 1;
+            $("#GLAccount" + t + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
+            if (GLAccount == "") { $("#GLAccount" + t).val(null).trigger("change"); }
         }
     }
     else {
         var htmlStr =
             '<tr>' +
-            '   <td scope="row" style="padding:0px";><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
+            '   <td scope="row" style="padding:0px; text-align:center;"><img id="chk" src="DILibrary/images/remove-button-red.png" ' +
             '        title="delete item" alt = "del" onclick = "gUtil.removeRow(this)" ></td > ' +
             '   <td  data-label="Item" style="text-align:left"><input type="text" class="inputData" id="ItemNumber0" value="" onclick="openForm(0)" ></td >' +
-            '   <input type="hidden" id=\'ItemDescription0\' value="" /> ' +
-            '   <td data-label="Item" ><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
+            '       <input type="hidden" id=\'ItemDescription0\' value="" /> ' +
+            '   <td data-label="Qty" ><input type="text" class="inputData" id="Quantity0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td>' +
-            '   <td data-label="Qty" ><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
+            '   <td data-label="Unit $" ><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
-            '   <td data-label="Unit $" ><input type="text" id="InvoiceLineExtension0" value="" readonly="true"></td>' +
-            '   <td data-label="Ext $" ><input type="text" class="inputData" id="PONumber0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td data-label="Ext $" ><input type="text" class="inputData" id="InvoiceLineExtension0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
+            '   <td data-label="TAX" ><input type="text" id="Tax0" value="" readonly="true"></td>' +
+            '   <td data-label="PO#" ><input type="text" id="PONumber0" value="" readonly="true"></td>' +
             '   <td data-label="GL Account" ><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
             '       </select> ' +
             '   </td>' +
@@ -197,22 +357,26 @@ function SetInvoiceDetails(controller) {
         $('.select2-dropdown').css('left', (tabW - 255 - pos) + 'px');
     });
 
-
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
     var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
     TableBody.append(
         '<tr>' +
         '<td style="text-align:center"><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
-        '       onclick=gUtil.addRowToTable("invoice_details_table");><strong>+</strong></a ></td > ' +
-        '<td colspan="4" style="text-align:right; border-right: none; "><label id="Balanced" class="Balance ' + balance.split(" ").join("") + '">' + balance + '</label> ' +
-        '<td colspan="2"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></td>' +
+        '       onclick="gUtil.addRowToTable(\'invoice_details_table\');"><strong>+</strong></a ></td > ' +
+        '<td colspan="4"><div class="gp-balance">' +
+        '   <label for="Total" id="Balanced" class="Balance ' + balance.split(" ").join("") + '" > ' + balance + '</label> ' +
+        '   <span id="totalSpan"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></span></div></td>' +
+        '<td data-label="TAX" ><input type="text" id="Tax0" value="" readonly="true"></td>' +
+        '<td colspan="2"></td>' +
         '</tr>'
     );
+
+    generate_addedRow(editor.table, 'Tax');
     generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal');
-    generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified');
+    //generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Verified');
 
     generate_addedRow(editor.table, 'Freight');
-    generate_addedRow(editor.table, 'Taxable');
+    generate_addedRow(editor.table, 'TaxCode');
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 }
 
@@ -488,9 +652,9 @@ function generate_addedRow(tableID, propertyName) {
         }
     );
 
-    var bottomLine = (propertyName == "Freight") ?
-        '<div class="mf-internal-text"><input type="text" id="txt' + propertyName + '" value="$" class="inputData" onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)" style="width:50%"></div>' :
-        '<input type="checkbox" id="chk' + propertyName + '" class="inputData" onclick="gUtil.UpdateInvoice()"; >';
+    var bottomLine = (propertyName == "TaxCode") ?
+        '<div class="mf-internal-text"><input type="text" id="txt' + propertyName + '" value="" class="inputData" style="width:50%"></div>' :
+        '<div class="mf-internal-text"><input type="text" id="txt' + propertyName + '" value="$" class="inputData" onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)" style="width:50%"></div>';
 
     propertyLine.append(
         '<td class="mf-dynamic-namefield">' +
@@ -690,7 +854,18 @@ function PopupDashboard() {
     RefreshTab();
 }
 
+function openForm1(i) {
+
+    var tbl = document.getElementById("invoice_details_table");
+    if (tbl != null) {
+        for (var i = 1; i < tbl.rows.length; i++) {
+            tbl.rows[i].cells[1].onclick = function () { getval(i); };
+        }
+    }
+}
+
 function openForm(i) {
+
     var item = $("#ItemNumber" + i)[0].value;
     var itemDesc = $("#ItemDescription" + i)[0].value;
     if (itemDesc == undefined) itemDesc = "";
@@ -706,7 +881,7 @@ function openForm(i) {
         '   <br/>' +
         '       <button type="submit" class="btn" onclick="gUtil.StoreItemNDesc(' + i + ');">save</button>' +
         '       <button type="button" class="btn cancel" onclick="closeForm()">Close</button>' +
-        '</div >';
+        '</div>';
     $("#popupDesc").append(modalHtml);
 
     var tbl = document.getElementById('invoice_details_table');

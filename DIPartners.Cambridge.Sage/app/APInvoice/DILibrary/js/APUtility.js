@@ -59,8 +59,9 @@ function APUtil(Vault, controller, editor) {
 		else if (pptName == "Quantity") return 2;
 		else if (pptName == "UnitPrice") return 3;
 		else if (pptName == "InvoiceLineExtension") return 4;
-		else if (pptName == "PONumber") return 5;
-		else if (pptName == "GLAccount") return 6;
+		else if (pptName == "Tax") return 5;
+		else if (pptName == "PONumber") return 6;
+		else if (pptName == "GLAccount") return 7;
 	}
 
 	this.DestroyOldDetails = function () {
@@ -196,6 +197,8 @@ function APUtil(Vault, controller, editor) {
 		if (this.DuplicatedPOValue()) return false;
 		var actCount = document.getElementById('invoice_details_table').rows.length - 2;
 
+		var t = $("#invoice_details_table")[0].innerHTML;
+		//return;
 		for (var i = 0; i < actCount; i++) {
 			var propertyValues = new MFiles.PropertyValues();
 
@@ -258,6 +261,40 @@ function APUtil(Vault, controller, editor) {
 		return true;
 	}
 
+	this.UpdateInvoice = function () {
+		var ci = controller.Invoice;
+		var Verified = ($("#Verified")[0].checked) ? 1 : 0;
+		var Freight = ($("#txtFreight")[0].value.substring(0, 1) == "$") ? $("#txtFreight")[0].value.substring(1) : $("#txtFreight")[0].value.substring(0);
+		var Taxable = ($("#chkTaxable")[0].checked) ? 1 : 0;
+
+		var objID = new MFiles.ObjID();
+		objID.SetIDs(ci.ObjectVersion.ObjVer.Type, ci.ObjectVersion.ObjVer.ID);
+		var InvoiceObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
+		var InvoiceoObjProperties = Vault.ObjectOperations.GetObjectVersionAndProperties(InvoiceObjVer);
+		/*if (!InvoiceoObjProperties.VersionData.ObjectCheckedOut) {
+			var COInvoiceObjVer = Vault.ObjectOperations.CheckOut(objID);
+
+			var InvoiceVerified = new MFiles.PropertyValue();
+			InvoiceVerified.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Verified");
+			InvoiceVerified.TypedValue.SetValue(MFDatatypeBoolean, Verified);
+			Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceVerified);
+
+			//var InvoiceFreight = new MFiles.PropertyValue();
+			//InvoiceFreight.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Freight");
+			//InvoiceFreight.TypedValue.SetValue(MFDatatypeFloating, Freight);
+			//Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceFreight);
+
+
+			//var InvoiceTaxable = new MFiles.PropertyValue();
+			//InvoiceTaxable.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Taxable");
+			//InvoiceTaxable.TypedValue.SetValue(MFDatatypeBoolean, Taxable);
+			//Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceTaxable);
+
+			Vault.ObjectOperations.CheckIn(COInvoiceObjVer.ObjVer);
+		}*/
+		return true;
+	}
+
 	this.setGL = function (dropValue) {
 		var val = dropValue.split("-");
 		$('#GLAccount' + gNo).val(val[0].trim());
@@ -310,7 +347,6 @@ function APUtil(Vault, controller, editor) {
 		var cellLeft = row.insertCell(0);
 		var el = document.createElement('IMG');
 		el.setAttribute('src', 'DILibrary/images/remove-button-red.png');
-		el.setAttribute('style', 'padding-left:0px;text-align:center;');
 		el.setAttribute('id', 'chk');
 		el.setAttribute('onclick', 'gUtil.removeRow(this)');
 
@@ -318,20 +354,22 @@ function APUtil(Vault, controller, editor) {
 		cellLeft.style.padding = '0 0 0 0px';
 		cellLeft.style.textAlign = 'center';
 
-		var startCell = iteration / iteration;
+		//var startCell = (iteration == 0)? 1 : (iteration / iteration);
+		var startCell = 1;
 
-		for (var i = iteration; i < iteration + 6; i++) {
+		for (var i = iteration; i < iteration + 7; i++) {
 			var id = "";
 			if (startCell == 1) id = "ItemNumber";
 			else if (startCell == 2) id = "Quantity";
 			else if (startCell == 3) id = "UnitPrice";
 			else if (startCell == 4) id = "InvoiceLineExtension";
-			else if (startCell == 5) id = "PONumber";
-			else if (startCell == 6) id = "GLAccount";
+			else if (startCell == 5) id = "Tax";
+			else if (startCell == 6) id = "PONumber";
+			else if (startCell == 7) id = "GLAccount";
 
 			var cellRight = row.insertCell(startCell);
 
-			if (startCell != 6) {
+			if (startCell != 7) {
 				var el = document.createElement('input');
 
 				el.setAttribute('type', 'text');
@@ -455,19 +493,12 @@ function APUtil(Vault, controller, editor) {
 			TextLabel.innerHTML = "Not Balanced";
 			TextLabel.style.color = "red";
 			TextLabel.style.background = "rgb(250, 215, 215)";
-			TextLabel.style.width = "85px";
 		}
 		else {
 			TextLabel.innerHTML = "Balanced";
 			TextLabel.style.color = "green";
 			TextLabel.style.background = "rgb(223, 248, 223)";
-			TextLabel.style.width = "60px";
 		}
-
-		TextLabel.style.height = "22px";
-		TextLabel.style.textAlign = "center";
-		TextLabel.style.verticalAlign = "sub";
-		TextLabel.style.display = "inline-block";
 	};
 
 	this.SortLineNo = function (ArrayVal) {
