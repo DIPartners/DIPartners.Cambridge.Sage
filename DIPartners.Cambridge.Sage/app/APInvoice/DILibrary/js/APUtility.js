@@ -59,9 +59,10 @@ function APUtil(Vault, controller, editor) {
 		else if (pptName == "Quantity") return 2;
 		else if (pptName == "UnitPrice") return 3;
 		else if (pptName == "InvoiceLineExtension") return 4;
-		else if (pptName == "Tax") return 5;
-		else if (pptName == "PONumber") return 6;
-		else if (pptName == "GLAccount") return 7;
+		else if (pptName == "TaxCode") return 5;
+		else if (pptName == "Tax") return 6;
+		else if (pptName == "PONumber") return 7;
+		else if (pptName == "GLAccount") return 8;
 	}
 
 	this.DestroyOldDetails = function () {
@@ -304,7 +305,7 @@ function APUtil(Vault, controller, editor) {
 	this.GetGLAccount = function () {
 
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			gUtil.FindGLObjects('vObject.GLAccount'), MFSearchFlagNone, true);
+			gUtil.FindObjectsWithoutValue('vObject.GLAccount'), MFSearchFlagNone, true);
 		var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
 		var dropValue;
 		var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
@@ -357,19 +358,20 @@ function APUtil(Vault, controller, editor) {
 		//var startCell = (iteration == 0)? 1 : (iteration / iteration);
 		var startCell = 1;
 
-		for (var i = iteration; i < iteration + 7; i++) {
+		for (var i = iteration; i < iteration + 8; i++) {
 			var id = "";
 			if (startCell == 1) id = "ItemNumber";
 			else if (startCell == 2) id = "Quantity";
 			else if (startCell == 3) id = "UnitPrice";
 			else if (startCell == 4) id = "InvoiceLineExtension";
-			else if (startCell == 5) id = "Tax";
-			else if (startCell == 6) id = "PONumber";
-			else if (startCell == 7) id = "GLAccount";
+			else if (startCell == 5) id = "TaxCode";
+			else if (startCell == 6) id = "Tax";
+			else if (startCell == 7) id = "PONumber";
+			else if (startCell == 8) id = "GLAccount";
 
 			var cellRight = row.insertCell(startCell);
 
-			if (startCell != 7) {
+			if (startCell != 8) {
 				var el = document.createElement('input');
 
 				el.setAttribute('type', 'text');
@@ -387,7 +389,7 @@ function APUtil(Vault, controller, editor) {
 					el.setAttribute('onkeyup', 'gUtil.Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'InvoiceLineExtension' + iteration + '\')');
 					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
 				}
-				if (startCell == 4) {
+				if (startCell == 4 | startCell == 5 || startCell == 6) {
 					el.setAttribute("readonly", 'true');
 					el.classList.remove("inputData");
 				}
@@ -533,7 +535,7 @@ function APUtil(Vault, controller, editor) {
 		$(".ui-scrollable").css('height', $(".panel-left").height() - 30);
 	};
 
-	this.FindGLObjects = function (OTAlias) {
+	this.FindObjectsWithoutValue = function (OTAlias) {
 
 		var OT = Vault.ObjectTypeOperations.GetObjectTypeIDByAlias(OTAlias);
 
@@ -570,4 +572,120 @@ function APUtil(Vault, controller, editor) {
 		closeForm();
 	}
 
+	this.GetPOTaxCode1 = function (No) {
+		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
+		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
+		if (PONO == "") return null;
+		var POObjSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
+
+		var POObjVers = POObjSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
+
+		for (var i = 0; i < POObjSearchResults.Count; i++) {
+			var POprops = POResultsProperties[i];
+			var LineNo = POprops.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
+			if (LineNo == No) {
+				return this.GetTaxDef(POprops.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).Value.DisplayValue);
+			}
+		}
+	}
+
+	this.GetPOTaxCode = function (PONo) {
+		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
+		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
+		if (PONO == "") return null;
+		var POObjSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
+
+		var POObjVers = POObjSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
+
+		for (var i = 0; i < POObjSearchResults.Count; i++) {
+			if (POObjSearchResults[i].Title == PONo) {
+				return POResultsProperties[i].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
+			}
+		}
+	}
+
+	this.GetTaxDef = function (TaxID) {
+		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
+
+		for (var i = 0; i < TaxSearchResults.Count; i++) {
+			if (TaxSearchResults[i].DisplayID == TaxID) {
+				var objID = new MFiles.ObjID();
+				objID.SetIDs(TaxSearchResults[i].ObjVer.Type, TaxSearchResults[i].ObjVer.ID);
+				var TaxObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
+				return Vault.ObjectPropertyOperations.GetProperties(TaxObjVer);
+			}
+		}
+	}
+
+	this.GetTax = function (Ext, PONo) {
+		var TaxId = this.GetPOTaxCode(PONo);
+		var TaxDef = this.GetTaxDef(TaxId);
+
+		var AdjTax = [];
+		//Calculation rules Including Tax
+		//Ext = AdjExt + Tax
+		//AdjExt = Ext / (1 + TaxRate)
+		//for example, 100 is Ext, 
+		//AdjExt = 100 / 1.13 = 88.5(88.4955..)
+		//Tax = AdjExt * TaxRate = 88.5 * 0.13 = 11.5
+
+		if (TaxDef == null) {
+			AdjTax[0] = Ext;
+			AdjTax[1] = 0;
+			AdjTax[2] = "";
+			return AdjTax;
+		}
+
+		var OriExt = parseFloat(Ext);
+		var AdjustExt = OriExt;
+
+		var TaxCode = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
+		TaxCode = (TaxCode == null) ? "" : TaxCode;
+		var GSTR = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.GSTRate", true).TypedValue.Value;
+		var GSTP = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.GSTInPrice", true).TypedValue.Value;
+		var PSTR = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.PSTRate", true).TypedValue.Value;
+		var PSTP = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.PSTInPrice", true).TypedValue.Value;
+		var HSTR = TaxDef.SearchForPropertyByAlias(Vault, "vPropert.HSTRate", true).TypedValue.Value;
+		var HSTP = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.HSTInPrice", true).TypedValue.Value;
+		var TotalTax = 0;
+
+		//HSTP = true;
+		if (GSTR != 0) {
+			if (GSTP) {		// included tax
+				TotalTax += OriExt - OriExt / (1 + GSTR / 100);	// calculate only for Tax
+				TotalTax += (OriExt / (1 + GSTR / 100)) * (GSTR / 100);	// calculate only for Tax
+				AdjustExt += OriExt - TotalTax;
+			}
+			else TotalTax += OriExt * (GSTR / 100);
+		}
+
+		if (PSTR != 0) {
+			if (PSTP) {		// included tax
+				TotalTax += OriExt - OriExt / (1 + PSTR / 100);
+				AdjustExt += OriExt - TotalTax;
+			}
+			else TotalTax += OriExt * (PSTR / 100);
+		}
+
+		if (HSTR != 0) {
+			if (HSTP) {		// included tax
+				TotalTax += OriExt - OriExt / (1 + HSTR / 100);
+				//TotalTax += (OriExt / (1 + HSTR / 100)) * (HSTR / 100);
+				AdjustExt += OriExt - TotalTax;
+			}
+			else TotalTax += OriExt * (HSTR / 100);
+		}
+
+		AdjTax[0] = AdjustExt;
+		AdjTax[1] = TotalTax;
+		AdjTax[2] = TaxCode;
+
+		return AdjTax;
+	}
 }
+

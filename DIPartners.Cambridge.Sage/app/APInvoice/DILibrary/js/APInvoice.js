@@ -254,33 +254,47 @@ function SetInvoiceDetails(controller) {
     SetInvoicePreview();
     LoadPreview();
 
+
     var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
         FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, editor.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
 
     editor.table.append(
         '<tr><td colspan="6" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details mf-dynamic-table">' +
-        '       <tr><th scope="col" width="5%">-</th><th scope="col" width="20%">Item</th><th scope="col" width="10%">Qty</th><th scope="col" width="15%">Unit $</th>' +
-        '           <th scope="col" width="15%">Ext $</th><th scope="col" width="8%">TAX</th><th scope="col" width="8%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
+        '       <tr><th scope="col" width="5%">-</th><th scope="col" width="20%">Item</th><th scope="col" width="10%">Qty</th><th scope="col" width="13%">Unit $</th>' +
+        '           <th scope="col" width="15%">Ext $</th><th scope="col" width="8%">TAX<br>Code</th><th scope="col" width="13%">TAX</th><th scope="col" width="8%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
     var TableBody = editor.table.find('#invoice_details_table');
     var SearchResultsObjVers = ObjectSearchResults.GetAsObjectVersions().GetAsObjVers();
     var Total = 0, Count = ObjectSearchResults.Count
+    var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'CAD',
+        minimumFractionDigits: 2,
+    });
 
     if (ObjectSearchResults.Count > 0) {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         for (var i = 0; i < Count; i++) {
             var props = ObjectSearchResultsProperties[i];
+
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineNumber", true).Value.DisplayValue;
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
             var ItemDesc = props.SearchForPropertyByAlias(Vault, "vProperty.ItemDescription", true).Value.DisplayValue;
             var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
-            var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            var Tax = "HI";
+            var Price = formatter.format(props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value);//'$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            var Amount = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;    //'$' + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
+
+            //var TaxDef = gUtil.GetPOTaxCode(PONumber.split(" - ").pop().trim());
+            //var TaxDef = gUtil.GetPOTaxCode(PONumber);
+            //var TaxCode = (TaxDef == undefined) ? "" : TaxDef.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
+            //TaxCode = (TaxCode == null) ? "" : TaxCode;
+
+            var AdjExt = gUtil.GetTax(Amount, PONumber);
+
             var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
             var curNo = Number(PONumber.split(" - ").pop().trim()) - 1;
@@ -300,18 +314,15 @@ function SetInvoiceDetails(controller) {
                 '   <td data-label="Unit $"><input type="text" class="inputData" id=\'UnitPrice' + i + '\' value="' + Price + '" ' +
                 '       onkeyup="gUtil.Calculate(\'Quantity' + i + '\', \'UnitPrice' + i + '\', \'InvoiceLineExtension' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
-                '   <td data-label="Ext $"><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + Amount + '" readonly="true"></td>' +
-                '   <td data-label="TAX"><input type="text" id=\'Tax' + i + '\' value="' + Tax + '" readonly="true"></td>' +
+                '   <td data-label="Ext $"><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + formatter.format(AdjExt[0]) + '" readonly="true"></td>' +
+                '   <td data-label="TAX Code"><input type="text" id=\'TaxCode' + i + '\' value="' + AdjExt[2] + '" readonly="true"></td>' +
+                '   <td data-label="TAX"><input type="text" id=\'Tax' + i + '\' value="' + formatter.format(AdjExt[1]) + '" readonly="true"></td>' +
                 '   <td data-label="PO#"><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td data-label="GL Account" ><select id=\"GLAccount' + i + '\" class="SelectGL">' + gUtil.GLAccountList +
                 '       </select></td>' +
                 '</tr>';
-
-            //TableBody.append(htmlStr);
-            //$("#GLAccount" + i + " option[value=\"" + GLAccount + "\"]").prop("selected", true);
-            //if (GLAccount == "") { $("#GLAccount" + i).val(null).trigger("change"); }
 
             ArrayVal[i] = PONumber + ", " + htmlStr;
         }
@@ -337,8 +348,9 @@ function SetInvoiceDetails(controller) {
             '   <td data-label="Unit $" ><input type="text" class="inputData" id="UnitPrice0" value="" onkeyup="gUtil.Calculate(\'Quantity0\', \'UnitPrice0\', \'InvoiceLineExtension0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)" ></td> ' +
             '   <td data-label="Ext $" ><input type="text" class="inputData" id="InvoiceLineExtension0" value="" onkeypress="return gUtil.isNumberKey(event,this.id)"></td>' +
-            '   <td data-label="TAX" ><input type="text" id="Tax0" value="" readonly="true"></td>' +
-            '   <td data-label="PO#" ><input type="text" id="PONumber0" value="" readonly="true"></td>' +
+            '   <td data-label="TAX Code"><input type="text" id="TaxCode0" value="" readonly="true"></td>' +
+            '   <td data-label="TAX"><input type="text" id="Tax0" value="" readonly="true"></td>' +
+            '   <td data-label="PO#"><input type="text" id="PONumber0" value=""></td>' +
             '   <td data-label="GL Account" ><select id=\"GLAccount0\" class="SelectGL">' + gUtil.GLAccountList +
             '       </select> ' +
             '   </td>' +
@@ -363,10 +375,10 @@ function SetInvoiceDetails(controller) {
         '<tr>' +
         '<td style="text-align:center"><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick="gUtil.addRowToTable(\'invoice_details_table\');"><strong>+</strong></a ></td > ' +
-        '<td colspan="4"><div class="gp-balance">' +
+        '<td colspan="5"><div class="gp-balance">' +
         '   <label for="Total" id="Balanced" class="Balance ' + balance.split(" ").join("") + '" > ' + balance + '</label> ' +
         '   <span id="totalSpan"><input type="text" id="Total" value="' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '" readonly></span></div></td>' +
-        '<td data-label="TAX" ><input type="text" id="Tax0" value="" readonly="true"></td>' +
+        '<td data-label="TAX" ><input type="text" id="TotalTax" value="" readonly="true"></td>' +
         '<td colspan="2"></td>' +
         '</tr>'
     );
@@ -401,7 +413,7 @@ function SetPODetails(controller) {
         editor.table.append(
             '<tr><td colspan="5" align="center">' +
             '    <table width="90%" id="po_details_table" class="details">' +
-            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th width="18%">Ext $</th><th>Account</th></tr>' +
+            '        <tr><th width="7%">Line</th><th width="22%">Item</th><th>Ordered</th><th>RTD</th><th>Unit $</th><th width="18%">Ext $</th><th width="18%">TAX</th><th>Account</th></tr>' +
             '    </table>' +
             '</td></tr>' +
             '');
@@ -417,10 +429,12 @@ function SetPODetails(controller) {
             var LineNo = props.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
             var PODetailName = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetailName", true).Value.DisplayValue;
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.POItem", true).Value.DisplayValue;
+            var ItemDesc = props.SearchForPropertyByAlias(Vault, "vProperty.POItemDescription", true).Value.DisplayValue;
             var ItemNO = Item.split("=>");
             var ItemVal = ItemNO[0];
             var OrdQty = props.SearchForPropertyByAlias(Vault, "vProperty.OrderedQty", true).Value.DisplayValue;
             var RTDQty = props.SearchForPropertyByAlias(Vault, "vProperty.ReceivedQty", true).Value.DisplayValue;
+            var TAX = props.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).Value.DisplayValue;
             var Price = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Amount = '$' + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value.toLocaleString('en-US', { minimumFractionDigits: 2 });
             var Account = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
@@ -428,11 +442,12 @@ function SetPODetails(controller) {
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.POLineExtension", true).Value.Value;
             strTable = '<tr>' +
                 '<td style="text-align:center" title="' + PODetailName + '"><span id="LineNumber">' + LineNo + '</span></td>' +
-                '<td style="text-align:left; word-wrap:break-word;" title="' + ItemNO[1] + '"><span id="ItemNumber">' + ItemNO[0] + '</span></td>' +
+                '<td style="text-align:left; word-wrap:break-word;" title="' + ItemDesc + '"><span id="ItemNumber">' + Item + '</span></td>' +
                 '<td style="text-align:right"><span id="OrdQuantity">' + OrdQty + '</span></td>' +
                 '<td style="text-align:right"><span id="RTDQuantity">' + RTDQty + '</span></td>' +
                 '<td style="text-align:right"><span id="UnitPrice">' + Price + '</span></td>' +
                 '<td style="text-align:right"><span id="Extension" title="' + Amount + '">' + Amount + '</span></td>' +
+                '<td style="text-align:right"><span id="Extension" title="' + TAX + '">' + TAX + '</span></td>' +
                 '<td style="text-align:right" title="' + AccountNO.slice(2).join(" ") + '"><span id="Account">' + AccountNO.slice(0, 1) + '</span></td>' +
                 "</tr>";
             // HKo; sort the list: 1, 10, 11, 2, 3 => 1, 2, 3, 10
