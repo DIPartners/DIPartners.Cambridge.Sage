@@ -6,6 +6,7 @@ function APUtil(Vault, controller, editor) {
 	this.editor = editor;
 	this.GLAccountList = "";
 	this.GLAccountArr = [];
+	//	this.TaxCode = "";
 
 	this.GetText = function (id) {
 		switch (id) {
@@ -296,12 +297,6 @@ function APUtil(Vault, controller, editor) {
 		return true;
 	}
 
-	this.setGL = function (dropValue) {
-		var val = dropValue.split("-");
-		$('#GLAccount' + gNo).val(val[0].trim());
-		document.getElementById("GLOption").style.display = "none";
-	}
-
 	this.GetGLAccount = function () {
 
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
@@ -386,12 +381,15 @@ function APUtil(Vault, controller, editor) {
 				}
 
 				if (startCell == 2 || startCell == 3) {
-					el.setAttribute('onkeyup', 'gUtil.Calculate(\'Quantity' + iteration + '\', \'UnitPrice' + iteration + '\', \'InvoiceLineExtension' + iteration + '\')');
+					el.setAttribute('onkeyup', 'gUtil.Calculate(\'' + iteration + '\')');
 					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
 				}
 				if (startCell == 4 | startCell == 5 || startCell == 6) {
 					el.setAttribute("readonly", 'true');
 					el.classList.remove("inputData");
+				}
+				if (startCell == 7) {
+					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
 				}
 				cellRight.appendChild(el);
 			}
@@ -414,16 +412,19 @@ function APUtil(Vault, controller, editor) {
 		this.toggleButton(false);
 	};
 
-	this.Calculate = function (_qty, _unit, _ext) {
-		var Ext = document.getElementById(_ext);
-		var Qty = document.getElementById(_qty).value;
+	//this.Calculate = function (_qty, _unit, _ext, TaxCode) {
+	this.Calculate = function (idx) {
+		var Qty = ($("#Quantity" + idx)[0] == undefined) ? "" : $("#Quantity" + idx)[0].value;
+		var Unit = $("#UnitPrice" + idx)[0].value;
+		//var TaxCode = $("#TaxCode0")[0].value;
 
+		Unit = (Unit.substring(0, 1) == "$") ? Unit.substring(1) : Unit;
+		var Total = this.GetTax(Qty, Unit, TaxCode);
 
-		var Unit = document.getElementById(_unit).value;
-		if (Unit.substring(0, 1) != "$") document.getElementById(_unit).value = '$' + Unit;
-
-		var Total = (Unit.substring(0, 1) == "$") ? Qty * Unit.substr(1) * 1 : Qty * Unit * 1;
-		Ext.value = '$' + Total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+		$("#InvoiceLineExtension" + idx)[0].value = (this.CurrencyFormatter(Total[0]) == "NaN") ? this.CurrencyFormatter("0") : this.CurrencyFormatter(Total[0]);
+		$("#Tax" + idx)[0].value = (this.CurrencyFormatter(Total[1]) == "NaN") ? this.CurrencyFormatter("0") : this.CurrencyFormatter(Total[1]);
+		$("#TaxCode" + idx)[0].value = TaxCode;
+		if (Unit.substring(0, 1) != "$") $("#UnitPrice" + idx)[0].value = '$' + Unit;
 
 		this.CalculateTotal();
 	};
@@ -472,16 +473,20 @@ function APUtil(Vault, controller, editor) {
 	this.CalculateTotal = function () {
 
 		var tbl = document.getElementById('invoice_details_table');
-		var lastRow = tbl.rows.length - 1;	// header
-		var Ext = 0;
-		for (var i = 0; i <= lastRow; i++) {
-			if (document.getElementById('InvoiceLineExtension' + i) != undefined) {
-				var currency = document.getElementById('InvoiceLineExtension' + i).value;
-
+		var lastRow = $("#invoice_details_table")[0].rows.length - 2;	// header
+		var Ext = 0, Tax = 0;
+		for (var i = 0; i < lastRow; i++) {
+			if ($("#InvoiceLineExtension" + i)[0] != undefined) {
+				var currency = $("#InvoiceLineExtension" + i)[0].value;
 				Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
 			}
+			if ($("#Tax" + i)[0] != undefined) {
+				var currency = $("#Tax" + i)[0].value;
+				Tax += Number(currency.replace(/[^0-9.-]+/g, ""));
+			}
 		}
-		document.getElementById('Total').value = '$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+		$("#Total")[0].value = this.CurrencyFormatter(Ext);	//'$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+		$("#TotalTax")[0].value = this.CurrencyFormatter(Tax);	//'$' + Tax.toLocaleString('en-US', { minimumFractionDigits: 2 });
 		this.setBalanceStyle();
 	};
 
@@ -572,26 +577,7 @@ function APUtil(Vault, controller, editor) {
 		closeForm();
 	}
 
-	this.GetPOTaxCode1 = function (No) {
-		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
-		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
-		if (PONO == "") return null;
-		var POObjSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
-
-		var POObjVers = POObjSearchResults.GetAsObjectVersions().GetAsObjVers();
-		var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
-
-		for (var i = 0; i < POObjSearchResults.Count; i++) {
-			var POprops = POResultsProperties[i];
-			var LineNo = POprops.SearchForPropertyByAlias(Vault, "vProperty.POLine#", true).Value.DisplayValue;
-			if (LineNo == No) {
-				return this.GetTaxDef(POprops.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).Value.DisplayValue);
-			}
-		}
-	}
-
-	this.GetPOTaxCode = function (PONo) {
+	this.GetPOTaxCodeXXX = function (PONo) {
 		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
 		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
 		if (PONO == "") return null;
@@ -608,44 +594,78 @@ function APUtil(Vault, controller, editor) {
 		}
 	}
 
-	this.GetTaxDef = function (TaxID) {
-		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
+	this.GetPOTaxCode = function (PONO) {
+		//var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
+		//var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
+		if (PONO == "") return null;
+		var POObjSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
 
-		for (var i = 0; i < TaxSearchResults.Count; i++) {
-			if (TaxSearchResults[i].DisplayID == TaxID) {
-				var objID = new MFiles.ObjID();
-				objID.SetIDs(TaxSearchResults[i].ObjVer.Type, TaxSearchResults[i].ObjVer.ID);
-				var TaxObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
-				return Vault.ObjectPropertyOperations.GetProperties(TaxObjVer);
-			}
+		var POObjVers = POObjSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
+
+		if (POResultsProperties.Count > 0) {
+			//POResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
+			return this.GetTaxDef(POResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value).SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
 		}
 	}
 
-	this.GetTax = function (Ext, PONo) {
-		var TaxId = this.GetPOTaxCode(PONo);
-		var TaxDef = this.GetTaxDef(TaxId);
+	this.GetTaxDef = function (TaxID) {
 
+		if (parseInt(TaxID)) {
+			var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+				this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
+			for (var i = 0; i < TaxSearchResults.Count; i++) {
+				if (TaxSearchResults[i].DisplayID == TaxID) {
+					var objID = new MFiles.ObjID();
+					objID.SetIDs(TaxSearchResults[i].ObjVer.Type, TaxSearchResults[i].ObjVer.ID);
+					var TaxObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
+					return Vault.ObjectPropertyOperations.GetProperties(TaxObjVer);
+				}
+			}
+		}
+		else {
+			var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+				FindObjects(Vault, 'vObject.TaxDefinition', 'vProperty.TaxCode', MFDatatypeText, TaxID), MFSearchFlagNone, true);
+			var TaxObjVers = TaxSearchResults.GetAsObjectVersions().GetAsObjVers();
+			var TaxProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(TaxObjVers);
+			return TaxProperties[0];
+		}
+	}
+
+	//this.GetTax = function (Qty, Price, PONo, TaxCode) {
+	this.GetTax = function (Qty, Price, TaxCode) {
+		//PONo = (PONo == "") ? $("#TaxCode0")[0].value : PONo;
+
+		//var TaxId = (PONo == number) ? this.GetPOTaxCode(PONo) : (PONo == "")?
+		//var TaxId = (PONo == "" && TaxCode != "") ? TaxCode : this.GetPOTaxCode(PONo);
+
+		var TaxDef = this.GetTaxDef(TaxCode);
 		var AdjTax = [];
+
+		if (TaxDef == null) {
+			AdjTax[0] = parseInt(Qty) * parseFloat(Price);
+			AdjTax[1] = 0;
+			AdjTax[2] = "";
+			AdjTax[3] = "";
+			return AdjTax;
+		}
+
 		//Calculation rules Including Tax
+
 		//Ext = AdjExt + Tax
 		//AdjExt = Ext / (1 + TaxRate)
 		//for example, 100 is Ext, 
 		//AdjExt = 100 / 1.13 = 88.5(88.4955..)
 		//Tax = AdjExt * TaxRate = 88.5 * 0.13 = 11.5
 
-		if (TaxDef == null) {
-			AdjTax[0] = Ext;
-			AdjTax[1] = 0;
-			AdjTax[2] = "";
-			return AdjTax;
-		}
-
-		var OriExt = parseFloat(Ext);
+		var OriExt = parseInt(Qty) * parseFloat(Price);
 		var AdjustExt = OriExt;
 
 		var TaxCode = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
 		TaxCode = (TaxCode == null) ? "" : TaxCode;
+		var TaxDesc = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.TaxDescription", true).TypedValue.Value;
+		TaxDesc = (TaxDesc == null) ? "" : TaxDesc;
 		var GSTR = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.GSTRate", true).TypedValue.Value;
 		var GSTP = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.GSTInPrice", true).TypedValue.Value;
 		var PSTR = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.PSTRate", true).TypedValue.Value;
@@ -654,12 +674,11 @@ function APUtil(Vault, controller, editor) {
 		var HSTP = TaxDef.SearchForPropertyByAlias(Vault, "vProperty.HSTInPrice", true).TypedValue.Value;
 		var TotalTax = 0;
 
-		//HSTP = true;
+		//HSTP = true;  // for test
 		if (GSTR != 0) {
 			if (GSTP) {		// included tax
 				TotalTax += OriExt - OriExt / (1 + GSTR / 100);	// calculate only for Tax
-				TotalTax += (OriExt / (1 + GSTR / 100)) * (GSTR / 100);	// calculate only for Tax
-				AdjustExt += OriExt - TotalTax;
+				AdjustExt -= TotalTax;
 			}
 			else TotalTax += OriExt * (GSTR / 100);
 		}
@@ -667,16 +686,16 @@ function APUtil(Vault, controller, editor) {
 		if (PSTR != 0) {
 			if (PSTP) {		// included tax
 				TotalTax += OriExt - OriExt / (1 + PSTR / 100);
-				AdjustExt += OriExt - TotalTax;
+				AdjustExt -= TotalTax;
 			}
 			else TotalTax += OriExt * (PSTR / 100);
 		}
 
 		if (HSTR != 0) {
 			if (HSTP) {		// included tax
-				TotalTax += OriExt - OriExt / (1 + HSTR / 100);
 				//TotalTax += (OriExt / (1 + HSTR / 100)) * (HSTR / 100);
-				AdjustExt += OriExt - TotalTax;
+				TotalTax += OriExt - OriExt / (1 + HSTR / 100);
+				AdjustExt -= TotalTax;
 			}
 			else TotalTax += OriExt * (HSTR / 100);
 		}
@@ -684,8 +703,19 @@ function APUtil(Vault, controller, editor) {
 		AdjTax[0] = AdjustExt;
 		AdjTax[1] = TotalTax;
 		AdjTax[2] = TaxCode;
+		AdjTax[3] = TaxDesc;
 
 		return AdjTax;
+	}
+
+	this.CurrencyFormatter = function (number) {
+		var formatter = new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'CAD',
+			minimumFractionDigits: 2,
+		});
+
+		return formatter.format(number);
 	}
 }
 
