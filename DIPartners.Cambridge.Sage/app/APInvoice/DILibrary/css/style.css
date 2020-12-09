@@ -7,6 +7,10 @@ body {
 	margin: 0px;
 }
 
+table.mf-dynamic-table tr {
+	background-color: white;
+}
+
 label {
 	/*font-family:Segoe UI, Tahoma, Arial, sans-serif;*/
 	color: #000000;
@@ -25,7 +29,7 @@ label {
 	flex: 0 0 auto; /* only manually resize */
 	padding: 0px;
 	min-height: 200px;
-	width: 40%;
+	width: 45%;
 	min-width: 200px;
 	white-space: nowrap;
 }
@@ -46,7 +50,12 @@ label {
 }
 
 .details {
+	border: 1px solid #ccc;
 	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	table-layout: fixed;
 }
 
 .ui-tabs .ui-tabs-panel {
@@ -68,6 +77,10 @@ label {
 	min-height: 750px;
 }
 
+#invoice_details_table.mf-dynamic-table tr {
+	cursor: default !important;
+}
+
 .details th, .details td {
 	border: 1px solid rgb(109, 109, 109);
 	padding: 5px 5px 5px 5px;
@@ -80,6 +93,8 @@ label {
 .details th {
 	background-color: #c9c9ce;
 	color: rgb(88, 88, 88);
+	font-size: .9em;
+	/*letter-spacing: .1em;*/
 	/*font-size: 1.3vw;*/
 }
 
@@ -93,17 +108,30 @@ label {
 		background-color: transparent;
 	}
 
-#invoice_details_table tr td:nth-child(2) input,
+#chk {
+	cursor: pointer;
+}
+
+#invoice_details_table td:nth-child(2) input,
+#invoice_details_table td:nth-child(3) input,
+#invoice_details_table td:nth-child(4) input,
+#invoice_details_table td:nth-child(8) input {
+	cursor: pointer;
+}
+
 #invoice_details_table tr td:nth-child(6) input,
+#invoice_details_table tr td:nth-child(8) input {
+	text-align: center !important;
+}
+
+#invoice_details_table tr td:nth-child(3) input,
+#invoice_details_table tr td:nth-child(4) input,
+#invoice_details_table tr td:nth-child(5) input,
 #invoice_details_table tr td:nth-child(7) input {
-	cursor: pointer !important;
+	text-align: right !important;
 }
 
-#invoice_details_table tr td:nth-child(5) input {
-	cursor: default !important;
-}
-
-#invoice_details_table tr td:nth-child(n+3) input {
+#TotalTax {
 	text-align: right !important;
 }
 
@@ -133,29 +161,40 @@ input[type="text"]:disabled {
 	color: #000000;
 }
 
+.gp-balance {
+	text-align: right !important;
+}
+
+#Balanced {
+	display: table-cell;
+	width: 100px;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+#totalSpan {
+	display: table-cell;
+	padding: 0 4px 0 6px;
+}
+
 .Balance {
 	-webkit-border-radius: 20px;
 	-moz-border-radius: 20px;
 	border-radius: 25px;
 	text-align: center;
-	float: right;
+	/*float: right;*/
 }
 
 .Balanced {
 	color: green;
 	background: rgb(223, 248, 223);
-	width: 60px;
+	/*width: 60px;*/
 }
 
 .NotBalanced {
 	color: red;
 	background: rgb(250, 215, 215);
 	width: 85px;
-}
-
-#chk {
-	cursor: pointer !important;
-	text-align: center !important;
 }
 
 .btn {
@@ -166,11 +205,22 @@ input[type="text"]:disabled {
 	text-shadow: 0 0 0;
 }
 
+labelS {
+	/* Other styling... */
+	text-align: right;
+	clear: both;
+	float: left;
+	margin-right: 15px;
+}
+
 /*select2*/
 .SelectGL {
 	height: 20px;
 	font-size: 11px;
 	border: 0px;
+	/*text-align: right;
+	direction: rtl*/
+	position: relative;
 }
 
 .select2-results {
@@ -187,8 +237,8 @@ input[type="text"]:disabled {
 }
 
 .select2-dropdown {
-	left: -180px !important;
-	top: 8px !important;
+	/*left: -200px !important;*/
+	top: 5px !important;
 	width: 260px !important;
 }
 
@@ -210,6 +260,9 @@ input[type="text"]:disabled {
 	width: 100% !important
 }
 
+.select2-search--dropdown {
+	padding: 0px !important;
+}
 /* popup window */
 .modal {
 	display: none;
@@ -234,6 +287,60 @@ input[type="text"]:disabled {
 	margin-left: 160px;
 }
 
-.importantRule {
-	color: transparent !important;
+#totalSpan {
+	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
+}
+
+@media screen and (max-width: 600px) {
+	.details {
+		border: 0;
+	}
+
+		.details th {
+			border: none;
+			clip: rect(0 0 0 0);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			width: 1px;
+		}
+
+		.details tr {
+			border-bottom: 2px solid #cccccc;
+			display: block;
+			margin-bottom: .625em;
+		}
+
+		.details td {
+			display: block;
+			font-size: .9em;
+			text-align: right;
+		}
+
+			.details td::before {
+				content: attr(data-label);
+				float: left;
+				font-weight: bold;
+				text-transform: uppercase;
+			}
+
+			.details td:last-child {
+				border-bottom: 0;
+			}
+
+		.details td, .details th {
+			padding-top: 5px !important;
+			vertical-align: top;
+		}
+
+		.details td, .details th {
+			border: 1px solid #cccccc;
+			border-bottom: 0 !important
+		}
+
+	.details {
+		border: 0px !important
+	}
 }

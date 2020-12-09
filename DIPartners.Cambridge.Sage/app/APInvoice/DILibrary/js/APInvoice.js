@@ -70,14 +70,6 @@ function SetDetails(dashboard) {
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.PORequiredDate'));
             PropertyControls.push(setProperty(Vault, editor, 'vProperty.Currency'));
             editor.PropertyControls = PropertyControls;
-
-            /* var PODetailsResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-                 FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, editor.ObjectVersion.Title), MFSearchFlagNone, true);
-             var POObjVers = PODetailsResults.GetAsObjectVersions().GetAsObjVers();
-             var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
-             if (POResultsProperties.Count > 0)
-                 var t = gUtil.GetTaxDef(POResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value).SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
-             gUtil.gTaxCode = t;*/
         }
     }
 
@@ -137,20 +129,17 @@ function SetInvoiceDetails(controller) {
 
     if (Count > 0) {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
-        //var TaxCode = "";
         for (var i = 0; i < Count; i++) {
             var props = ObjectSearchResultsProperties[i];
             var Item = props.SearchForPropertyByAlias(Vault, "vProperty.ItemNumber", true).Value.DisplayValue;
             var ItemDesc = props.SearchForPropertyByAlias(Vault, "vProperty.ItemDescription", true).Value.DisplayValue;
             var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
             var Price = props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value;
-            var Amount = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
+            //var Amount = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
             PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
 
             var Tax = gUtil.GetTax(Qty, Price, TaxCode);
-            //TaxCode = (Tax[TAX_CODE] != "NaN")? Tax[TAX_CODE] : "";
 
-            //var Tax = gUtil.GetTax(Amount, PONumber);
             var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
             var curNo = Number(PONumber.split(" - ").pop().trim()) - 1;
@@ -197,7 +186,7 @@ function SetInvoiceDetails(controller) {
             '<tr>' +
             '   <td scope="row" style="padding:0px; text-align:center;"><img id="chk" src="DILibrary/images/remove-button-red.png" title="delete item"' +
             '       alt="del" onclick="gUtil.removeRow(this)"></td> ' +
-            '   <td data-label="Item"><input type="text" id=\'ItemNumber0\' value="" title=""' +
+            '   <td data-label="Item"><input type="text" class="inputData" id=\'ItemNumber0\' value="" title=""' +
             '       onclick="openForm(0)"><input type="hidden" id=\'ItemDescription0\' value="" /></td>' +
             '   <td data-label="Qty"><input type="text" class="inputData" id=\'Quantity0\' value="" onkeyup="gUtil.Calculate(\'0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
@@ -231,9 +220,10 @@ function SetInvoiceDetails(controller) {
         '<tr>' +
         '<td style="text-align:center"><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick="gUtil.addRowToTable(\'invoice_details_table\');"><strong>+</strong></a ></td > ' +
-        '<td colspan="5"><div class="gp-balance">' +
+        '<td colspan="5"><div class="gp-balance" style="margin-right: 40px; float: right;">' +
         '   <label for="Total" id="Balanced" class="Balance ' + balance.split(" ").join("") + '" > ' + balance + '</label> ' +
-        '   <span id="totalSpan"><input type="text" id="Total" value="' + gUtil.CurrencyFormatter(Total) + '" readonly></span></div></td>' +
+        //'   <span id="totalSpan"><input type="text" id="Total" value="' + gUtil.CurrencyFormatter(Total) + '" readonly style="text-align: right; padding-right: 0px;"></span></div></td>' +
+        '   <span id="totalSpan">' + gUtil.CurrencyFormatter(Total) + '</span></div></td>' +
         '<td data-label="TAX" ><input type="text" id="TotalTax" value="' + gUtil.CurrencyFormatter(TotalTax) + '" readonly="true"></td>' +
         '<td colspan="2"></td>' +
         '</tr>'

@@ -406,17 +406,20 @@ function APUtil(Vault, controller, editor) {
 				cellRight.appendChild(glSel);
 				$("#GLAccount" + iteration).select2({ allowClear: true, placeholder: { text: '' } });
 				$("#GLAccount" + iteration).val(null).trigger("change");
+				$('.SelectGL').on('select2:open', function (e) {
+					var tabW = $('#invoice_details_table')[0].clientWidth;
+					var pos = $(this).select('select2-container').position().left;
+					$('.select2-dropdown').css('left', (tabW - 255 - pos) + 'px');
+				});
 			}
 			startCell++;
 		}
 		this.toggleButton(false);
 	};
 
-	//this.Calculate = function (_qty, _unit, _ext, TaxCode) {
 	this.Calculate = function (idx) {
 		var Qty = ($("#Quantity" + idx)[0] == undefined) ? "" : $("#Quantity" + idx)[0].value;
 		var Unit = $("#UnitPrice" + idx)[0].value;
-		//var TaxCode = $("#TaxCode0")[0].value;
 
 		Unit = (Unit.substring(0, 1) == "$") ? Unit.substring(1) : Unit;
 		var Total = this.GetTax(Qty, Unit, TaxCode);
@@ -485,14 +488,15 @@ function APUtil(Vault, controller, editor) {
 				Tax += Number(currency.replace(/[^0-9.-]+/g, ""));
 			}
 		}
-		$("#Total")[0].value = this.CurrencyFormatter(Ext);	//'$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+		$("#totalSpan").text(this.CurrencyFormatter(Ext));	//'$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 		$("#TotalTax")[0].value = this.CurrencyFormatter(Tax);	//'$' + Tax.toLocaleString('en-US', { minimumFractionDigits: 2 });
 		this.setBalanceStyle();
 	};
 
 	this.setBalanceStyle = function () {
 		var subTotal = document.getElementById('hSubtotal').value.replace(/[^0-9.-]+/g, "");
-		var total = document.getElementById('Total').value.replace(/[^0-9.-]+/g, "");
+		var total = $("#totalSpan").text().replace(/[^0-9.-]+/g, "");
+		//var total = document.getElementById('Total').value.replace(/[^0-9.-]+/g, "");
 
 		var TextLabel = document.getElementById('Balanced');
 
@@ -577,26 +581,7 @@ function APUtil(Vault, controller, editor) {
 		closeForm();
 	}
 
-	this.GetPOTaxCodeXXX = function (PONo) {
-		var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
-		var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
-		if (PONO == "") return null;
-		var POObjSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
-
-		var POObjVers = POObjSearchResults.GetAsObjectVersions().GetAsObjVers();
-		var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
-
-		for (var i = 0; i < POObjSearchResults.Count; i++) {
-			if (POObjSearchResults[i].Title == PONo) {
-				return POResultsProperties[i].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
-			}
-		}
-	}
-
 	this.GetPOTaxCode = function (PONO) {
-		//var ObjectVersionProperties = Vault.ObjectPropertyOperations.GetProperties(controller.ObjectVersion.ObjVer);
-		//var PONO = ObjectVersionProperties.SearchForPropertyByAlias(gDashboard.Vault, "vProperty.POReference", true).Value.DisplayValue;
 		if (PONO == "") return null;
 		var POObjSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
 			FindObjects(Vault, 'vObject.PurchaseOrderDetail', 'vProperty.PurchaseOrder', MFDatatypeText, PONO), MFSearchFlagNone, true);
@@ -605,42 +590,37 @@ function APUtil(Vault, controller, editor) {
 		var POResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(POObjVers);
 
 		if (POResultsProperties.Count > 0) {
-			//POResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
-			return this.GetTaxDef(POResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value).SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
+			return this.GetTaxDefbyID(POResultsProperties[0].SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value)
+				.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
 		}
 	}
 
-	this.GetTaxDef = function (TaxID) {
+	this.GetTaxDefbyID = function (TaxID) {
 
-		if (parseInt(TaxID)) {
-			var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-				this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
-			for (var i = 0; i < TaxSearchResults.Count; i++) {
-				if (TaxSearchResults[i].DisplayID == TaxID) {
-					var objID = new MFiles.ObjID();
-					objID.SetIDs(TaxSearchResults[i].ObjVer.Type, TaxSearchResults[i].ObjVer.ID);
-					var TaxObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
-					return Vault.ObjectPropertyOperations.GetProperties(TaxObjVer);
-				}
+		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
+		for (var i = 0; i < TaxSearchResults.Count; i++) {
+			if (TaxSearchResults[i].DisplayID == TaxID) {
+				var objID = new MFiles.ObjID();
+				objID.SetIDs(TaxSearchResults[i].ObjVer.Type, TaxSearchResults[i].ObjVer.ID);
+				var TaxObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
+				return Vault.ObjectPropertyOperations.GetProperties(TaxObjVer);
 			}
 		}
-		else {
-			var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-				FindObjects(Vault, 'vObject.TaxDefinition', 'vProperty.TaxCode', MFDatatypeText, TaxID), MFSearchFlagNone, true);
-			var TaxObjVers = TaxSearchResults.GetAsObjectVersions().GetAsObjVers();
-			var TaxProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(TaxObjVers);
-			return TaxProperties[0];
-		}
 	}
 
-	//this.GetTax = function (Qty, Price, PONo, TaxCode) {
+	this.GetTaxDefbyCode = function (TaxCode) {
+
+		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			FindObjects(Vault, 'vObject.TaxDefinition', 'vProperty.TaxCode', MFDatatypeText, TaxCode), MFSearchFlagNone, true);
+		var TaxObjVers = TaxSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var TaxProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(TaxObjVers);
+		return TaxProperties[0];
+	}
+
 	this.GetTax = function (Qty, Price, TaxCode) {
-		//PONo = (PONo == "") ? $("#TaxCode0")[0].value : PONo;
 
-		//var TaxId = (PONo == number) ? this.GetPOTaxCode(PONo) : (PONo == "")?
-		//var TaxId = (PONo == "" && TaxCode != "") ? TaxCode : this.GetPOTaxCode(PONo);
-
-		var TaxDef = this.GetTaxDef(TaxCode);
+		var TaxDef = this.GetTaxDefbyCode(TaxCode);
 		var AdjTax = [];
 
 		if (TaxDef == null) {
@@ -651,7 +631,7 @@ function APUtil(Vault, controller, editor) {
 			return AdjTax;
 		}
 
-		//Calculation rules Including Tax
+		//Calculation rules for Including Tax
 
 		//Ext = AdjExt + Tax
 		//AdjExt = Ext / (1 + TaxRate)
