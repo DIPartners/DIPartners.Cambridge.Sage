@@ -172,7 +172,7 @@ input[type="text"]:disabled {
 	vertical-align: middle;
 }
 
-#totalSpan {
+#TotalExt {
 	display: table-cell;
 	padding: 0 4px 0 6px;
 }
@@ -295,9 +295,33 @@ option {
 	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
 }
 
+Table {
+	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
+}
+
 #TaxInfoTable tr:nth-child(even) {
 	background-color: #eff5fa;
 }
+
+td.mf-dynamic-namefield > div {
+	padding-top: 1px !important;
+}
+
+td {
+	white-space: nowrap;
+}
+
+.TotalCost {
+	width: 30%;
+	/*text-align:right;*/
+	padding-left: 20px;
+}
+
+	.TotalCost:hover {
+		background-color: #e5f3ff;
+		color: #333;
+	}
+
 
 @media screen and (max-width: 600px) {
 	.details {

@@ -493,14 +493,14 @@ function APUtil(Vault, controller, editor) {
 				Tax += Number(currency.replace(/[^0-9.-]+/g, ""));
 			}
 		}
-		$("#totalSpan").text(this.CurrencyFormatter(Ext));	//'$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
+		$("#TotalExt").text(this.CurrencyFormatter(Ext));	//'$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
 		$("#TotalTax")[0].value = this.CurrencyFormatter(Tax);	//'$' + Tax.toLocaleString('en-US', { minimumFractionDigits: 2 });
 		this.setBalanceStyle();
 	};
 
 	this.setBalanceStyle = function () {
 		var subTotal = document.getElementById('hSubtotal').value.replace(/[^0-9.-]+/g, "");
-		var total = $("#totalSpan").text().replace(/[^0-9.-]+/g, "");
+		var total = $("#TotalExt").text().replace(/[^0-9.-]+/g, "");
 		//var total = document.getElementById('Total').value.replace(/[^0-9.-]+/g, "");
 
 		var TextLabel = document.getElementById('Balanced');
@@ -725,7 +725,8 @@ function APUtil(Vault, controller, editor) {
 	}
 
 	this.CheckTaxCode = function (_idx) {
-		var tx = $("#TaxCode" + _idx)[0].value.toUpperCase();
+		//var tx = $("#TaxCode" + _idx)[0].value.toUpperCase();
+		var tx = $("#" + _idx)[0].value.toUpperCase();
 		//var tax = [];
 
 		//for (var i = 0; i < this.TaxCodeArr.length; i++) {
@@ -734,13 +735,14 @@ function APUtil(Vault, controller, editor) {
 
 		if (this.TaxCodeArr.indexOf(tx) > 0) {
 			TaxCode = tx;
-			this.Calculate(_idx);
+			var d = _idx.replace(/[^0-9.-]+/g, "");
+			this.Calculate(d);
 		}
 		else {
 			if ($("#popupTaxInfo")[0].innerHTML == "") {
 				alert("Tax code is invalid!!\nYou can see the Tax Code hover your mouse over the blue icon.");
 			}
-			$("#TaxCode" + _idx)[0].focus();
+			$("#" + _idx)[0].focus();
 		}
 	}
 
