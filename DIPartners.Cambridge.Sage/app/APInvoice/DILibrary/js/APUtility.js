@@ -6,7 +6,8 @@ function APUtil(Vault, controller, editor) {
 	this.editor = editor;
 	this.GLAccountList = "";
 	this.GLAccountArr = [];
-	//	this.TaxCode = "";
+	this.TaxCodeArr = [];
+	this.TaxInfoArr = [];
 
 	this.GetText = function (id) {
 		switch (id) {
@@ -384,9 +385,13 @@ function APUtil(Vault, controller, editor) {
 					el.setAttribute('onkeyup', 'gUtil.Calculate(\'' + iteration + '\')');
 					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
 				}
-				if (startCell == 4 | startCell == 5 || startCell == 6) {
+				if (startCell == 4 || startCell == 6) {
 					el.setAttribute("readonly", 'true');
 					el.classList.remove("inputData");
+				}
+
+				if (startCell == 5) {
+					el.setAttribute('onblur', 'gUtil.CheckTaxCode(\'' + iteration + '\')');
 				}
 				if (startCell == 7) {
 					el.setAttribute('onkeypress', 'return gUtil.isNumberKey(event,this.id)');
@@ -595,6 +600,37 @@ function APUtil(Vault, controller, editor) {
 		}
 	}
 
+	this.GetTaxDefXXX = function () {
+
+		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
+		var TAXObjVers = TaxSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var TAXResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(TAXObjVers);
+
+		for (var i = 0; i < TaxSearchResults.Count; i++) {
+			var props = TAXResultsProperties[i];
+			var TC = props.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value + ' - ' + props.SearchForPropertyByAlias(Vault, "vProperty.TaxDescription", true).TypedValue.Value;
+			this.TaxCodeList += '<option value=\"' + TaxSearchResults[i].DisplayID + '\">' + TC + '</option>';
+		}
+	}
+
+	this.GetTaxDef = function () {
+
+		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
+			this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
+		var TAXObjVers = TaxSearchResults.GetAsObjectVersions().GetAsObjVers();
+		var TAXResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(TAXObjVers);
+
+		for (var i = 0; i < TaxSearchResults.Count; i++) {
+			var taxInfo = [];
+			var props = TAXResultsProperties[i];
+			taxInfo[0] = props.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value;
+			taxInfo[1] = props.SearchForPropertyByAlias(Vault, "vProperty.TaxDescription", true).TypedValue.Value;
+			this.TaxInfoArr[i] = taxInfo;
+			this.TaxCodeArr[i] = taxInfo[0];
+		}
+	}
+
 	this.GetTaxDefbyID = function (TaxID) {
 
 		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
@@ -686,6 +722,26 @@ function APUtil(Vault, controller, editor) {
 		AdjTax[3] = TaxDesc;
 
 		return AdjTax;
+	}
+
+	this.CheckTaxCode = function (_idx) {
+		var tx = $("#TaxCode" + _idx)[0].value.toUpperCase();
+		//var tax = [];
+
+		//for (var i = 0; i < this.TaxCodeArr.length; i++) {
+		//	tax[i] = this.TaxCodeArr[i][0];
+		//}
+
+		if (this.TaxCodeArr.indexOf(tx) > 0) {
+			TaxCode = tx;
+			this.Calculate(_idx);
+		}
+		else {
+			if ($("#popupTaxInfo")[0].innerHTML == "") {
+				alert("Tax code is invalid!!\nYou can see the Tax Code hover your mouse over the blue icon.");
+			}
+			$("#TaxCode" + _idx)[0].focus();
+		}
 	}
 
 	this.CurrencyFormatter = function (number) {

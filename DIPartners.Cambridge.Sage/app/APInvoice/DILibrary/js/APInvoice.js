@@ -82,6 +82,7 @@ function SetDetails(dashboard) {
 
     gUtil.ResizeContentArea();
     gUtil.GetGLAccount();
+    gUtil.GetTaxDef();
     SetInvoiceDetails(controller);
     SetPODetails(controller);
     SetPSDetails(controller);
@@ -115,7 +116,8 @@ function SetInvoiceDetails(controller) {
         '<tr><td colspan="6" align="center">' +
         '    <table width="90%" id="invoice_details_table" class="details mf-dynamic-table">' +
         '       <tr><th scope="col" width="5%">-</th><th scope="col" width="20%">Item</th><th scope="col" width="10%">Qty</th><th scope="col" width="13%">Unit $</th>' +
-        '           <th scope="col" width="15%">Ext $</th><th scope="col" width="8%">TAX<br>Code</th><th scope="col" width="13%">TAX</th><th scope="col" width="8%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
+        '           <th scope="col" width="15%">Ext $</th><th scope="col" width="8%">TAX<img id="chk" src="DILibrary/images/more_info.png" width="10px" onmouseover="openTaxInform();"><br>Code</th>' +
+        '           <th scope="col" width="13%">TAX</th><th scope="col" width="8%">PO#</th><th scope="col" width="15%"><span>GL<br>Account</span></th></tr>' +
         '    </table>' +
         '</td></tr>' +
         '');
@@ -126,7 +128,6 @@ function SetInvoiceDetails(controller) {
     const TOTAL_TAX = 1;
     const TAX_CODE = 2;
     const TAX_DESC = 3;
-
     if (Count > 0) {
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         for (var i = 0; i < Count; i++) {
@@ -139,7 +140,6 @@ function SetInvoiceDetails(controller) {
             PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
 
             var Tax = gUtil.GetTax(Qty, Price, TaxCode);
-
             var GLAccount = props.SearchForPropertyByAlias(Vault, "vProperty.GLAccount", true).Value.DisplayValue;
             Total = Total + props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
             var curNo = Number(PONumber.split(" - ").pop().trim()) - 1;
@@ -160,7 +160,8 @@ function SetInvoiceDetails(controller) {
                 '       onkeyup="gUtil.Calculate(\'' + i + '\')" ' +
                 '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
                 '   <td data-label="Ext $"><input type="text" id=\'InvoiceLineExtension' + i + '\' value="' + gUtil.CurrencyFormatter(Tax[ADJ_EXT]) + '" readonly="true"></td>' +
-                '   <td data-label="TAX Code"><input type="text" id=\'TaxCode' + i + '\' value="' + Tax[TAX_CODE] + '" title="' + Tax[TAX_DESC] + '" readonly="true"></td>' +
+                '   <td data-label="TAX Code"><input type="text" class="inputData" id=\'TaxCode' + i + '\' value="' + Tax[TAX_CODE] + '" title="' + Tax[TAX_DESC] + '" onblur="gUtil.CheckTaxCode(\'' + i + '\')"></td>' +
+                //'   <td data-label="TAX Code"><select id=\'TaxCode' + i + '\' class="SelectTaxCode">'+gUtil.TaxCodeList+'</select></td>' +
                 '   <td data-label="TAX"><input type="text" id=\'Tax' + i + '\' value="' + gUtil.CurrencyFormatter(Tax[TOTAL_TAX]) + '" readonly="true"></td>' +
                 '   <td data-label="PO#"><input type="text" class="inputData" id=\'PONumber' + i + '\' ' +
                 '       value="' + PONumber.split(" - ").pop().trim() + '" title = "' + PONumber + '"' +
@@ -193,7 +194,7 @@ function SetInvoiceDetails(controller) {
             '   <td data-label="Unit $"><input type="text" class="inputData" id=\'UnitPrice0\' value="" onkeyup="gUtil.Calculate(\'0\')" ' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
             '   <td data-label="Ext $"><input type="text" id=\'InvoiceLineExtension0\' value="" readonly="true"></td>' +
-            '   <td data-label="TAX Code"><input type="text" id=\'TaxCode0\' value="" title="" readonly="true"></td>' +
+            '   <td data-label="TAX Code"><input type="text" class="inputData" id=\'TaxCode0\' value="" title="" onblur="gUtil.CheckTaxCode(\'0\')"></td>' +
             '   <td data-label="TAX"><input type="text" id=\'Tax0\' value="" readonly="true"></td>' +
             '   <td data-label="PO#"><input type="text" class="inputData" id=\'PONumber0\' value="" title = ""' +
             '       onkeypress="return gUtil.isNumberKey(event,this.id)"></td> ' +
@@ -207,6 +208,7 @@ function SetInvoiceDetails(controller) {
         if (GLAccount == "") { $("#GLAccount0").val(null).trigger("change"); }
     }
     $(".SelectGL").select2({ allowClear: true, width: '260px', placeholder: { text: '' } });
+    //$(".SelectTaxCode").select2({ allowClear: true, width: '60px', placeholder: { text: '' } });
     $(".SelectGL").on('select2:open', function (e) { gUtil.toggleButton(false); });
     $('.SelectGL').on('select2:open', function (e) {
         var tabW = $('#invoice_details_table')[0].clientWidth;
@@ -770,4 +772,40 @@ function closeForm(val) {
     $("#popupItemDesc").empty();
     $("#invoice_details_table").focus();
     if (val) RefreshTab();
+}
+
+function openTaxInform() {
+    var taxInfo = "";
+    for (var i = 0; i < gUtil.TaxInfoArr.length; i++) {
+        var taxCd = gUtil.TaxInfoArr[i][0];
+        var taxDesc = gUtil.TaxInfoArr[i][1];
+        taxInfo += '<tr><td>' + taxCd + '</td>' +
+            '<td>' + taxDesc + '</td></tr>';
+    }
+
+    var modalHtml =
+        '<div class="modal-content">' +
+        '<span style="float:right; font-size:20px; cursor:pointer;" id="closeX">&times;</span><br />' +
+        ' <table id="TaxInfoTable">' +
+        '    <tr>' +
+        '        <th>TaxCode</th>' +
+        '        <th>Description</th>' +
+        '    </tr>' + taxInfo +
+        '</table>' +
+        '</div>';
+    $("#popupTaxInfo").append(modalHtml);
+
+    //var tbl = document.getElementById('TaxInfoTable');
+    var modal = $("#popupTaxInfo")[0].style;
+    modal.display = "block";
+    modal.top = "0px";
+    modal.left = "0px";
+    modal.width = $(".page-container").width() + "px";
+    modal.height = $(".panel-left").height() + "px";
+    $(".modal-content").css("width", "25%");
+
+    $("#closeX").on("click", function () {
+        document.getElementById("popupTaxInfo").style.display = "none";
+        $("#popupTaxInfo").empty();
+    });
 }

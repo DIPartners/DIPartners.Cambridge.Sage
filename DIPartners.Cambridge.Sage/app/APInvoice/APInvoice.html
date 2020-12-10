@@ -60,6 +60,73 @@
             <button type="button" class="btn" id="discard-data" onclick="DiscardInvoice();"></button>
         </div>
     </div>
-    <div id="popupDesc" class="modal"></div>
+    <div id="popupItemDesc" class="modal"></div>
+    <div id="popupTaxInfo" class="modal"></div>
+</body>
+</html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Invoice Metadata Details</title>
+
+    <!-- To avoid display Date/Telephone number as hyperlink in edge browser. -->
+    <meta name="format-detection" content="telephone=no,date=no" />
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="DILibrary/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css" />
+    <!-- CSS for layout and style -->
+    <link rel="Stylesheet" type="text/css" href="DILibrary/css/uicontrollibrary-new.css" />
+    <link rel="Stylesheet" type="text/css" href="DILibrary/css/style.css" />
+    <!-- JavaScript -->
+    <script type="text/javascript" src="DILibrary/js/jquery-2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="DILibrary/js/jquery-ui-1.10.0.custom/jquery-ui-1.10.0.custom.js"></script>
+    <script type="text/javascript" src="DILibrary/js/jquery.timeentry-1.5.0-1/jquery.timeentry.m-files.js"></script>
+    <!-- Select2 Control -->
+    <link rel="stylesheet" type="text/css" href="DILibrary/js/select2-4.0.6/css/select2.min.css" />
+    <script type="text/javascript" src="DILibrary/js/select2-4.0.6/js/select2.min.js"></script>
+
+    <!-- DIP Library -->
+    <script src="DILibrary/js/jquery-resizable-dom/jquery-resizable.min.js"></script>
+    <script src="DILibrary/js/console-dashboard.js"></script>
+    <script src="DILibrary/js/APUtility.js"></script>
+    <script src="DILibrary/js/APInvoice.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $(".panel-left").resizableSafe({
+                handleSelector: ".splitter",
+                resizeHeight: false
+            });
+
+        });
+        // Apply left-to-right layout.
+        $("html").attr("dir", "ltr");
+        $("html").addClass("mf-ltr");
+    </script>
+
+</head>
+<body style="zoom: 1;">
+    <div class="page-container">
+        <label id="titleLabel">Invoice Details:  <span id="message_placeholder"></span></label>
+        <div class="panel-container">
+            <div class="panel-left"></div>
+            <div class="splitter"></div>
+            <div class="panel-right"></div>
+        </div>
+    </div>
+    <!-- Footer begins -->
+    <div class="eclip" id="mf-footer" style="padding-bottom:10px;">
+        <div id="iv-buttons">
+            <button type="button" class="btn" id="save-data" onclick="SaveInvoice();"></button>
+            <button type="button" class="btn" id="discard-data" onclick="DiscardInvoice();"></button>
+        </div>
+    </div>
+    <div id="popupItemDesc" class="modal"></div>
+    <div id="popupTaxInfo" class="modal"></div>
 </body>
 </html>

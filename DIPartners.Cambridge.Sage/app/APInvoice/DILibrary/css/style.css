@@ -291,6 +291,14 @@ labelS {
 	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
 }
 
+option {
+	font-family: Segoe UI, Tahoma, Arial, sans-serif !important;
+}
+
+#TaxInfoTable tr:nth-child(even) {
+	background-color: #eff5fa;
+}
+
 @media screen and (max-width: 600px) {
 	.details {
 		border: 0;
