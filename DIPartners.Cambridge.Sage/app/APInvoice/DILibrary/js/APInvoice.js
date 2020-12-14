@@ -232,7 +232,7 @@ function SetInvoiceDetails(controller) {
         '</tr>'
     );
 
-    generate_addedRowX(editor.table, 'Detail Subtotal');
+    generate_totalCode(editor.table, 'Detail Subtotal');
     //generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal');
 
     //generate_addedRow(editor.table, 'Freight');
@@ -530,7 +530,7 @@ function generate_addedRowXXX(tableID, propertyName) {
     tableID.append(propertyLine);
 }
 
-function generate_addedRowX(tableID, propertyName) {
+function generate_addedRowXX(tableID) {
 
     var DetailSubtotal = gUtil.GetNumber($("#TotalExt").text());//.replace(/[^0-9.-]+/g, "");
     var InvoiceSubTotal = gUtil.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(gUtil.Vault, "vProperty.Subtotal", true).Value.DisplayValue;
@@ -547,6 +547,7 @@ function generate_addedRowX(tableID, propertyName) {
     DetailTotal = parseFloat(DetailSubtotal) + parseFloat(DetailTax);
     InvoiceTotal = parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax);
     var TC = (TaxCode == null) ? "" : TaxCode;
+
     var propertyLine =
         '<tr class="TotalCost" >' +
         '   <td class="mf-dynamic-namefield"> <div><span>Detail Subtotal</span></td > ' +
@@ -555,9 +556,6 @@ function generate_addedRowX(tableID, propertyName) {
         '   <td class="mf-dynamic-namefield"> <div><span>Invoice Subtotal</span></td > ' +
         '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceSubtotal">' + gUtil.CurrencyFormatter(InvoiceSubTotal) + '</span></div>' +
         '       <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + InvoiceSubTotal + '" disabled ></div></td></tr> ' +
-        //tableID.append(propertyLine);
-        //generate_row(tableID, gUtil.Vault, gUtil.controller.editor.ObjectVersionProperties, 'vProperty.Subtotal');
-        //propertyLine =
         '<tr class="TotalCost">' +
         '   <td class="mf-dynamic-namefield"> <div><span>Freight</span></td > ' +
         '   <td class="mf-dynamic-namefield"><input type="text" id="FreightCost" value="$" class="inputData" onkeyup="gUtil.CalculateFreight()"; onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)"></td>' +
@@ -573,22 +571,48 @@ function generate_addedRowX(tableID, propertyName) {
         '<tr class="TotalCost">' +
         '   <td class="mf-dynamic-namefield"><div><span>Detail Total</span></div></td>' +
         '   <td colspan="4"><div class="mf-internal-text"><span id="DetailTotal" style="background-color:' + bgTotal + '">' + gUtil.CurrencyFormatter(DetailTotal) + '</span></div></td></tr>' +
-        //'<tr class="TotalCost">' +
-        //'   <td class="mf-dynamic-namefield"><div><span>Invoice Total</span></div></td>' +
-        //'   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceTotal">' + gUtil.CurrencyFormatter(InvoiceTotal) + '</span></div></td></tr>' +
         '<tr class="TotalCost">' +
         '   <td class="mf-dynamic-namefield"><div><span>Invoice Total</span></div></td>' +
         '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceTotal">' + gUtil.CurrencyFormatter(InvoiceTotal) + '</span></div></td></tr>';
 
     tableID.append(propertyLine);
-    /*tableID.hover(
-        function () {
-            $(this).addClass("ui-state-hover");
-        },
-        function () {
-            $(this).removeClass("ui-state-hover");
-        }
-    );*/
+    gUtil.SetTotalCost();
+
+}
+
+function generate_totalCode(tableID) {
+
+    var TC = (TaxCode == null) ? "" : TaxCode;
+    var propertyLine =
+        '<tr class="TotalCost" >' +
+        '   <td class="mf-dynamic-namefield"> <div><span>Detail Subtotal</span></td > ' +
+        '   <td colspan="4"><div class="mf-internal-text"><span id="DetailSubtotal"></span></div></td></tr>' +
+        '<tr class="TotalCost" >' +
+        '   <td class="mf-dynamic-namefield"> <div><span>Invoice Subtotal</span></td > ' +
+        '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceSubtotal"></span></div>' +
+        '       <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="" disabled ></div></td></tr> ' +
+        '<tr class="TotalCost">' +
+        '   <td class="mf-dynamic-namefield"> <div><span>Freight</span></td > ' +
+        '   <td class="mf-dynamic-namefield"><input type="text" id="FreightCost" value="$" class="inputData" onkeyup="gUtil.CalculateFreight()"; onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)"></td>' +
+        '   <td style="width:15%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax Code</span></td>' +
+        '   <td style="width:10%"><input type="text" id="FreightTaxCode" class="inputData" value="' + TC + '" onblur="gUtil.CheckTaxCode(this.id);"></div></td>' +
+        '   <td style="width:30%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax:</span><span id="FreightTax"></span></td>' +
+        '<tr class="TotalCost">' +
+        '   <td class="mf-dynamic-namefield"><div><span>Detail Tax</span></div></td>' +
+        '   <td colspan="4"><div class="mf-internal-text"><span id="DetailTax"></span></div></td></tr>' +
+        '<tr class="TotalCost">' +
+        '   <td class="mf-dynamic-namefield"><div><span>Invoice Tax</span></div></td>' +
+        '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceTax"></span></div></td></tr>' +
+        '<tr class="TotalCost">' +
+        '   <td class="mf-dynamic-namefield"><div><span>Detail Total</span></div></td>' +
+        '   <td colspan="4"><div class="mf-internal-text"><span id="DetailTotal"></span></div></td></tr>' +
+        '<tr class="TotalCost">' +
+        '   <td class="mf-dynamic-namefield"><div><span>Invoice Total</span></div></td>' +
+        '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceTotal"></span></div></td></tr>';
+
+    tableID.append(propertyLine);
+    gUtil.SetTotalCost();
+
 }
 
 function generate_addedRow(tableID, propertyName) {
@@ -704,68 +728,6 @@ function CreateMetadataCard(controller, editor, tablist, tabid, tabtitle) {
     mfdynamicTab.attr('id', 'mf-property-table');
     mfdynamicTab.css("margin-bottom", "30px");
     mfscrollableDiv.append(mfdynamicTab);
-
-    editor.metadatacard = MetaCard;
-    editor.table = $('div #' + editor.cardname + ' #mf-property-table');
-}
-
-function CreateMetadataCard1(controller, editor, tablist, tabid, tabtitle) {
-    var self = this;
-    var Vault = controller.Vault;
-    controller.editor = editor;
-    var cardid = (typeof controller.cards === 'undefined') ? 0 : controller.cards + 1;
-    controller.cards = cardid;
-    editor.cardname = 'metadatacard-' + cardid;
-    editor.tabname = tabid;
-    editor.tabdisplayname = tabtitle;
-    var active = (tablist == "ltabs") ? "active" : "";
-
-    // Add the tab to the tab list
-    $('<li class="nav-item"><a class="nav-link ' + active + '\" href="#' + editor.tabname + '" role="tab" data-toggle="tab" >' + editor.tabdisplayname + '</a></li>').appendTo("#" + tablist + " ul");
-    $('<div class="tab-content" id="' + editor.tabname + '"><div class="tab-pane fade show active mf-metadatacard mf-mode-properties" id="' + editor.cardname + '"></div></div>').appendTo("#" + tablist);
-    $("#" + tablist).tabs("refresh");
-
-    var MetaCard = $('div #' + editor.cardname);
-    MetaCard.addClass("mf-card-docked");
-
-    var mfcontentDiv = $('<div>');
-    mfcontentDiv.addClass('mf-content');
-    mfcontentDiv.css('height', '100%');
-    MetaCard.append(mfcontentDiv);
-
-    var mfpropertiesviewDiv = $('<div>');
-    mfpropertiesviewDiv.attr('id', 'mf-properties-view')
-    mfcontentDiv.append(mfpropertiesviewDiv);
-
-    var mfdynamiccontrolsDiv = $('<div>');
-    mfdynamiccontrolsDiv.addClass('mf-dynamic-controls');
-    mfpropertiesviewDiv.append(mfdynamiccontrolsDiv);
-
-    var mfinternaldynamiccontrolsDiv = $('<div>');
-    mfinternaldynamiccontrolsDiv.addClass('mf-internal-dynamic-controls');
-    mfdynamiccontrolsDiv.append(mfinternaldynamiccontrolsDiv);
-
-    var scroll = $(window).outerHeight() - $("#mf-footer").outerHeight() - $("#titleLabel").height() - 20;
-    var mfsectionDiv = $('<div>');
-    mfsectionDiv.addClass('mf-section mf-section-properties');
-    mfinternaldynamiccontrolsDiv.append(mfsectionDiv);
-
-    var mfscrollableDiv = $('<div>');
-    mfscrollableDiv.addClass('ui-scrollable');
-    //mfscrollableDiv.css('height', scroll + 'px');
-    mfscrollableDiv.css('height', '700px');
-    mfsectionDiv.append(mfscrollableDiv);
-
-    var mfsectioncontentDiv = $('<div>');
-    mfsectioncontentDiv.addClass('mf-section-content mf-dynamic-properties');
-    mfsectioncontentDiv.attr('id', 'a' + cardid);
-    mfscrollableDiv.append(mfsectioncontentDiv);
-
-    var mfdynamicTab = $('<table>');
-    mfdynamicTab.addClass('mf-dynamic-table');
-    mfdynamicTab.attr('id', 'mf-property-table');
-    mfdynamicTab.css("margin-bottom", "30px");
-    mfsectioncontentDiv.append(mfdynamicTab);
 
     editor.metadatacard = MetaCard;
     editor.table = $('div #' + editor.cardname + ' #mf-property-table');
