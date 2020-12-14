@@ -484,8 +484,8 @@ function APUtil(Vault, controller, editor) {
 		//var DetailTotal = parseFloat(DetailTax) + (DetailSubtotal != "") ? parseFloat(DetailSubtotal) : 0;
 		//var InvoiceTotal = this.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Total", true).Value.DisplayValue;
 
-		var DetailTotal = DetailSubtotal + DetailTax + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
-		var InvoiceTotal = InvoiceSubTotal + InvoiceTax;// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
+		var DetailTotal = (DetailSubtotal + DetailTax + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text())).toFixed(2);
+		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
 
 
 		var BalanceBG = "rgb(223, 248, 223)";
@@ -652,20 +652,6 @@ function APUtil(Vault, controller, editor) {
 		}
 	}
 
-	this.GetTaxDefXXX = function () {
-
-		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
-			this.FindObjectsWithoutValue('vObject.TaxDefinition'), MFSearchFlagNone, true);
-		var TAXObjVers = TaxSearchResults.GetAsObjectVersions().GetAsObjVers();
-		var TAXResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(TAXObjVers);
-
-		for (var i = 0; i < TaxSearchResults.Count; i++) {
-			var props = TAXResultsProperties[i];
-			var TC = props.SearchForPropertyByAlias(Vault, "vProperty.TaxCode", true).TypedValue.Value + ' - ' + props.SearchForPropertyByAlias(Vault, "vProperty.TaxDescription", true).TypedValue.Value;
-			this.TaxCodeList += '<option value=\"' + TaxSearchResults[i].DisplayID + '\">' + TC + '</option>';
-		}
-	}
-
 	this.GetTaxDef = function () {
 
 		var TaxSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
@@ -802,10 +788,16 @@ function APUtil(Vault, controller, editor) {
 			minimumFractionDigits: 2,
 		});
 
+		//var num = number, rounded = number.rounded
+		//return num.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
+
+
+		//return  Number(number).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 		return formatter.format(number);
 	}
 
 	this.GetNumber = function (str) {
+		if ($.isNumeric(str)) return str;
 		var n = parseFloat(str.replace(/[^0-9.-]+/g, ""));
 		return (isNaN(n)) ? 0 : n;
 	}
