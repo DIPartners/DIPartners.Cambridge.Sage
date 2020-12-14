@@ -447,10 +447,6 @@ function APUtil(Vault, controller, editor) {
 		$("#FreightTax").text((this.CurrencyFormatter(Total[1]) == "NaN") ? this.CurrencyFormatter("0") : this.CurrencyFormatter(Total[1]));
 
 		this.SetTotalCost();
-		//var DetailTotal = this.GetNumber($("#DetailSubtotal").text()) + this.GetNumber($("#DetailTax").text()) + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text()); 
-		//var InvoiceTotal = this.GetNumber($("#InvoiceSubtotal").text()) + this.GetNumber($("#InvoiceTax").text()) + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
-		//$("#DetailTotal").text(this.CurrencyFormatter(DetailTotal));
-		//$("#InvoiceTotal").text(this.CurrencyFormatter(InvoiceTotal));
 	};
 
 	this.CalculateTotal = function () {
@@ -480,21 +476,14 @@ function APUtil(Vault, controller, editor) {
 		var InvoiceSubTotal = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Subtotal", true).Value.DisplayValue);
 		var DetailTax = this.GetNumber($("#TotalTax")[0].value);
 		var InvoiceTax = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Tax", true).Value.DisplayValue);
-		//var DetailTotal = parseFloat(DetailTax) + (DetailSubtotal != "") ? parseFloat(DetailSubtotal) : 0;
-		//var DetailTotal = parseFloat(DetailTax) + (DetailSubtotal != "") ? parseFloat(DetailSubtotal) : 0;
-		//var InvoiceTotal = this.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Total", true).Value.DisplayValue;
-
 		var DetailTotal = (DetailSubtotal + DetailTax + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text())).toFixed(2);
 		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
-
 
 		var BalanceBG = "rgb(223, 248, 223)";
 		var NotBalanceBG = "rgb(250, 215, 215)";
 		var bgSubtotal = (DetailSubtotal == InvoiceSubTotal) ? BalanceBG : NotBalanceBG;
 		var bgTax = (DetailTax == InvoiceTax) ? BalanceBG : NotBalanceBG;
 		var bgTotal = (DetailTotal == InvoiceTotal) ? BalanceBG : NotBalanceBG;
-		//DetailTotal = parseFloat(DetailSubtotal) + parseFloat(DetailTax);
-		//InvoiceTotal = parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax); 
 
 		$("#DetailSubtotal").text(this.CurrencyFormatter(DetailSubtotal));
 		$("#InvoiceSubtotal").text(this.CurrencyFormatter(InvoiceSubTotal));
@@ -788,11 +777,6 @@ function APUtil(Vault, controller, editor) {
 			minimumFractionDigits: 2,
 		});
 
-		//var num = number, rounded = number.rounded
-		//return num.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
-
-
-		//return  Number(number).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 		return formatter.format(number);
 	}
 
