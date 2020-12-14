@@ -437,6 +437,21 @@ function APUtil(Vault, controller, editor) {
 		this.CalculateTotal();
 	};
 
+	this.CalculateFreight = function () {
+		var Qty = 1;
+		var Cost = $("#FreightCost")[0].value;
+		var TC = $("#FreightTaxCode")[0].value;
+
+		Cost = (Cost.substring(0, 1) == "$") ? Cost.substring(1) : Cost;
+		var Total = this.GetTax(Qty, Cost, TC);
+
+		var DetailTotal = this.GetNumber($("#DetailSubtotal").text()) + this.GetNumber($("#DetailTax").text()) + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
+		var InvoiceTotal = this.GetNumber($("#InvoiceSubtotal").text()) + this.GetNumber($("#InvoiceTax").text()) + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
+		$("#FreightTax").text((this.CurrencyFormatter(Total[1]) == "NaN") ? this.CurrencyFormatter("0") : this.CurrencyFormatter(Total[1]));
+		$("#DetailTotal").text(this.CurrencyFormatter(DetailTotal));
+		$("#InvoiceTotal").text(this.CurrencyFormatter(InvoiceTotal));
+	};
+
 	this.isNumberKey = function (evt, id) {
 		try {
 			var charCode = (evt.which) ? evt.which : event.keyCode;
@@ -486,11 +501,13 @@ function APUtil(Vault, controller, editor) {
 		for (var i = 0; i < lastRow; i++) {
 			if ($("#InvoiceLineExtension" + i)[0] != undefined) {
 				var currency = $("#InvoiceLineExtension" + i)[0].value;
-				Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
+				//Ext += Number(currency.replace(/[^0-9.-]+/g, ""));
+				Ext += this.GetNumber(currency);
 			}
 			if ($("#Tax" + i)[0] != undefined) {
 				var currency = $("#Tax" + i)[0].value;
-				Tax += Number(currency.replace(/[^0-9.-]+/g, ""));
+				//Tax += Number(currency.replace(/[^0-9.-]+/g, ""));
+				Tax += this.GetNumber(currency);
 			}
 		}
 		$("#TotalExt").text(this.CurrencyFormatter(Ext));	//'$' + Ext.toLocaleString('en-US', { minimumFractionDigits: 2 });
@@ -499,8 +516,8 @@ function APUtil(Vault, controller, editor) {
 	};
 
 	this.setBalanceStyle = function () {
-		var subTotal = document.getElementById('hSubtotal').value.replace(/[^0-9.-]+/g, "");
-		var total = $("#TotalExt").text().replace(/[^0-9.-]+/g, "");
+		var subTotal = this.GetNumber(document.getElementById('hSubtotal').value);
+		var total = this.GetNumber($("#TotalExt").text());
 		//var total = document.getElementById('Total').value.replace(/[^0-9.-]+/g, "");
 
 		var TextLabel = document.getElementById('Balanced');
@@ -725,18 +742,15 @@ function APUtil(Vault, controller, editor) {
 	}
 
 	this.CheckTaxCode = function (_idx) {
-		//var tx = $("#TaxCode" + _idx)[0].value.toUpperCase();
 		var tx = $("#" + _idx)[0].value.toUpperCase();
-		//var tax = [];
-
-		//for (var i = 0; i < this.TaxCodeArr.length; i++) {
-		//	tax[i] = this.TaxCodeArr[i][0];
-		//}
-
+		if (tx == "") tx = null;
 		if (this.TaxCodeArr.indexOf(tx) > 0) {
 			TaxCode = tx;
-			var d = _idx.replace(/[^0-9.-]+/g, "");
-			this.Calculate(d);
+			if (_idx == "FreightTaxCode") {
+				$("#FreightTaxCode")[0].value = $("#FreightTaxCode")[0].value.toUpperCase();
+				this.CalculateFreight();
+			}
+			else this.Calculate(this.GetNumber(_idx));
 		}
 		else {
 			if ($("#popupTaxInfo")[0].innerHTML == "") {
@@ -754,6 +768,11 @@ function APUtil(Vault, controller, editor) {
 		});
 
 		return formatter.format(number);
+	}
+
+	this.GetNumber = function (str) {
+		var n = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+		return (isNaN(n)) ? 0 : n;
 	}
 }
 

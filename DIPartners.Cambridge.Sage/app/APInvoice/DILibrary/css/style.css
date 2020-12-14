@@ -124,6 +124,14 @@ label {
 	text-align: center !important;
 }
 
+#FreightTaxCode {
+	text-align: center !important;
+}
+
+#FreightTax {
+	color: black;
+}
+
 #invoice_details_table tr td:nth-child(3) input,
 #invoice_details_table tr td:nth-child(4) input,
 #invoice_details_table tr td:nth-child(5) input,
