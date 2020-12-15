@@ -68,7 +68,6 @@ function APUtil(Vault, controller, editor) {
 	}
 
 	this.DestroyOldDetails = function () {
-
 		var ci = controller.Invoice;
 		var ObjectSearchResults = Vault.ObjectSearchOperations.SearchForObjectsByConditions(
 			FindObjects(Vault, 'vObject.InvoiceDetail', 'vProperty.Invoice', MFDatatypeLookup, ci.ObjectVersion.ObjVer.ID), MFSearchFlagNone, true);
@@ -112,6 +111,17 @@ function APUtil(Vault, controller, editor) {
 		var value = tbl.rows[no + 1].cells[this.GetColIndex(pptName)].querySelector('input').value;
 
 		propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + pptName);
+		propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
+
+		return propertyValue;
+	}
+
+	this.GetFreightPropertyValue = function (pptName) {
+
+		var propertyValue = new MFiles.PropertyValue();
+		var VaultOp = Vault.PropertyDefOperations;
+
+		propertyValue.PropertyDef = VaultOp.GetPropertyDefIDByAlias("vProperty." + $("#" + pptName)[0].value);
 		propertyValue.Value.SetValue(VaultOp.GetPropertyDef(propertyValue.PropertyDef).DataType, value);
 
 		return propertyValue;
@@ -196,6 +206,7 @@ function APUtil(Vault, controller, editor) {
 	}
 
 	this.CreateNewDetails = function () {
+
 		var ci = controller.Invoice;
 		if (this.DuplicatedPOValue()) return false;
 		var actCount = document.getElementById('invoice_details_table').rows.length - 2;
@@ -260,41 +271,39 @@ function APUtil(Vault, controller, editor) {
 				MFiles.CreateInstance("AccessControlList"));
 
 			Vault.ObjectOperations.CheckIn(oObjectVersionAndProperties.ObjVer);
+			this.UpdateInvoice();
 		}
 		return true;
 	}
 
 	this.UpdateInvoice = function () {
 		var ci = controller.Invoice;
-		var Verified = ($("#Verified")[0].checked) ? 1 : 0;
-		var Freight = ($("#txtFreight")[0].value.substring(0, 1) == "$") ? $("#txtFreight")[0].value.substring(1) : $("#txtFreight")[0].value.substring(0);
-		var Taxable = ($("#chkTaxable")[0].checked) ? 1 : 0;
+		var FreightCost = $("#FreightCost")[0].value.trim();
+		var FreightTaxCode = $("#FreightTaxCode")[0].value.trim();
+		if (FreightCost == "$") return;
 
+		FreightCost = this.GetNumber(FreightCost);
+
+		//FreightTaxCode
 		var objID = new MFiles.ObjID();
 		objID.SetIDs(ci.ObjectVersion.ObjVer.Type, ci.ObjectVersion.ObjVer.ID);
 		var InvoiceObjVer = Vault.ObjectOperations.GetLatestObjVer(objID, false, true);
 		var InvoiceoObjProperties = Vault.ObjectOperations.GetObjectVersionAndProperties(InvoiceObjVer);
-		/*if (!InvoiceoObjProperties.VersionData.ObjectCheckedOut) {
+		if (!InvoiceoObjProperties.VersionData.ObjectCheckedOut) {
 			var COInvoiceObjVer = Vault.ObjectOperations.CheckOut(objID);
 
 			var InvoiceVerified = new MFiles.PropertyValue();
-			InvoiceVerified.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Verified");
-			InvoiceVerified.TypedValue.SetValue(MFDatatypeBoolean, Verified);
+			InvoiceVerified.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Freight");
+			InvoiceVerified.TypedValue.SetValue(MFDatatypeFloating, FreightCost);
 			Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceVerified);
 
-			//var InvoiceFreight = new MFiles.PropertyValue();
-			//InvoiceFreight.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Freight");
-			//InvoiceFreight.TypedValue.SetValue(MFDatatypeFloating, Freight);
-			//Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceFreight);
-
-
-			//var InvoiceTaxable = new MFiles.PropertyValue();
-			//InvoiceTaxable.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.Taxable");
-			//InvoiceTaxable.TypedValue.SetValue(MFDatatypeBoolean, Taxable);
-			//Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceTaxable);
+			var InvoiceFreight = new MFiles.PropertyValue();
+			InvoiceFreight.PropertyDef = Vault.PropertyDefOperations.GetPropertyDefIDByAlias("vProperty.FreightTaxCode");
+			InvoiceFreight.TypedValue.SetValue(MFDatatypeText, FreightTaxCode);
+			Vault.ObjectPropertyOperations.SetProperty(COInvoiceObjVer.ObjVer, InvoiceFreight);
 
 			Vault.ObjectOperations.CheckIn(COInvoiceObjVer.ObjVer);
-		}*/
+		}
 		return true;
 	}
 
@@ -470,7 +479,7 @@ function APUtil(Vault, controller, editor) {
 
 	};
 
-	this.SetTotalCost = function () {
+	this.SetTotalCostXXX = function () {
 
 		var ci = (controller.Invoice == undefined) ? controller.editor : controller.Invoice;
 		var DetailSubtotal = this.GetNumber($("#TotalExt").text()) + this.GetNumber($("#FreightCost")[0].value);
@@ -481,6 +490,35 @@ function APUtil(Vault, controller, editor) {
 		var DetailTotal = (DetailSubtotal + DetailTax).toFixed(2);
 		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
 
+
+		var BalanceBG = "rgb(223, 248, 223)";
+		var NotBalanceBG = "rgb(250, 215, 215)";
+		var bgSubtotal = (DetailSubtotal == InvoiceSubTotal) ? BalanceBG : NotBalanceBG;
+		var bgTax = (DetailTax == InvoiceTax) ? BalanceBG : NotBalanceBG;
+		var bgTotal = (DetailTotal == InvoiceTotal) ? BalanceBG : NotBalanceBG;
+
+		$("#DetailSubtotal").text(this.CurrencyFormatter(DetailSubtotal));
+		$("#InvoiceSubtotal").text(this.CurrencyFormatter(InvoiceSubTotal));
+		$("#hSubtotal").text(this.CurrencyFormatter(InvoiceSubTotal));
+		$("#DetailTax").text(this.CurrencyFormatter(DetailTax));
+		$("#InvoiceTax").text(this.CurrencyFormatter(InvoiceTax));
+		$("#DetailTotal").text(this.CurrencyFormatter(DetailTotal));
+		$("#InvoiceTotal").text(this.CurrencyFormatter(InvoiceTotal));
+
+		$("#DetailSubtotal").css("background-color", bgSubtotal);
+		$("#DetailTax").css("background-color", bgTax);
+		$("#DetailTotal").css("background-color", bgTotal);
+	}
+
+	this.SetTotalCost = function () {
+
+		var ci = (controller.Invoice == undefined) ? controller.editor : controller.Invoice;
+		var DetailSubtotal = this.GetNumber($("#TotalExt").text()) + this.GetNumber($("#FreightCost")[0].value);
+		var InvoiceSubTotal = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Subtotal", true).Value.DisplayValue);
+		var DetailTax = this.GetNumber($("#TotalTax")[0].value) + this.GetNumber($("#FreightTax").text());
+		var InvoiceTax = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Tax", true).Value.DisplayValue);
+		var DetailTotal = (DetailSubtotal + DetailTax);//.toFixed(2);
+		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
 
 		var BalanceBG = "rgb(223, 248, 223)";
 		var NotBalanceBG = "rgb(250, 215, 215)";

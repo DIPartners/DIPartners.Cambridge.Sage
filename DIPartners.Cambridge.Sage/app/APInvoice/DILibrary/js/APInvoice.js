@@ -130,6 +130,7 @@ function SetInvoiceDetails(controller) {
     const TAX_CODE = 2;
     const TAX_DESC = 3;
     if (Count > 0) {
+
         var ObjectSearchResultsProperties = Vault.ObjectPropertyOperations.GetPropertiesOfMultipleObjects(SearchResultsObjVers);
         for (var i = 0; i < Count; i++) {
             var props = ObjectSearchResultsProperties[i];
@@ -232,6 +233,9 @@ function SetInvoiceDetails(controller) {
     );
 
     generate_totalCode(editor.table);
+    $("#FreightCost")[0].value = "$" + editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Freight", true).Value.DisplayValue;
+    $("#FreightTaxCode")[0].value = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.FreightTaxCode", true).Value.DisplayValue;
+    $("#FreightTax")[0].value = gUtil.CheckTaxCode("FreightTaxCode");
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 }
 
@@ -529,7 +533,6 @@ function generate_totalCode(tableID) {
 
     tableID.append(propertyLine);
     gUtil.SetTotalCost();
-
 }
 
 function generate_addedRow(tableID, propertyName) {
@@ -752,7 +755,7 @@ function closeForm(val) {
 function openTaxInform() {
     var taxInfo = "";
     for (var i = 0; i < gUtil.TaxInfoArr.length; i++) {
-        var taxCd = gUtil.TaxInfoArr[i][0];
+        var taxCd = (gUtil.TaxInfoArr[i][0] == null) ? "" : gUtil.TaxInfoArr[i][0];
         var taxDesc = gUtil.TaxInfoArr[i][1];
         taxInfo += '<tr><td>' + taxCd + '</td>' +
             '<td>' + taxDesc + '</td></tr>';
