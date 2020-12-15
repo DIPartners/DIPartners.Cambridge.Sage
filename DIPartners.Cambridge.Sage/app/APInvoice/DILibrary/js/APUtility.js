@@ -471,13 +471,16 @@ function APUtil(Vault, controller, editor) {
 	};
 
 	this.SetTotalCost = function () {
+
 		var ci = (controller.Invoice == undefined) ? controller.editor : controller.Invoice;
-		var DetailSubtotal = this.GetNumber($("#TotalExt").text());
+		var DetailSubtotal = this.GetNumber($("#TotalExt").text()) + this.GetNumber($("#FreightCost")[0].value);
 		var InvoiceSubTotal = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Subtotal", true).Value.DisplayValue);
-		var DetailTax = this.GetNumber($("#TotalTax")[0].value);
+		var DetailTax = this.GetNumber($("#TotalTax")[0].value) + this.GetNumber($("#FreightTax").text());
 		var InvoiceTax = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Tax", true).Value.DisplayValue);
-		var DetailTotal = (DetailSubtotal + DetailTax + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text())).toFixed(2);
+		//var DetailTotal = (DetailSubtotal + DetailTax + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text())).toFixed(2);
+		var DetailTotal = (DetailSubtotal + DetailTax).toFixed(2);
 		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
+
 
 		var BalanceBG = "rgb(223, 248, 223)";
 		var NotBalanceBG = "rgb(250, 215, 215)";
@@ -752,6 +755,11 @@ function APUtil(Vault, controller, editor) {
 	}
 
 	this.CheckTaxCode = function (_idx) {
+		if (_idx == "FreightCost") {
+			$("#FreightCost")[0].value = this.CurrencyFormatter(this.GetNumber($("#FreightCost")[0].value));
+			return;
+		}
+
 		var tx = $("#" + _idx)[0].value.toUpperCase();
 		if (tx == "") tx = null;
 		if (this.TaxCodeArr.indexOf(tx) > 0) {

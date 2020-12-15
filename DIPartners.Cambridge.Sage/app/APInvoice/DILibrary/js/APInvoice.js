@@ -137,7 +137,6 @@ function SetInvoiceDetails(controller) {
             var ItemDesc = props.SearchForPropertyByAlias(Vault, "vProperty.ItemDescription", true).Value.DisplayValue;
             var Qty = props.SearchForPropertyByAlias(Vault, "vProperty.Quantity", true).Value.DisplayValue;
             var Price = props.SearchForPropertyByAlias(Vault, "vProperty.UnitPrice", true).Value.Value;
-            //var Amount = props.SearchForPropertyByAlias(Vault, "vProperty.InvoiceLineExtension", true).Value.Value;
             PONumber = props.SearchForPropertyByAlias(Vault, "vProperty.PurchaseOrderDetail", true).Value.DisplayValue;
 
             var Tax = gUtil.GetTax(Qty, Price, TaxCode);
@@ -232,14 +231,7 @@ function SetInvoiceDetails(controller) {
         '</tr>'
     );
 
-    generate_totalCode(editor.table, 'Detail Subtotal');
-    //generate_row(editor.table, Vault, editor.ObjectVersionProperties, 'vProperty.Subtotal');
-
-    //generate_addedRow(editor.table, 'Freight');
-    //generate_addedRow(editor.table, 'Detail Tax');
-    //generate_addedRow(editor.table, 'Invoice Tax');
-    //generate_addedRow(editor.table, 'Detail Total');
-    //generate_addedRow(editor.table, 'Invoice Total');
+    generate_totalCode(editor.table);
     $(".inputData").click(function (event) { gUtil.toggleButton(false); });
 }
 
@@ -505,85 +497,16 @@ function generate_row(tableID, Vault, ObjVerProperties, propertyAlias) {
         requiredspan = propertyLine.find('.mf-required-indicator').hide();
 }
 
-function generate_addedRowXXX(tableID, propertyName) {
-
-    var DitailSubtotal = $("#TotalExt").text().replace(/[^0-9.-]+/g, "");
-    var InvoiceSubTotal = gUtil.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(gUtil.Vault, "vProperty.Subtotal", true).Value.DisplayValue;
-    //var TaxCode = gUtil.TaxCode;
-    var BalanceBG = "rgb(223, 248, 223)";
-    var NotBalanceBG = "rgb(250, 215, 215)";
-    var bgSubtotal = "";
-    var propertyLine =
-        '<tr class="TotalCost" >' +
-        '   <td class="mf-dynamic-namefield"> <div><span>Detail Subtotal</span></td > ' +
-        '   <td colspan="4"><div class="mf-internal-text"><span style="background-color:' + bgSubtotal + '">' + gUtil.CurrencyFormatter(DitailSubtotal) + '</span></div></td></tr>';
-    tableID.append(propertyLine);
-    generate_row(tableID, gUtil.Vault, gUtil.controller.editor.ObjectVersionProperties, 'vProperty.Subtotal');
-    propertyLine =
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"> <div><span>Freight</span></td > ' +
-        '   <td class="mf-dynamic-namefield"><input type="text" id="FreightCost" value="$" class="inputData" onkeyup="gUtil.CalculateFreight()"; onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)"></td>' +
-        '   <td style="width:15%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax Code</span></td>' +
-        '   <td style="width:5%"><input type="text" id="FreightTaxCode" class="inputData" value="' + TaxCode + '" onblur="gUtil.CheckTaxCode(this.id);"></div></td>' +
-        '   <td style="width:30%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax:</span><span id="FreightTax"></span></td>';
-
-    tableID.append(propertyLine);
-}
-
-function generate_addedRowXX(tableID) {
-
-    var DetailSubtotal = gUtil.GetNumber($("#TotalExt").text());//.replace(/[^0-9.-]+/g, "");
-    var InvoiceSubTotal = gUtil.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(gUtil.Vault, "vProperty.Subtotal", true).Value.DisplayValue;
-    var DetailTax = gUtil.GetNumber($("#TotalTax")[0].value);//.replace(/[^0-9.-]+/g, "");  
-    var InvoiceTax = gUtil.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(gUtil.Vault, "vProperty.Tax", true).Value.DisplayValue;
-    var DetailTotal = parseFloat(DetailTax) + (DetailSubtotal != "") ? parseFloat(DetailSubtotal) : 0;
-    var InvoiceTotal = gUtil.controller.editor.ObjectVersionProperties.SearchForPropertyByAlias(gUtil.Vault, "vProperty.Total", true).Value.DisplayValue;
-
-    var BalanceBG = "rgb(223, 248, 223)";
-    var NotBalanceBG = "rgb(250, 215, 215)";
-    var bgSubtotal = (DetailSubtotal == InvoiceSubTotal) ? BalanceBG : NotBalanceBG;
-    var bgTax = (DetailTax == InvoiceTax) ? BalanceBG : NotBalanceBG;
-    var bgTotal = (DetailTotal == InvoiceTotal) ? BalanceBG : NotBalanceBG;
-    DetailTotal = parseFloat(DetailSubtotal) + parseFloat(DetailTax);
-    InvoiceTotal = parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax);
-    var TC = (TaxCode == null) ? "" : TaxCode;
-
-    var propertyLine =
-        '<tr class="TotalCost" >' +
-        '   <td class="mf-dynamic-namefield"> <div><span>Detail Subtotal</span></td > ' +
-        '   <td colspan="4"><div class="mf-internal-text"><span id="DetailSubtotal" style="background-color:' + bgSubtotal + '">' + gUtil.CurrencyFormatter(DetailSubtotal) + '</span></div></td></tr>' +
-        '<tr class="TotalCost" >' +
-        '   <td class="mf-dynamic-namefield"> <div><span>Invoice Subtotal</span></td > ' +
-        '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceSubtotal">' + gUtil.CurrencyFormatter(InvoiceSubTotal) + '</span></div>' +
-        '       <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="' + InvoiceSubTotal + '" disabled ></div></td></tr> ' +
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"> <div><span>Freight</span></td > ' +
-        '   <td class="mf-dynamic-namefield"><input type="text" id="FreightCost" value="$" class="inputData" onkeyup="gUtil.CalculateFreight()"; onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)"></td>' +
-        '   <td style="width:15%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax Code</span></td>' +
-        '   <td style="width:10%"><input type="text" id="FreightTaxCode" class="inputData" value="' + TC + '" onblur="gUtil.CheckTaxCode(this.id);"></div></td>' +
-        '   <td style="width:30%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax:</span><span id="FreightTax"></span></td>' +
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"><div><span>Detail Tax</span></div></td>' +
-        '   <td colspan="4"><div class="mf-internal-text"><span id="DetailTax" style="background-color:' + bgTax + '">' + gUtil.CurrencyFormatter(DetailTax) + '</span></div></td></tr>' +
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"><div><span>Invoice Tax</span></div></td>' +
-        '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceTax">' + gUtil.CurrencyFormatter(InvoiceTax) + '</span></div></td></tr>' +
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"><div><span>Detail Total</span></div></td>' +
-        '   <td colspan="4"><div class="mf-internal-text"><span id="DetailTotal" style="background-color:' + bgTotal + '">' + gUtil.CurrencyFormatter(DetailTotal) + '</span></div></td></tr>' +
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"><div><span>Invoice Total</span></div></td>' +
-        '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceTotal">' + gUtil.CurrencyFormatter(InvoiceTotal) + '</span></div></td></tr>';
-
-    tableID.append(propertyLine);
-    gUtil.SetTotalCost();
-
-}
-
 function generate_totalCode(tableID) {
 
     var TC = (TaxCode == null) ? "" : TaxCode;
     var propertyLine =
+        '<tr class="TotalCost">' +
+        '   <td class="mf-dynamic-namefield"> <div><span>Freight</span></td > ' +
+        '   <td class="mf-dynamic-namefield"><input type="text" id="FreightCost" value="$" class="inputData" onblur="gUtil.CheckTaxCode(this.id)"; onkeyup="gUtil.CalculateFreight()"; onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)"></td>' +
+        '   <td style="width:15%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax Code</span></td>' +
+        '   <td style="width:10%"><input type="text" id="FreightTaxCode" class="inputData" value="' + TC + '" onblur="gUtil.CheckTaxCode(this.id);"></div></td>' +
+        '   <td style="width:30%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax:</span><span id="FreightTax"></span></td>' +
         '<tr class="TotalCost" >' +
         '   <td class="mf-dynamic-namefield"> <div><span>Detail Subtotal</span></td > ' +
         '   <td colspan="4"><div class="mf-internal-text"><span id="DetailSubtotal"></span></div></td></tr>' +
@@ -591,12 +514,6 @@ function generate_totalCode(tableID) {
         '   <td class="mf-dynamic-namefield"> <div><span>Invoice Subtotal</span></td > ' +
         '   <td colspan="4"><div class="mf-internal-text"><span id="InvoiceSubtotal"></span></div>' +
         '       <div><input type="hidden" id="hSubtotal" name="hSubtotal" value="" disabled ></div></td></tr> ' +
-        '<tr class="TotalCost">' +
-        '   <td class="mf-dynamic-namefield"> <div><span>Freight</span></td > ' +
-        '   <td class="mf-dynamic-namefield"><input type="text" id="FreightCost" value="$" class="inputData" onkeyup="gUtil.CalculateFreight()"; onkeypress="return gUtil.isNumberKeyWithCurrency(event,this.id)"></td>' +
-        '   <td style="width:15%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax Code</span></td>' +
-        '   <td style="width:10%"><input type="text" id="FreightTaxCode" class="inputData" value="' + TC + '" onblur="gUtil.CheckTaxCode(this.id);"></div></td>' +
-        '   <td style="width:30%"><span style="padding-left:20px;padding-right:5px;line-height:20px">Tax:</span><span id="FreightTax"></span></td>' +
         '<tr class="TotalCost">' +
         '   <td class="mf-dynamic-namefield"><div><span>Detail Tax</span></div></td>' +
         '   <td colspan="4"><div class="mf-internal-text"><span id="DetailTax"></span></div></td></tr>' +
