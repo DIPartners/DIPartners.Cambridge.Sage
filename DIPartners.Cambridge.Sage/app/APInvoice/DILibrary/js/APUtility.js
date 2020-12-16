@@ -482,14 +482,12 @@ function APUtil(Vault, controller, editor) {
 	this.SetTotalCostXXX = function () {
 
 		var ci = (controller.Invoice == undefined) ? controller.editor : controller.Invoice;
-		var DetailSubtotal = this.GetNumber($("#TotalExt").text()) + this.GetNumber($("#FreightCost")[0].value);
+		var DetailSubtotal = parseFloat(this.GetNumber($("#TotalExt").text()) + this.GetNumber($("#FreightCost")[0].value)).toFixed(2);
 		var InvoiceSubTotal = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Subtotal", true).Value.DisplayValue);
 		var DetailTax = this.GetNumber($("#TotalTax")[0].value) + this.GetNumber($("#FreightTax").text());
 		var InvoiceTax = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Tax", true).Value.DisplayValue);
-		//var DetailTotal = (DetailSubtotal + DetailTax + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text())).toFixed(2);
-		var DetailTotal = (DetailSubtotal + DetailTax).toFixed(2);
+		var DetailTotal = parseFloat(DetailSubtotal + DetailTax).toFixed(2);
 		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
-
 
 		var BalanceBG = "rgb(223, 248, 223)";
 		var NotBalanceBG = "rgb(250, 215, 215)";
@@ -514,11 +512,13 @@ function APUtil(Vault, controller, editor) {
 
 		var ci = (controller.Invoice == undefined) ? controller.editor : controller.Invoice;
 		var DetailSubtotal = this.GetNumber($("#TotalExt").text()) + this.GetNumber($("#FreightCost")[0].value);
-		var InvoiceSubTotal = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Subtotal", true).Value.DisplayValue);
+		DetailSubtotal = parseFloat(DetailSubtotal.toFixed(2));
+		var InvoiceSubTotal = ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Subtotal", true).TypedValue.Value;
 		var DetailTax = this.GetNumber($("#TotalTax")[0].value) + this.GetNumber($("#FreightTax").text());
-		var InvoiceTax = this.GetNumber(ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Tax", true).Value.DisplayValue);
-		var DetailTotal = (DetailSubtotal + DetailTax);//.toFixed(2);
-		var InvoiceTotal = (parseFloat(InvoiceSubTotal) + parseFloat(InvoiceTax)).toFixed(2);// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
+		var InvoiceTax = ci.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.Tax", true).TypedValue.Value;
+		var DetailTotal = DetailSubtotal + DetailTax;
+		DetailTotal = parseFloat(DetailTotal.toFixed(2));
+		var InvoiceTotal = parseFloat((InvoiceSubTotal + InvoiceTax).toFixed(2));// + this.GetNumber($("#FreightCost")[0].value) + this.GetNumber($("#FreightTax").text());
 
 		var BalanceBG = "rgb(223, 248, 223)";
 		var NotBalanceBG = "rgb(250, 215, 215)";
@@ -534,9 +534,9 @@ function APUtil(Vault, controller, editor) {
 		$("#DetailTotal").text(this.CurrencyFormatter(DetailTotal));
 		$("#InvoiceTotal").text(this.CurrencyFormatter(InvoiceTotal));
 
-		$("#DetailSubtotal").css("background-color", bgSubtotal);
-		$("#DetailTax").css("background-color", bgTax);
-		$("#DetailTotal").css("background-color", bgTotal);
+		//$("#DetailSubtotal").css("background-color", bgSubtotal);
+		//$("#DetailTax").css("background-color", bgTax);
+		//$("#DetailTotal").css("background-color", bgTotal);
 	}
 
 	this.isNumberKey = function (evt, id) {
@@ -794,7 +794,14 @@ function APUtil(Vault, controller, editor) {
 
 	this.CheckTaxCode = function (_idx) {
 		if (_idx == "FreightCost") {
-			$("#FreightCost")[0].value = this.CurrencyFormatter(this.GetNumber($("#FreightCost")[0].value));
+
+			var formatter = new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: 'CAD',
+				minimumFractionDigits: 3,
+			});
+
+			$("#FreightCost")[0].value = formatter.format(this.GetNumber($("#FreightCost")[0].value));
 			return;
 		}
 
@@ -827,7 +834,7 @@ function APUtil(Vault, controller, editor) {
 	}
 
 	this.GetNumber = function (str) {
-		if ($.isNumeric(str)) return str;
+		//if ($.isNumeric(str)) return str;
 		var n = parseFloat(str.replace(/[^0-9.-]+/g, ""));
 		return (isNaN(n)) ? 0 : n;
 	}
