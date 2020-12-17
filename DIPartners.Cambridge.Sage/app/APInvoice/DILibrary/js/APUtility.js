@@ -474,7 +474,7 @@ function APUtil(Vault, controller, editor) {
 		}
 		$("#TotalExt").text(this.CurrencyFormatter(Ext));
 		$("#TotalTax")[0].value = this.CurrencyFormatter(Tax);
-		this.setBalanceStyle();
+		//this.setBalanceStyle();
 		this.SetTotalCost();
 
 	};
@@ -534,9 +534,9 @@ function APUtil(Vault, controller, editor) {
 		$("#DetailTotal").text(this.CurrencyFormatter(DetailTotal));
 		$("#InvoiceTotal").text(this.CurrencyFormatter(InvoiceTotal));
 
-		//$("#DetailSubtotal").css("background-color", bgSubtotal);
-		//$("#DetailTax").css("background-color", bgTax);
-		//$("#DetailTotal").css("background-color", bgTotal);
+		$("#DetailSubtotal").css("background-color", bgSubtotal);
+		$("#DetailTax").css("background-color", bgTax);
+		$("#DetailTotal").css("background-color", bgTotal);
 	}
 
 	this.isNumberKey = function (evt, id) {

@@ -218,13 +218,12 @@ function SetInvoiceDetails(controller) {
     });
 
     var subTotal = editor.ObjectVersionProperties.SearchForPropertyByAlias(Vault, "vProperty.subtotal", true).Value.DisplayValue;
-    var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
+    //var balance = (subTotal != Total) ? "Not Balanced" : "Balanced";
     TableBody.append(
         '<tr>' +
         '<td style="text-align:center"><a id="addRow" href="#" title="Add Item" style="text-decoration: none;" ' +
         '       onclick="gUtil.addRowToTable(\'invoice_details_table\');"><strong>+</strong></a ></td > ' +
-        '<td colspan="5"><div class="gp-balance" style="margin-right: 40px; float: right;">' +
-        '   <label for="Total" id="Balanced" class="Balance ' + balance.split(" ").join("") + '" > ' + balance + '</label> ' +
+        '<td colspan="5"><div class="gp-balance" style="margin-right: 35px; float: right;">' +
         //'   <span id="totalSpan"><input type="text" id="Total" value="' + gUtil.CurrencyFormatter(Total) + '" readonly style="text-align: right; padding-right: 0px;"></span></div></td>' +
         '   <span id="TotalExt">' + gUtil.CurrencyFormatter(Total) + '</span></div></td>' +
         '<td data-label="TAX" ><input type="text" id="TotalTax" value="' + gUtil.CurrencyFormatter(TotalTax) + '" readonly="true"></td>' +

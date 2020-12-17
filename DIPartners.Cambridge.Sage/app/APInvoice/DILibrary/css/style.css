@@ -169,8 +169,8 @@ input[type="text"]:disabled {
 	color: #000000;
 }
 
-.gp-balance {
-	text-align: right !important;
+/*.gp-balance {
+	text-align: right!important;
 }
 
 #Balanced {
@@ -178,32 +178,32 @@ input[type="text"]:disabled {
 	width: 100px;
 	white-space: nowrap;
 	vertical-align: middle;
-}
+}*/
 
 #TotalExt {
 	display: table-cell;
-	padding: 0 4px 0 6px;
+	padding: 0 6px 0 6px;
 }
 
-.Balance {
+/*.Balance{
 	-webkit-border-radius: 20px;
-	-moz-border-radius: 20px;
-	border-radius: 25px;
-	text-align: center;
-	/*float: right;*/
-}
+    -moz-border-radius: 20px;
+	 border-radius: 25px;
+	 text-align: center;*/
+/*float: right;*/
+/*}
 
-.Balanced {
+.Balanced{
 	color: green;
-	background: rgb(223, 248, 223);
-	/*width: 60px;*/
-}
+	background: rgb(223, 248, 223);*/
+/*width: 60px;*/
+/*}
 
-.NotBalanced {
-	color: red;
+.NotBalanced{
+	color:red;
 	background: rgb(250, 215, 215);
 	width: 85px;
-}
+}*/
 
 .btn {
 	color: white;
